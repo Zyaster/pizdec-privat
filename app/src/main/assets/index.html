@@ -16,44 +16,106 @@
 
     <!-- On-screen Edge Hardware Buttons (Vol+, Vol-, Power) -->
     <div class="edge-hardware-controls" id="edge-controls">
-      <div class="hw-trigger-btn" id="btn-hw-power" title="Питание (Power)">⚡</div>
-      <div class="hw-trigger-btn" id="btn-hw-volup" title="Громкость + (Vol +)">+</div>
-      <div class="hw-trigger-btn" id="btn-hw-voldown" title="Громкость - (Vol -)">−</div>
+      <button class="hw-trigger-btn" id="btn-hw-power" title="Питание (Power)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+      </button>
+      <button class="hw-trigger-btn" id="btn-hw-volup" title="Громкость + (Vol +)">+</button>
+      <button class="hw-trigger-btn" id="btn-hw-voldown" title="Громкость - (Vol -)">−</button>
     </div>
 
     <!-- Floating HUD Pill to Open PC Station / 4PDA -->
     <button id="hud-pc-toggle" class="hud-pill-btn">
-      <span class="hud-icon">💻</span>
+      <span class="hud-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </span>
       <span class="hud-label">ПК & 4PDA</span>
       <span class="usb-indicator-dot connected" id="hud-usb-dot"></span>
     </button>
 
     <!-- STATE 0: Screen Off (AMOLED Black) -->
     <div id="screen-off" class="screen-view">
-      <div class="off-hint">Экран выключен<br><span>Зажмите кнопку ⚡ (Power) для включения</span></div>
+      <div class="off-hint">Экран выключен<br><span>Зажмите кнопку питания [Power] для включения</span></div>
     </div>
 
-    <!-- STATE 1: Fastboot Mode (100% Fullscreen Authentic) -->
+    <!-- STATE 1: Fastboot Mode (100% Fullscreen Authentic Xiaomi Fastboot) -->
     <div id="screen-fastboot" class="screen-view">
       <div class="fb-wrapper">
-        <div class="fb-header">
-          <div class="fb-title">FASTBOOT</div>
-          <div class="fb-art">
-            <pre class="fb-bunny-ascii">
-     (\__/)
-     (='.'=)  [ Mi FASTBOOT ]
-     (")_(")  ⚡ REPAIRING ⚡
-            </pre>
-          </div>
-        </div>
-
-        <div class="fb-details">
-          <div class="fb-row"><span>PRODUCT NAME - </span><b>vayu</b></div>
+        <!-- Top Left Phosphor Green Info Console -->
+        <div class="fb-console-info">
+          <div class="fb-info-title">=&gt; FASTBOOT mode...</div>
+          <div class="fb-row"><span>PRODUCT_NAME - </span><b>vayu</b></div>
           <div class="fb-row"><span>VARIANT - </span><b>SM_ UFS 256GB</b></div>
           <div class="fb-row"><span>BOOTLOADER - </span><b>vayu-0.2.1-rel</b></div>
           <div class="fb-row"><span>BASEBAND - </span><b>MPSS.HI.4.3.c2-00072</b></div>
           <div class="fb-row"><span>SECURE BOOT - </span><b>yes</b></div>
           <div class="fb-row"><span>DEVICE STATE - </span><b id="fb-device-state" class="state-locked">locked</b></div>
+        </div>
+
+        <!-- Center: Official Xiaomi Mitu Mascot Vector Repairing Android Bot -->
+        <div class="fb-center-visual">
+          <svg class="fb-mitu-svg" viewBox="0 0 200 135" width="220" height="150">
+            <!-- Ground baseline -->
+            <line x1="15" y1="120" x2="185" y2="120" stroke="#ff9900" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
+            
+            <!-- Fallen Android Bot -->
+            <g id="fb-android-bot" transform="translate(102, 78)">
+              <!-- Body -->
+              <rect x="0" y="6" width="38" height="28" rx="4" fill="#3ddc84"/>
+              <!-- Exposed internal circuit bay -->
+              <rect x="5" y="10" width="28" height="19" rx="2" fill="#1b4d24"/>
+              <line x1="9" y1="15" x2="28" y2="15" stroke="#facc15" stroke-width="1.5"/>
+              <line x1="9" y1="20" x2="23" y2="20" stroke="#facc15" stroke-width="1.5"/>
+              <line x1="14" y1="24" x2="27" y2="24" stroke="#4ade80" stroke-width="1.5"/>
+              <!-- Tilted Android Head -->
+              <path d="M40 22 A 15 15 0 0 0 40 7 Z" fill="#3ddc84"/>
+              <circle cx="43" cy="13" r="1.5" fill="#000"/>
+              <line x1="38" y1="7" x2="45" y2="1" stroke="#3ddc84" stroke-width="1.8" stroke-linecap="round"/>
+              <!-- Limbs -->
+              <rect x="-7" y="9" width="5" height="18" rx="2.5" fill="#3ddc84"/>
+              <rect x="9" y="34" width="7" height="6" rx="2" fill="#3ddc84"/>
+              <rect x="23" y="34" width="7" height="6" rx="2" fill="#3ddc84"/>
+            </g>
+
+            <!-- Mitu (Xiaomi Bunny with Ushanka Hat) -->
+            <g id="fb-mitu-bunny" transform="translate(32, 22)">
+              <!-- Ears -->
+              <path d="M26 14 C 20 -14, 33 -14, 35 14 Z" fill="#ffffff" stroke="#2d5a3f" stroke-width="1.5"/>
+              <path d="M28 8 C 26 -5, 31 -5, 33 8 Z" fill="#fca5a5"/>
+              <path d="M48 14 C 42 -14, 55 -14, 57 14 Z" fill="#ffffff" stroke="#2d5a3f" stroke-width="1.5"/>
+              <path d="M50 8 C 48 -5, 53 -5, 55 8 Z" fill="#fca5a5"/>
+              <!-- Ushanka Hat Flaps -->
+              <path d="M16 26 C 9 34, 7 54, 15 62 C 20 66, 24 58, 23 48 Z" fill="#2d5a3f"/>
+              <path d="M64 26 C 71 34, 73 54, 65 62 C 60 66, 56 58, 57 48 Z" fill="#2d5a3f"/>
+              <!-- Head -->
+              <ellipse cx="40" cy="42" rx="22" ry="19" fill="#ffffff"/>
+              <!-- Ushanka Hat Cap -->
+              <path d="M16 30 C 16 14, 64 14, 64 30 C 64 36, 16 36, 16 30 Z" fill="#3b704c"/>
+              <!-- Red Star on Ushanka -->
+              <polygon points="40,21 42,27 48,27 43,31 45,37 40,33 35,37 37,31 32,27 38,27" fill="#ef4444"/>
+              <!-- Eyes & Cheeks -->
+              <circle cx="33" cy="40" r="2.5" fill="#18181b"/>
+              <circle cx="47" cy="40" r="2.5" fill="#18181b"/>
+              <circle cx="28" cy="45" r="3.5" fill="#f87171" opacity="0.65"/>
+              <circle cx="52" cy="45" r="3.5" fill="#f87171" opacity="0.65"/>
+              <!-- Nose -->
+              <path d="M38 45 Q 40 47 42 45" stroke="#18181b" stroke-width="1.5" fill="none"/>
+              <!-- Coat -->
+              <path d="M23 58 C 23 54, 57 54, 57 58 L 60 84 C 60 86, 20 86, 20 84 Z" fill="#2d5a3f"/>
+              <path d="M20 58 Q 40 66 60 58 Q 40 52 20 58 Z" fill="#ffffff"/>
+              <!-- Arm holding Screwdriver/Soldering tool -->
+              <path d="M52 62 L 72 73" stroke="#2d5a3f" stroke-width="6.5" stroke-linecap="round"/>
+              <circle cx="72" cy="73" r="4" fill="#ffffff"/>
+              <line x1="72" y1="73" x2="94" y2="82" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
+              <!-- Sparks from repair -->
+              <circle cx="96" cy="84" r="2" fill="#ffffff"/>
+              <line x1="96" y1="84" x2="102" y2="78" stroke="#facc15" stroke-width="1.5"/>
+              <line x1="96" y1="84" x2="104" y2="86" stroke="#fb923c" stroke-width="1.5"/>
+              <line x1="96" y1="84" x2="95" y2="91" stroke="#f87171" stroke-width="1.5"/>
+            </g>
+          </svg>
+
+          <!-- Glowing Orange FASTBOOT Stencil Typography -->
+          <div class="fb-title">FASTBOOT</div>
         </div>
 
         <div class="fb-footer">
@@ -65,7 +127,10 @@
     <!-- STATE 2: Booting Screen (100% Fullscreen Authentic Boot Animation) -->
     <div id="screen-booting" class="screen-view">
       <div class="boot-unlocked-badge" id="boot-unlocked-icon">
-        <span class="lock-icon">🔓</span>
+        <svg class="boot-lock-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+        </svg>
         <span class="lock-text">Загрузчик разблокирован</span>
       </div>
 
@@ -85,21 +150,23 @@
     <div id="screen-crashdump" class="screen-view">
       <div class="crashdump-container">
         <div class="cd-title">QUALCOMM CrashDump Mode</div>
-        <div class="cd-line">Subsystem: Modem / AP Bootloader</div>
+        <div class="cd-line">Subsystem: Modem / AP Bootloader (SubSys-Crash: Apps)</div>
         <div class="cd-line error-line" id="cd-error-msg">Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b</div>
         <div class="cd-line">Data partition encryption mismatch! (Dirty Flash Detected)</div>
         <div class="cd-memdump">
-          [ 0.000000] CPU: 0 PID: 1 Comm: init Not tainted 4.14.336-vayu<br>
-          [ 0.000000] Hardware name: Qualcomm Technologies, Inc. SM8150 v2<br>
+          [ 0.000000] CPU: 0 PID: 1 Comm: init Not tainted 4.14.336-vayu #1 SMP PREEMPT<br>
+          [ 0.000000] Hardware name: Qualcomm Technologies, Inc. SM8150 v2 (DT)<br>
+          [ 0.000000] PC is at __switch_to+0x94/0xb0<br>
+          [ 0.000000] LR is at __schedule+0x310/0x6c8<br>
           [ 0.000000] Call trace:<br>
           [ 0.000000]  dump_backtrace+0x0/0x150<br>
           [ 0.000000]  panic+0x13c/0x310<br>
           [ 0.000000]  do_exit+0x9b0/0x9e8
         </div>
         <div class="cd-instruction">
-          ⚠️ <b>Телефон в бутлупе (кирпич)!</b><br>
-          Вы прошили кастом поверх другой системы без очистки данных.<br>
-          <b>Решение:</b> Перейдите в Fastboot (Power + Vol-) и сделайте Format Data в рекавери или перепрошейте через Mi Flash!
+          [CRASHDUMP RECOVERY PROCEDURE]<br>
+          FAULT REASON: Encrypted data partition incompatible with new ROM.<br>
+          ACTION: Hold [Power] + [Vol -] -> Fastboot -> Boot TWRP -> Wipe -> Format Data 'yes'.
         </div>
       </div>
     </div>
@@ -109,12 +176,26 @@
       <!-- Recovery Top Bar -->
       <div class="recovery-topbar" id="recovery-topbar">
         <div style="display:flex; align-items:center; gap:8px;">
-          <button class="rec-top-back-btn" id="rec-top-back-btn" title="Назад в меню">◀</button>
-          <div class="rec-logo-badge" id="rec-brand-title">Team Win Recovery Project 3.7</div>
+          <button class="rec-top-back-btn" id="rec-top-back-btn" title="Назад в меню">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="rec-brand-group">
+            <svg class="rec-teamwin-logo" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+            <div class="rec-logo-badge" id="rec-brand-title">Team Win Recovery Project 3.7</div>
+          </div>
         </div>
         <div class="rec-stats">
           <span id="rec-clock">12:34</span>
-          <span>🔋 98%</span>
+          <span class="rec-temp">42°C</span>
+          <div class="sb-battery">
+            <span class="sb-bat-pct">98%</span>
+            <div class="sb-battery-capsule">
+              <div class="sb-battery-fill" style="width: 98%;"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -125,42 +206,86 @@
         <div class="rec-page" id="rec-page-main">
           <div class="rec-tiles-grid" id="rec-tiles-grid">
             <button class="rec-tile" data-action="install">
-              <span class="t-icon">📥</span>
+              <span class="t-icon">
+                <svg class="rec-tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              </span>
               <span class="t-title">Install</span>
               <span class="t-sub">Установка ZIP/IMG</span>
             </button>
             <button class="rec-tile" data-action="wipe">
-              <span class="t-icon">🧹</span>
+              <span class="t-icon">
+                <svg class="rec-tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  <line x1="10" y1="11" x2="10" y2="17"/>
+                  <line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+              </span>
               <span class="t-title">Wipe</span>
               <span class="t-sub">Очистка и Format Data</span>
             </button>
             <button class="rec-tile" data-action="backup">
-              <span class="t-icon">💾</span>
+              <span class="t-icon">
+                <svg class="rec-tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+              </span>
               <span class="t-title">Backup</span>
               <span class="t-sub">Бэкап разделов</span>
             </button>
             <button class="rec-tile" data-action="restore">
-              <span class="t-icon">♻️</span>
+              <span class="t-icon">
+                <svg class="rec-tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10"/>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                </svg>
+              </span>
               <span class="t-title">Restore</span>
               <span class="t-sub">Восстановление</span>
             </button>
             <button class="rec-tile" data-action="mount">
-              <span class="t-icon">📁</span>
+              <span class="t-icon">
+                <svg class="rec-tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <line x1="6" y1="12" x2="18" y2="12"/>
+                  <line x1="12" y1="8" x2="12" y2="16"/>
+                </svg>
+              </span>
               <span class="t-title">Mount</span>
               <span class="t-sub">Монтирование разделов</span>
             </button>
             <button class="rec-tile" data-action="settings">
-              <span class="t-icon">⚙️</span>
+              <span class="t-icon">
+                <svg class="rec-tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+              </span>
               <span class="t-title">Settings</span>
               <span class="t-sub">Настройки рекавери</span>
             </button>
             <button class="rec-tile" data-action="advanced">
-              <span class="t-icon">🔧</span>
+              <span class="t-icon">
+                <svg class="rec-tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                </svg>
+              </span>
               <span class="t-title">Advanced</span>
               <span class="t-sub">Терминал и утилиты</span>
             </button>
             <button class="rec-tile" data-action="reboot">
-              <span class="t-icon">🔄</span>
+              <span class="t-icon">
+                <svg class="rec-tile-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+                  <line x1="12" y1="2" x2="12" y2="12"/>
+                </svg>
+              </span>
               <span class="t-title">Reboot</span>
               <span class="t-sub">Перезагрузка</span>
             </button>
@@ -300,19 +425,27 @@
       <!-- Recovery Bottom Navigation Bar (Authentic TWRP 3.7 / OrangeFox) -->
       <div class="recovery-navbar" id="recovery-navbar">
         <button class="rec-nav-btn rec-btn-back" id="rec-bottom-back" title="Назад">
-          <span class="rec-nav-icon">◀</span>
+          <span class="rec-nav-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </span>
           <span class="rec-nav-label">Back</span>
         </button>
         <button class="rec-nav-btn" id="rec-bottom-home" title="Главное меню">
-          <span class="rec-nav-icon">🏠</span>
+          <span class="rec-nav-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </span>
           <span class="rec-nav-label">Home</span>
         </button>
         <button class="rec-nav-btn" id="rec-bottom-console" title="Консоль / Лог">
-          <span class="rec-nav-icon">≡</span>
+          <span class="rec-nav-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </span>
           <span class="rec-nav-label">Log</span>
         </button>
         <button class="rec-nav-btn" id="rec-bottom-reboot" title="Перезагрузка">
-          <span class="rec-nav-icon">🔄</span>
+          <span class="rec-nav-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+          </span>
           <span class="rec-nav-label">Reboot</span>
         </button>
       </div>
@@ -327,8 +460,32 @@
           <span class="root-badge ksu-badge" id="os-ksu-badge">KernelSU</span>
           <span class="root-badge magisk-badge" id="os-magisk-badge"># SU</span>
           <span class="fps-badge" id="os-fps-badge">120 Hz</span>
-          <span id="os-wifi-icon">📶 5G</span>
-          <span id="os-bat-icon">🔋 98%</span>
+          
+          <!-- Authentic Android 5G Signal Bars -->
+          <div class="sb-cellular" title="Мобильная сеть 5G">
+            <span class="sb-net-type">5G</span>
+            <svg class="sb-svg-bars" width="15" height="11" viewBox="0 0 15 11" fill="currentColor">
+              <rect x="0" y="8" width="2.5" height="3" rx="0.5"/>
+              <rect x="4" y="5.5" width="2.5" height="5.5" rx="0.5"/>
+              <rect x="8" y="3" width="2.5" height="8" rx="0.5"/>
+              <rect x="12" y="0" width="2.5" height="11" rx="0.5"/>
+            </svg>
+          </div>
+
+          <!-- Authentic Wi-Fi Arc -->
+          <div class="sb-wifi" title="Wi-Fi 6">
+            <svg class="sb-svg-wifi" width="15" height="11" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4zm0 3.5c3.55 0 6.77 1.41 9.14 3.71L12 18.29 2.86 11.21C5.23 8.91 8.45 7.5 12 7.5z"/>
+            </svg>
+          </div>
+
+          <!-- Authentic Battery Capsule with Level -->
+          <div class="sb-battery" id="os-bat-container" title="Батарея">
+            <span class="sb-bat-pct" id="os-bat-text">98%</span>
+            <div class="sb-battery-capsule">
+              <div class="sb-battery-fill" id="os-bat-fill" style="width: 98%;"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -348,22 +505,47 @@
         <div class="pixel-search-bar" id="pixel-search-bar" style="display:none;">
           <span class="search-g">G</span>
           <span class="search-text">Поиск в Google и на устройстве</span>
-          <div class="search-icons"><span>🎤</span><span>📷</span></div>
+          <div class="search-icons">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="4"/><path d="M5 7h2l2-3h6l2 3h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/></svg>
+          </div>
         </div>
 
         <!-- Android Bottom App Dock -->
         <div class="os-dock-bar" id="os-dock-bar">
-          <div class="dock-icon" data-open="phone-app" title="Телефон">📞</div>
-          <div class="dock-icon" data-open="termux" title="Termux">💻</div>
-          <div class="dock-icon" data-open="bank" title="СберБанк">🏦</div>
-          <div class="dock-icon" data-open="settings" title="Настройки">⚙️</div>
+          <div class="dock-icon" data-open="phone-app" title="Телефон">
+            <div class="dock-squircle phone-bg">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+          </div>
+          <div class="dock-icon" data-open="termux" title="Termux">
+            <div class="dock-squircle termux-bg">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="18" rx="4" fill="#0c0e12" stroke="#22c55e" stroke-width="1.5"/><path d="M7 8l4 4-4 4" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="13" y1="16" x2="18" y2="16" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="dock-icon" data-open="bank" title="СберБанк">
+            <div class="dock-squircle sber-bg">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1.5"/><path d="M8 12.5l2.5 2.5 5.5-5.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="dock-icon" data-open="settings" title="Настройки">
+            <div class="dock-squircle settings-bg">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+          </div>
         </div>
 
-        <!-- Android Navigation Bar (Pill gesture or 3-button) -->
+        <!-- Android Navigation Bar (3-Button Navigation) -->
         <div class="os-nav-bar" id="os-nav-bar">
-          <button class="nav-key" id="os-key-back">◀</button>
-          <button class="nav-key" id="os-key-home">●</button>
-          <button class="nav-key" id="os-key-recents">■</button>
+          <button class="nav-key" id="os-key-back" title="Назад">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="nav-key" id="os-key-home" title="Домой">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="8"/></svg>
+          </button>
+          <button class="nav-key" id="os-key-recents" title="Недавние приложения">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+          </button>
         </div>
       </div>
 
@@ -371,7 +553,9 @@
       <div class="os-app-window" id="os-app-window">
         <div class="app-window-header">
           <div class="app-header-left">
-            <button class="app-back-btn" id="app-window-back">◀</button>
+            <button class="app-back-btn" id="app-window-back">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
             <span class="app-window-title" id="app-window-title">Приложение</span>
           </div>
           <button class="app-close-btn" id="app-window-close">✕</button>
@@ -383,7 +567,11 @@
 
       <!-- Superuser Prompt Dialog (KernelSU / Magisk) -->
       <div class="magisk-su-prompt" id="magisk-su-prompt" style="display:none;">
-        <div class="su-shield" id="su-prompt-icon">🛡️</div>
+        <div class="su-shield" id="su-prompt-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
         <div class="su-title" id="su-prompt-title">KernelSU Superuser Request</div>
         <div class="su-desc" id="su-prompt-desc">Приложение <b>Termux (CLI)</b> запрашивает root доступ через системный вызов ядра!</div>
         <div class="su-countdown" id="su-countdown">Таймаут: 10с</div>
@@ -401,7 +589,7 @@
     <div class="pc-modal-frame">
       <div class="pc-modal-header">
         <div class="pc-modal-title">
-          <span>💻 Рабочая станция мододела (ПК & 4PDA)</span>
+          <span>Рабочая станция мододела (Fastboot / ADB / 4PDA)</span>
         </div>
         <div class="pc-tabs">
           <button class="pc-tab-btn active" data-tab="terminal">Консоль Fastboot/ADB</button>
@@ -446,21 +634,21 @@
         <div class="pc-tab-view" id="tab-forum">
           <div class="forum-scroller">
             <div class="forum-topic-head">
-              <h2>🌐 4PDA > Android > Прошивки > Poco X3 Pro (vayu)</h2>
+              <h2>4PDA &gt; Android &gt; Прошивки &gt; Poco X3 Pro (vayu)</h2>
               <p>Официальные и кастомные прошивки Android 14, ядра и системный моддинг.</p>
             </div>
 
             <div class="forum-post-card">
               <div class="fp-author">
-                <span class="fp-avatar">👨‍💻</span>
+                <div class="fp-avatar">4P</div>
                 <b>xXx_4PDA_Master_xXx</b>
                 <span class="fp-rank">Куратор темы</span>
               </div>
               <div class="fp-body">
-                <h3>📦 Кастомные прошивки (Выбор сообщества):</h3>
+                <h3>Кастомные прошивки (Выбор сообщества):</h3>
                 <div class="dl-items-list">
                   <div class="dl-row">
-                    <span class="dl-icon">📱</span>
+                    <span class="dl-badge zip">ZIP</span>
                     <div class="dl-desc">
                       <b>PixelOS Android 14 (vayu)</b>
                       <span>Чистый Pixel Experience, Monet UI, Google Фото безлимит</span>
@@ -469,7 +657,7 @@
                   </div>
 
                   <div class="dl-row">
-                    <span class="dl-icon">⚡</span>
+                    <span class="dl-badge zip">ZIP</span>
                     <div class="dl-desc">
                       <b>LineageOS 21 (AOSP 14)</b>
                       <span>Легковесный AOSP без сервисов Google и слежки, максимальная батарея</span>
@@ -478,7 +666,7 @@
                   </div>
 
                   <div class="dl-row">
-                    <span class="dl-icon">🔥</span>
+                    <span class="dl-badge zip">ZIP</span>
                     <div class="dl-desc">
                       <b>crDroid 10.5 (Gaming Edition)</b>
                       <span>Игровой кастом: оверклок CPU, разгон 120Hz экрана, анти-троттлинг</span>
@@ -487,7 +675,7 @@
                   </div>
 
                   <div class="dl-row">
-                    <span class="dl-icon">🧬</span>
+                    <span class="dl-badge zip">ZIP</span>
                     <div class="dl-desc">
                       <b>Evolution X 8.5 (The Customizer)</b>
                       <span>Ультра-кастомизация: кастомные анимации, шторка, стили часов AOD</span>
@@ -496,7 +684,7 @@
                   </div>
 
                   <div class="dl-row">
-                    <span class="dl-icon">🐉</span>
+                    <span class="dl-badge zip">ZIP</span>
                     <div class="dl-desc">
                       <b>Kali NetHunter OS (Hacker Edition)</b>
                       <span>Дистрибутив для этичного хакинга: мониторинг Wi-Fi, Nmap, Metasploit</span>
@@ -505,7 +693,7 @@
                   </div>
 
                   <div class="dl-row">
-                    <span class="dl-icon">🏬</span>
+                    <span class="dl-badge tgz">TGZ</span>
                     <div class="dl-desc">
                       <b>Stock HyperOS / MIUI 14 (Fastboot TGZ)</b>
                       <span>Официальная заводская прошивка для раскирпичивания через Mi Flash</span>
@@ -514,10 +702,10 @@
                   </div>
                 </div>
 
-                <h3>🦊 Образы рекавери для Fastboot:</h3>
+                <h3>Образы рекавери для Fastboot:</h3>
                 <div class="dl-items-list">
                   <div class="dl-row">
-                    <span class="dl-icon">🦊</span>
+                    <span class="dl-badge img">IMG</span>
                     <div class="dl-desc">
                       <b>TWRP Recovery 3.7.0.img</b>
                       <span>Классическое рекавери TeamWin</span>
@@ -526,7 +714,7 @@
                   </div>
 
                   <div class="dl-row">
-                    <span class="dl-icon">🍊</span>
+                    <span class="dl-badge img">IMG</span>
                     <div class="dl-desc">
                       <b>OrangeFox Recovery R11.1.img</b>
                       <span>Оранжевый интерфейс, поддержка паролей, встроенный Aroma-движок</span>
@@ -543,13 +731,13 @@
         <div class="pc-tab-view" id="tab-kernels">
           <div class="forum-scroller">
             <div class="forum-topic-head">
-              <h2>⚡ Кастомные ядра и KernelSU (Встроенный Root в ядро Linux)</h2>
+              <h2>Кастомные ядра и KernelSU (Встроенный Root в ядро Linux)</h2>
               <p>KernelSU работает на уровне ядра и невидим для защит банков и SafetyNet!</p>
             </div>
 
             <div class="dl-items-list">
               <div class="dl-row">
-                <span class="dl-icon">👑</span>
+                <span class="dl-badge zip">ZIP</span>
                 <div class="dl-desc">
                   <b>NoGravityKernel v5.2 (KernelSU Native)</b>
                   <span>Легендарное ядро с аппаратной поддержкой KernelSU v0.9.5 + разгон GPU</span>
@@ -558,7 +746,7 @@
               </div>
 
               <div class="dl-row">
-                <span class="dl-icon">🌪️</span>
+                <span class="dl-badge zip">ZIP</span>
                 <div class="dl-desc">
                   <b>StormBreaker Kernel v9 (Overclock 3.2GHz + KSU)</b>
                   <span>Экстремальный разгон частот процессора и фиксация 120 FPS</span>
@@ -567,7 +755,7 @@
               </div>
 
               <div class="dl-row">
-                <span class="dl-icon">🛡️</span>
+                <span class="dl-badge apk">APK</span>
                 <div class="dl-desc">
                   <b>KernelSU Manager APK (v0.9.5)</b>
                   <span>Менеджер суперпользователя и модулей для ядер с KernelSU</span>
@@ -576,7 +764,7 @@
               </div>
 
               <div class="dl-row">
-                <span class="dl-icon">🪄</span>
+                <span class="dl-badge zip">ZIP</span>
                 <div class="dl-desc">
                   <b>Magisk v27.0.zip</b>
                   <span>Классический root через патч ramdisk (Legacy)</span>
@@ -591,13 +779,13 @@
         <div class="pc-tab-view" id="tab-modules">
           <div class="forum-scroller">
             <div class="forum-topic-head">
-              <h2>🧩 Каталог модулей для KernelSU & Magisk</h2>
+              <h2>Каталог модулей для KernelSU & Magisk</h2>
               <p>Прошивайте модули в TWRP / OrangeFox или устанавливайте через менеджер.</p>
             </div>
 
             <div class="dl-items-list">
               <div class="dl-row">
-                <span class="dl-icon">🛡️</span>
+                <span class="dl-badge zip">ZIP</span>
                 <div class="dl-desc">
                   <b>Play Integrity Fix v16.0 (Модуль)</b>
                   <span>Спуфинг отпечатка Pixel 8 Pro для обхода проверок MEETS_DEVICE_INTEGRITY</span>
@@ -606,7 +794,7 @@
               </div>
 
               <div class="dl-row">
-                <span class="dl-icon">🥷</span>
+                <span class="dl-badge zip">ZIP</span>
                 <div class="dl-desc">
                   <b>Shamiko v1.0.1 (Zygisk Hide)</b>
                   <span>Полное скрытие root-прав от банков и античита</span>
@@ -615,7 +803,7 @@
               </div>
 
               <div class="dl-row">
-                <span class="dl-icon">🎵</span>
+                <span class="dl-badge zip">ZIP</span>
                 <div class="dl-desc">
                   <b>ViPER4Android FX Redesign</b>
                   <span>Студийный эквалайзер, мощный бас и улучшение звука динамиков</span>
@@ -624,7 +812,7 @@
               </div>
 
               <div class="dl-row">
-                <span class="dl-icon">💉</span>
+                <span class="dl-badge zip">ZIP</span>
                 <div class="dl-desc">
                   <b>LSPosed Framework (Zygisk Release)</b>
                   <span>Фреймворк для перехвата методов Java-приложений</span>
@@ -633,7 +821,7 @@
               </div>
 
               <div class="dl-row">
-                <span class="dl-icon">🎮</span>
+                <span class="dl-badge zip">ZIP</span>
                 <div class="dl-desc">
                   <b>PUBG 120 FPS Unlocker (Модуль)</b>
                   <span>Спуфинг ROG Phone 8 для разблокировки режима 120 кадров/сек</span>

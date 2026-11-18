@@ -31,7 +31,7 @@ class SoundManager {
     } catch (e) {}
   }
   click() {
-    this.beep(800, 0.02, 'triangle', 0.06);
+    this.beep(320, 0.018, 'sine', 0.08);
   }
   bootChime() {
     try {
@@ -423,19 +423,19 @@ function bootDevice() {
     `;
   } else if (GameState.rom === 'crdroid') {
     center.innerHTML = `
-      <div style="font-size:54px;">👾</div>
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#e11d48" stroke="#fb7185" stroke-width="1.5"/></svg>
       <div class="logo-big-text" style="color:#e11d48;">crDroid</div>
       <div class="logo-sub-text" style="color:#ff3366;">GAMING EDITION 120 FPS</div>
     `;
   } else if (GameState.rom === 'evolution') {
     center.innerHTML = `
-      <div style="font-size:54px;">🧬</div>
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
       <div class="logo-big-text" style="color:#a855f7;">Evolution X</div>
       <div class="logo-sub-text">Keep Evolving • Android 14</div>
     `;
   } else if (GameState.rom === 'kali') {
     center.innerHTML = `
-      <div class="kali-dragon-logo">🐉</div>
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#00f2fe" stroke-width="2"><path d="M12 2a10 10 0 0 0-7.07 17.07L12 22l7.07-2.93A10 10 0 0 0 12 2z"/><path d="M9 10h.01M15 10h.01M9 15c1.5 1.5 4.5 1.5 6 0"/></svg>
       <div class="logo-big-text" style="color:#00f2fe;">Kali NetHunter</div>
       <div class="logo-sub-text">Offensive Security Edition</div>
     `;
@@ -446,7 +446,7 @@ function bootDevice() {
     `;
   } else {
     center.innerHTML = `
-      <div style="font-size:48px;">⚠️</div>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div class="logo-big-text" style="color:#ff3366;">NO OS INSTALLED</div>
     `;
   }
@@ -759,12 +759,12 @@ function renderRecoveryFiles() {
     if (filename.endsWith('.zip') || filename.endsWith('.img') || filename.endsWith('.apk')) {
       const row = document.createElement('div');
       row.className = 'rec-file-row';
-      let icon = '📦';
-      if (filename.includes('Kernel')) icon = '⚡';
-      if (filename.includes('Fix') || filename.includes('Shamiko')) icon = '🛡️';
-      if (filename.endsWith('.apk')) icon = '📱';
+      let badgeType = 'zip';
+      if (filename.endsWith('.img')) badgeType = 'img';
+      if (filename.endsWith('.apk')) badgeType = 'apk';
+      if (filename.endsWith('.tgz')) badgeType = 'tgz';
 
-      row.innerHTML = `<span>${icon}</span> <b>${filename}</b>`;
+      row.innerHTML = `<span class="dl-badge ${badgeType}">${badgeType.toUpperCase()}</span> <b style="margin-left:8px;">${filename}</b>`;
       row.addEventListener('click', () => {
         sounds.click();
         currentRecFile = filename;
@@ -1061,7 +1061,10 @@ function renderOsWidgets(os) {
     UI.pixelSearchBar.style.display = 'flex';
     widget.innerHTML = `
       <div style="text-align:left; padding:0 8px; margin-bottom:12px;">
-        <div style="font-size:14px; font-weight:600; color:#d1e4ff;">Среда, 18 ноя • 21°C ⛅</div>
+        <div style="font-size:14px; font-weight:600; color:#d1e4ff; display:flex; align-items:center; gap:6px;">
+          <span>Среда, 18 ноя • 21°C</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </div>
         <div style="font-size:11px; color:#8e919e; margin-top:2px;">Google Pixel Experience • Чистый Android 14</div>
       </div>
       <div style="display:flex; justify-content:center; align-items:center; line-height:0.85; font-size:74px; font-weight:900; color:#a8c7fa; font-family:'Google Sans', sans-serif;">
@@ -1079,10 +1082,10 @@ function renderOsWidgets(os) {
   if (os === 'crdroid') {
     widget.innerHTML = `
       <div class="crdroid-hud-box">
-        <span>⚡ ${GameState.displayRefreshRate} FPS LOCKED</span>
-        <span>🎮 ADRENO 640</span>
-        <span>🔥 ${GameState.kernel === 'stormbreaker' ? '3.2 GHz OC' : '2.96 GHz'}</span>
-        <span>❄️ 38°C</span>
+        <span>FPS: ${GameState.displayRefreshRate} LOCKED</span>
+        <span>GPU: ADRENO 640</span>
+        <span>CPU: ${GameState.kernel === 'stormbreaker' ? '3.2 GHz OC' : '2.96 GHz'}</span>
+        <span>TEMP: 38°C</span>
       </div>
       <div style="font-family:var(--font-mono); font-size:38px; font-weight:900; color:#ff3366; text-shadow:0 0 15px rgba(255,51,102,0.6);" id="dyn-clock-time">
         ${timeStr}
@@ -1128,9 +1131,10 @@ function renderOsWidgets(os) {
   if (os === 'lineage') {
     widget.innerHTML = `
       <div style="font-size:42px; font-weight:700; color:#e6edf3;" id="dyn-clock-time">${timeStr}</div>
-      <div style="font-size:12px; color:#94a3b8; margin-top:2px;">Среда, 18 ноября • 21°C Солнечно</div>
+      <div style="font-size:12px; color:#94a3b8; margin-top:2px;">Среда, 18 ноября • 21°C Ясно</div>
       <div style="display:inline-flex; align-items:center; gap:6px; background:#064e43; border-radius:14px; padding:3px 10px; font-size:10.5px; color:#6ee7b7; margin-top:8px;">
-        <span>🛡️ Trust:</span> <b>SELinux Enforcing</b>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Trust:</span> <b>SELinux Enforcing</b>
       </div>
       <div class="hero-kernel-title" style="color:#6ee7b7;">${GameState.kernelVersion}</div>
     `;
@@ -1142,7 +1146,8 @@ function renderOsWidgets(os) {
     <div style="font-size:52px; font-weight:300; letter-spacing:-1px; color:#ffffff;" id="dyn-clock-time">${timeStr}</div>
     <div style="font-size:12px; color:#cbd5e1; margin-top:2px;">Среда, 18 ноября • Xiaomi HyperOS 1.0</div>
     <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.15); border-radius:14px; padding:3px 12px; font-size:10.5px; color:#fff; margin-top:8px;">
-      <span>👣 6 420 шагов</span> <span>•</span> <span>8.4 км</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      <span>6 420 шагов</span> <span>•</span> <span>8.4 км</span>
     </div>
     <div class="hero-kernel-title" style="color:#93c5fd;">${GameState.kernelVersion}</div>
   `;
@@ -1152,54 +1157,72 @@ function renderOsAppsGrid(os) {
   const grid = UI.osAppGrid;
   grid.innerHTML = '';
 
+  const appVectors = {
+    settings: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+    forum: `<svg viewBox="0 0 36 36" width="32" height="32"><rect width="36" height="36" rx="8" fill="#005999"/><text x="4" y="25" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#fff" letter-spacing="-1">4</text><text x="17" y="25" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="#38bdf8">PDA</text></svg>`,
+    fkm: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M4.93 4.93l2.83 2.83M2 12h4M4.93 19.07l2.83-2.83"/><path d="M13 10l5-6-3 8h4l-7 10 2-7h-4z" fill="#facc15" stroke="#f59e0b" stroke-width="1.5"/></svg>`,
+    mtmanager: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none"><rect x="2" y="4" width="9" height="16" rx="2" fill="#0284c7" stroke="#38bdf8" stroke-width="1.2"/><rect x="13" y="4" width="9" height="16" rx="2" fill="#d97706" stroke="#fbbf24" stroke-width="1.2"/><path d="M4 9h5M4 12h5M4 15h3M15 9h5M15 12h5M15 15h3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    pubg: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 0 0-9 9c0 4.97 4.03 9 9 9s9-4.03 9-9a9 9 0 0 0-9-9z" fill="#1e293b"/><path d="M4 11h16M7 11v6M17 11v6M9 14h6" stroke="#f59e0b"/><circle cx="12" cy="11" r="2" fill="#ef4444"/></svg>`,
+    termux: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none"><rect x="2" y="3" width="20" height="18" rx="4" fill="#0c0e12" stroke="#22c55e" stroke-width="1.5"/><path d="M7 8l4 4-4 4" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="13" y1="16" x2="18" y2="16" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+    bank: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none"><circle cx="12" cy="12" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1.5"/><path d="M8 12.5l2.5 2.5 5.5-5.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    antutu: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z" fill="#ef4444" stroke="#f97316" stroke-width="1.5"/></svg>`,
+    kernelsu: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none"><path d="M12 2l3 6 6 1-4.5 4.5 1 6.5-5.5-3-5.5 3 1-6.5L3 9l6-1z" fill="#15803d" stroke="#4ade80" stroke-width="1.5"/><text x="12" y="14" text-anchor="middle" font-size="7" font-family="monospace" font-weight="900" fill="#fff">KSU</text></svg>`,
+    magisk: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none"><path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6l-8-4z" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/><path d="M9 10l2 2 4-4M9 14l3 3 3-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    viper: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><circle cx="4" cy="12" r="2" fill="#c084fc"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><circle cx="12" cy="10" r="2" fill="#c084fc"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="20" cy="14" r="2" fill="#c084fc"/></svg>`,
+    lsposed: `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h4v4M17 7l5-5M19 15v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3"/><circle cx="12" cy="12" r="3" fill="#8b5cf6"/></svg>`,
+    'crdroid-mods': `<svg viewBox="0 0 24 24" width="28" height="28" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#e11d48" stroke="#fb7185" stroke-width="1.5"/></svg>`,
+    'kali-tools': `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#2dd4bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-7.07 17.07L12 22l7.07-2.93A10 10 0 0 0 12 2z"/><path d="M9 10h.01M15 10h.01M9 15c1.5 1.5 4.5 1.5 6 0"/></svg>`
+  };
+
   const apps = [
-    { id: 'settings', name: 'Настройки', icon: '⚙️', bg: '#475569' },
-    { id: 'forum', name: '4PDA Форум', icon: '💬', bg: '#1e3a8a' },
-    { id: 'fkm', name: 'FKM Разгон', icon: '⚡', bg: '#ea580c' },
-    { id: 'mtmanager', name: 'MT Manager', icon: '📂', bg: '#0284c7' },
-    { id: 'pubg', name: 'PUBG Arena', icon: '🎮', bg: '#b45309' },
-    { id: 'termux', name: 'Termux', icon: '💻', bg: '#000000' },
-    { id: 'bank', name: 'СберБанк', icon: '🏦', bg: '#16a34a' },
-    { id: 'antutu', name: 'AnTuTu', icon: '🔥', bg: '#dc2626' }
+    { id: 'settings', name: 'Настройки', bg: '#475569' },
+    { id: 'forum', name: '4PDA Форум', bg: '#005999' },
+    { id: 'fkm', name: 'FKM Разгон', bg: '#ea580c' },
+    { id: 'mtmanager', name: 'MT Manager', bg: '#0f172a' },
+    { id: 'pubg', name: 'PUBG Arena', bg: '#78350f' },
+    { id: 'termux', name: 'Termux', bg: '#000000' },
+    { id: 'bank', name: 'СберБанк', bg: '#166534' },
+    { id: 'antutu', name: 'AnTuTu', bg: '#991b1b' }
   ];
 
   if (GameState.ksuWorking) {
-    apps.splice(2, 0, { id: 'kernelsu', name: 'KernelSU', icon: '👑', bg: '#15803d' });
+    apps.splice(2, 0, { id: 'kernelsu', name: 'KernelSU', bg: '#14532d' });
   }
 
   if (GameState.magiskInstalled && !GameState.ksuWorking) {
-    apps.splice(2, 0, { id: 'magisk', name: 'Magisk', icon: '🪄', bg: '#0284c7' });
+    apps.splice(2, 0, { id: 'magisk', name: 'Magisk', bg: '#0369a1' });
   }
 
   if (GameState.modules.has('ViPER4Android')) {
-    apps.push({ id: 'viper', name: 'ViPER4Android', icon: '🎵', bg: '#6366f1' });
+    apps.push({ id: 'viper', name: 'ViPER4Android', bg: '#4c1d95' });
   }
 
   if (GameState.modules.has('LSPosed')) {
-    apps.push({ id: 'lsposed', name: 'LSPosed', icon: '💉', bg: '#8b5cf6' });
+    apps.push({ id: 'lsposed', name: 'LSPosed', bg: '#581c87' });
   }
 
   if (os === 'crdroid') {
-    apps.push({ id: 'crdroid-mods', name: 'crDroid Hub', icon: '⚡', bg: '#e11d48' });
+    apps.push({ id: 'crdroid-mods', name: 'crDroid Hub', bg: '#881337' });
   }
 
   if (os === 'kali') {
-    apps.push({ id: 'kali-tools', name: 'NetHunter', icon: '🐉', bg: '#0f766e' });
+    apps.push({ id: 'kali-tools', name: 'NetHunter', bg: '#042f2e' });
   }
 
   apps.forEach(app => {
     const tile = document.createElement('div');
     tile.className = 'app-tile';
 
-    // Different icon backgrounds matching OS theme
     let bg = app.bg;
-    if (os === 'pixel') bg = '#2a2e3d';
+    if (os === 'pixel') bg = '#252936';
     if (os === 'kali') bg = '#030a0a';
-    if (os === 'crdroid') bg = '#1f040f';
-    if (os === 'evolution') bg = '#310d54';
+    if (os === 'crdroid') bg = '#1a040d';
+    if (os === 'evolution') bg = '#240a3d';
+
+    const vector = appVectors[app.id] || `<span style="font-weight:900; font-size:16px; color:#fff;">${app.name.substring(0, 2)}</span>`;
 
     tile.innerHTML = `
-      <div class="app-icon-squircle" style="background:${bg}">${app.icon}</div>
+      <div class="app-icon-squircle" style="background:${bg}">${vector}</div>
       <span class="app-label">${app.name}</span>
     `;
     tile.addEventListener('click', () => {
@@ -2038,9 +2061,15 @@ function renderForumApp(container) {
     container.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:10px;">
         <div class="forum-tabs">
-          <button class="forum-tab ${activeTab === 'threads' ? 'active' : ''}" data-ftab="threads">💬 Горячие темы</button>
-          <button class="forum-tab ${activeTab === 'orders' ? 'active' : ''}" data-ftab="orders">💼 Биржа заказов</button>
-          <button class="forum-tab ${activeTab === 'profile' ? 'active' : ''}" data-ftab="profile">👑 Профиль (${GameState.modderReputation} rep)</button>
+          <button class="forum-tab ${activeTab === 'threads' ? 'active' : ''}" data-ftab="threads">
+            <span>Темы & FAQ</span>
+          </button>
+          <button class="forum-tab ${activeTab === 'orders' ? 'active' : ''}" data-ftab="orders">
+            <span>Биржа заказов</span>
+          </button>
+          <button class="forum-tab ${activeTab === 'profile' ? 'active' : ''}" data-ftab="profile">
+            <span>Профиль [ +${GameState.modderReputation} ]</span>
+          </button>
         </div>
 
         <div id="forum-content"></div>
@@ -2070,27 +2099,31 @@ function renderForumApp(container) {
     body.innerHTML = `
       <div class="forum-thread-card">
         <div class="forum-user-badge">
-          <span>👤 Noob_Poco_2026</span>
-          <span class="forum-rep-pill">Rep: 2</span>
-          <span style="color:#64748b; font-size:10px; margin-left:auto;">5 мин назад</span>
+          <div class="forum-user-avatar-mini">N</div>
+          <span>Noob_Poco_2026</span>
+          <span class="forum-rep-pill">[ - | +2 ]</span>
+          <span style="color:#64748b; font-size:10px; margin-left:auto;">5 мин назад • #482</span>
         </div>
         <div style="font-weight:700; color:#fff; font-size:13px;">
           SOS! Окирпичил Poco X3 Pro после прошивки PixelOS! Висит Qualcomm CrashDump!
         </div>
-        <div style="font-size:11px; color:#cbd5e1; line-height:1.4;">
-          Мужики, прошил архив с флешки, не нажал Format Data и словил черный экран с дампом. Что делать, плату менять?!
+        <div class="pda-quote">
+          <div class="pda-quote-title">Цитата (Noob_Poco_2026):</div>
+          <div class="pda-quote-body">
+            Мужики, накатил архив поверх стока, не сделал Format Data и словил черный экран с дампом. Что делать, плату в утиль или реболл?!
+          </div>
         </div>
         ${GameState.solvedForumThreads.has('thread1') ? `
           <div style="background:#064e3b; border:1px solid #059669; padding:8px 12px; border-radius:6px; color:#34d399; font-size:11px;">
-            ✓ Вы ответили: «Переведи в Fastboot, открой TWRP и сделай Format Data yes». Автор поблагодарил (+25 Репутации)!
+            ✓ Вы ответили: «Переведи в Fastboot, открой TWRP и сделай Format Data yes». Автор поднял репутацию (+25)!
           </div>
         ` : `
           <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
             <button class="forum-reply-option" id="btn-ans-1a">
-              🟢 «Зажми Power + Vol- для входа в Fastboot, зайди в TWRP и нажми Format Data с вводом 'yes'»
+              [Совет] «Зажми Power + Vol- для входа в Fastboot, прошей TWRP и сделай Format Data с вводом 'yes' для снятия шифрования»
             </button>
             <button class="forum-reply-option" id="btn-ans-1b">
-              🔴 «Выбрось в помойку и не трогай прошивки, если читать шапку не умеешь»
+              [Флуд] «Выбрось в помойку и не трогай прошивки, если читать шапку темы не умеешь»
             </button>
           </div>
         `}
@@ -2098,27 +2131,31 @@ function renderForumApp(container) {
 
       <div class="forum-thread-card">
         <div class="forum-user-badge">
-          <span>👤 Cybersport_Dimon</span>
-          <span class="forum-rep-pill">Rep: 84</span>
-          <span style="color:#64748b; font-size:10px; margin-left:auto;">12 мин назад</span>
+          <div class="forum-user-avatar-mini">C</div>
+          <span>Cybersport_Dimon</span>
+          <span class="forum-rep-pill">[ - | +84 ]</span>
+          <span style="color:#64748b; font-size:10px; margin-left:auto;">12 мин назад • #483</span>
         </div>
         <div style="font-weight:700; color:#fff; font-size:13px;">
           Какое ядро шить для стабильных 120 FPS в PUBG без троттлинга?
         </div>
-        <div style="font-size:11px; color:#cbd5e1; line-height:1.4;">
-          Стоковое ядро MIUI дропает кадры до 45 фпс при перестрелках. Посоветуйте проверенный вариант.
+        <div class="pda-quote">
+          <div class="pda-quote-title">Цитата (Cybersport_Dimon):</div>
+          <div class="pda-quote-body">
+            Стоковое ядро HyperOS сбрасывает частоты до 1.5 ГГц при нагреве, в катках фпс падает до 45. Какое кастомное ядро держит частоту?
+          </div>
         </div>
         ${GameState.solvedForumThreads.has('thread2') ? `
           <div style="background:#064e3b; border:1px solid #059669; padding:8px 12px; border-radius:6px; color:#34d399; font-size:11px;">
-            ✓ Вы ответили: «Шей StormBreaker Kernel с разгоном до 3.2 ГГц и GPU 825 МГц». Модератор закрепил в шапке (+30 Репутации)!
+            ✓ Вы ответили: «Шей StormBreaker Kernel с разгоном до 3.2 ГГц и GPU 825 МГц». Модератор закрепил пост в шапке темы (+30 Репутации)!
           </div>
         ` : `
           <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
             <button class="forum-reply-option" id="btn-ans-2a">
-              🟢 «Прошей StormBreaker Kernel через TWRP: разгон до 3.20 GHz Prime и Adreno 825 MHz держат стабильные 120 FPS»
+              [Совет] «Прошей StormBreaker Kernel через TWRP: разгон до 3.20 GHz Prime и Adreno 825 MHz держат стабильные 120 FPS»
             </button>
             <button class="forum-reply-option" id="btn-ans-2b">
-              🔴 «Положи телефон в морозилку во время катки»
+              [Флуд] «Положи телефон в морозилку во время катки»
             </button>
           </div>
         `}
@@ -2126,24 +2163,31 @@ function renderForumApp(container) {
 
       <div class="forum-thread-card">
         <div class="forum-user-badge">
-          <span>👤 Alexey_Banker</span>
-          <span class="forum-rep-pill">Rep: 42</span>
-          <span style="color:#64748b; font-size:10px; margin-left:auto;">28 мин назад</span>
+          <div class="forum-user-avatar-mini">A</div>
+          <span>Alexey_Banker</span>
+          <span class="forum-rep-pill">[ - | +42 ]</span>
+          <span style="color:#64748b; font-size:10px; margin-left:auto;">28 мин назад • #484</span>
         </div>
         <div style="font-weight:700; color:#fff; font-size:13px;">
           СберБанк видит Magisk даже со Shamiko! Как пройти Play Integrity?
         </div>
+        <div class="pda-quote">
+          <div class="pda-quote-title">Цитата (Alexey_Banker):</div>
+          <div class="pda-quote-body">
+            Google обновил DroidGuard, Magisk Hide палится через системные вызовы. Как заставить Сбер работать с рутом?
+          </div>
+        </div>
         ${GameState.solvedForumThreads.has('thread3') ? `
           <div style="background:#064e3b; border:1px solid #059669; padding:8px 12px; border-radius:6px; color:#34d399; font-size:11px;">
-            ✓ Вы ответили: «Переходи на KernelSU и активируй Unmount Root для Сбера». Решение признано лучшим (+35 Репутации)!
+            ✓ Вы ответили: «Переходи на KernelSU и активируй Unmount Root для Сбера». Решение признано лучшим в ветке (+35 Репутации)!
           </div>
         ` : `
           <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
             <button class="forum-reply-option" id="btn-ans-3a">
-              🟢 «Переходи на KernelSU: ядерный рут изолируется из namespace приложения через функцию Unmount, Сбер видит чистую систему»
+              [Совет] «Переходи на KernelSU: ядерный рут изолируется из mount namespace приложения через функцию Unmount, Сбер видит чистую систему»
             </button>
             <button class="forum-reply-option" id="btn-ans-3b">
-              🔴 «Удали СберБанк и пользуйся браузером»
+              [Флуд] «Удали СберБанк и пользуйся браузером»
             </button>
           </div>
         `}
@@ -2156,7 +2200,7 @@ function renderForumApp(container) {
       sounds.vibrate(50);
       GameState.modderReputation += 25;
       GameState.solvedForumThreads.add('thread1');
-      alert('🎉 Автор темы: «Огромное человеческое спасибо, брат! Сделал Format Data в TWRP и телефон воскрес! Лови + в репу!»');
+      alert('Автор темы: «Огромное человеческое спасибо, брат! Сделал Format Data в TWRP и телефон воскрес! Лови + в репу!»');
       render();
     };
 
@@ -2166,7 +2210,7 @@ function renderForumApp(container) {
       sounds.vibrate(50);
       GameState.modderReputation += 30;
       GameState.solvedForumThreads.add('thread2');
-      alert('🎉 Модератор 4PDA: «Отличный совет! Добавлено в FAQ по разгону Poco X3 Pro! Репутация повышена!»');
+      alert('Куратор ветки Poco X3 Pro: «Отличный совет! Добавлено в FAQ по ядрам! Репутация повышена!»');
       render();
     };
 
@@ -2176,7 +2220,7 @@ function renderForumApp(container) {
       sounds.vibrate(50);
       GameState.modderReputation += 35;
       GameState.solvedForumThreads.add('thread3');
-      alert('🎉 Сообщество 4PDA: «Проверено на практике, KernelSU Unmount действительно обходит MEETS_STRONG_INTEGRITY!»');
+      alert('Сообщество 4PDA: «Проверено на практике, KernelSU Unmount действительно обходит MEETS_STRONG_INTEGRITY!»');
       render();
     };
   }
@@ -2248,7 +2292,7 @@ function renderForumApp(container) {
       sounds.vibrate(60);
       GameState.solvedOrders.add('order1');
       GameState.modderReputation += 40;
-      alert('🎉 Заказ #1 выполнен! Клиент в восторге от плавности PixelOS 14. +40 к репутации 4PDA!');
+      alert('Заказ #1 выполнен! Клиент в восторге от плавности PixelOS 14. +40 к репутации 4PDA!');
       render();
     };
 
@@ -2258,7 +2302,7 @@ function renderForumApp(container) {
       sounds.vibrate(60);
       GameState.solvedOrders.add('order2');
       GameState.modderReputation += 50;
-      alert('🎉 Заказ #2 выполнен! В PUBG стабильные 120 FPS без просадок. +50 к репутации 4PDA!');
+      alert('Заказ #2 выполнен! В PUBG стабильные 120 FPS без просадок. +50 к репутации 4PDA!');
       render();
     };
 
@@ -2268,7 +2312,7 @@ function renderForumApp(container) {
       sounds.vibrate(60);
       GameState.solvedOrders.add('order3');
       GameState.modderReputation += 35;
-      alert('🎉 Заказ #3 выполнен! СберБанк запускается без предупреждений. +35 к репутации 4PDA!');
+      alert('Заказ #3 выполнен! СберБанк запускается без предупреждений. +35 к репутации 4PDA!');
       render();
     };
   }
@@ -2278,16 +2322,16 @@ function renderForumApp(container) {
     if (GameState.modderReputation > 50) rank = 'Форумчанин';
     if (GameState.modderReputation > 150) rank = 'Актив темы';
     if (GameState.modderReputation > 250) rank = 'Куратор темы Poco X3 Pro';
-    if (GameState.modderReputation > 350) rank = '👑 Легенда 4PDA';
+    if (GameState.modderReputation > 350) rank = 'Почетный разработчик 4PDA';
     GameState.modderRank = rank;
 
     body.innerHTML = `
       <div style="text-align:center; padding:20px; background:#151c2a; border-radius:14px; border:1px solid #233147;">
-        <div style="font-size:52px;">👑</div>
-        <div style="font-size:18px; font-weight:900; color:#fff; margin-top:8px;">Zyaster</div>
+        <div class="fp-avatar" style="width:56px; height:56px; font-size:24px; margin:0 auto;">4P</div>
+        <div style="font-size:18px; font-weight:900; color:#fff; margin-top:10px;">Zyaster</div>
         <div style="font-size:13px; color:#38bdf8; font-weight:700; margin-top:2px;">${rank}</div>
         
-        <div style="display:flex; justify-content:center; gap:20px; margin-top:16px;">
+        <div style="display:flex; justify-content:center; gap:24px; margin-top:16px;">
           <div>
             <div style="font-size:24px; font-weight:900; color:#00e676;">+${GameState.modderReputation}</div>
             <div style="font-size:11px; color:#888;">Репутация на форуме</div>
@@ -2468,7 +2512,6 @@ function renderSettingsApp(container) {
       codename: 'HyperOS 1.0 (Android 14)',
       security: '1 ноября 2026',
       badge: 'Официальная Global',
-      icon: '🍏',
       desc: 'Фирменная система Xiaomi с плавным интерфейсом и экосистемой Mi.'
     },
     pixel: {
@@ -2476,7 +2519,6 @@ function renderSettingsApp(container) {
       codename: 'Android 14 (UpsideDownCake)',
       security: '5 ноября 2026',
       badge: 'Pixel Edition',
-      icon: '📱',
       desc: 'Чистый интерфейс Google Pixel с Material You и Google сервисами.'
     },
     lineage: {
@@ -2484,7 +2526,6 @@ function renderSettingsApp(container) {
       codename: 'Android 14 (Pure AOSP)',
       security: '1 ноября 2026',
       badge: 'Lineage Trust Enforced',
-      icon: '⚡',
       desc: 'Эталонный открытый Android без мусора с контролем безопасности Trust.'
     },
     crdroid: {
@@ -2492,7 +2533,6 @@ function renderSettingsApp(container) {
       codename: 'crDroid vayu (Android 14)',
       security: '10 ноября 2026',
       badge: '120 FPS Gaming OC',
-      icon: '🎮',
       desc: 'Кастомная прошивка для геймеров с разгоном Adreno и игровым дашбордом.'
     },
     evolution: {
@@ -2500,7 +2540,6 @@ function renderSettingsApp(container) {
       codename: 'Evolver Build (Android 14)',
       security: '5 ноября 2026',
       badge: 'Themer Engine Active',
-      icon: '🔮',
       desc: 'Максимальная кастомизация каждого пикселя интерфейса.'
     },
     kali: {
@@ -2508,7 +2547,6 @@ function renderSettingsApp(container) {
       codename: 'Offensive Security Chroot',
       security: '1 ноября 2026',
       badge: 'Root Kernel Injected',
-      icon: '💀',
       desc: 'Дистрибутив для этичного хакинга, аудита сетей и тестирования на проникновение.'
     }
   };
@@ -2565,7 +2603,9 @@ function renderSettingsApp(container) {
       <div class="settings-container">
         <!-- Search Bar -->
         <div class="settings-search-wrapper">
-          <span class="settings-search-icon">🔍</span>
+          <span class="settings-search-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
           <input type="text" id="settings-search-input" class="settings-search-input" placeholder="Поиск настроек (экран, root, usb, герц...)" value="${searchQuery}" autocomplete="off">
         </div>
 
@@ -2575,18 +2615,18 @@ function renderSettingsApp(container) {
         <div id="settings-default-content" style="display: ${searchQuery.trim() ? 'none' : 'flex'}; flex-direction:column; gap:14px;">
           <!-- Modder Profile Card -->
           <div class="settings-profile-card">
-            <div class="settings-profile-avatar">👑</div>
+            <div class="fp-avatar" style="width:38px; height:38px; font-size:14px;">4P</div>
             <div style="flex:1;">
               <div class="settings-profile-name">Zyaster (Senior 4PDA Modder)</div>
-              <div class="settings-profile-sub">Аккаунт 4PDA синхронизирован • Репутация: 240+</div>
+              <div class="settings-profile-sub">Аккаунт 4PDA синхронизирован • Репутация: +${GameState.modderReputation}</div>
             </div>
-            <div style="font-size:18px; color:var(--accent-cyan);">✓</div>
+            <div style="font-size:16px; color:var(--accent-cyan);">✓</div>
           </div>
 
           <!-- Hero OS / About Phone Banner -->
           <div class="settings-hero-banner" id="btn-goto-about">
             <div class="settings-hero-header">
-              <div class="settings-hero-title">${curRom.icon} ${curRom.name}</div>
+              <div class="settings-hero-title">${curRom.name}</div>
               <span class="settings-hero-badge">${curRom.badge}</span>
             </div>
             <div style="font-size:12px; color:#cbd5e1;">Poco X3 Pro (vayu) • Snapdragon 860</div>
@@ -2611,7 +2651,9 @@ function renderSettingsApp(container) {
             
             <div class="settings-item" id="btn-goto-display">
               <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#0284c7;">📱</div>
+                <div class="settings-item-icon" style="background:#0284c7;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                </div>
                 <div class="settings-item-text">
                   <div class="settings-item-title">Экран и графика</div>
                   <div class="settings-item-sub">Частота: ${GameState.displayRefreshRate} Гц • Тёмная тема • DPI: ${GameState.dpiScale}</div>
@@ -2622,10 +2664,12 @@ function renderSettingsApp(container) {
 
             <div class="settings-item" id="btn-goto-battery">
               <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#16a34a;">🔋</div>
+                <div class="settings-item-icon" style="background:#16a34a;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2"/><line x1="20" y1="11" x2="20" y2="13"/><rect x="5" y="10" width="8" height="4" fill="#fff"/></svg>
+                </div>
                 <div class="settings-item-text">
                   <div class="settings-item-title">Батарея и питание</div>
-                  <div class="settings-item-sub">${GameState.battery}% • ${GameState.perfProfile === 'performance' ? '🚀 Game Turbo' : '⚖️ Сбалансированный'} • 31.8°C</div>
+                  <div class="settings-item-sub">${GameState.battery}% • ${GameState.perfProfile === 'performance' ? 'Game Turbo' : 'Сбалансированный'} • 31.8°C</div>
                 </div>
               </div>
               <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
@@ -2633,7 +2677,9 @@ function renderSettingsApp(container) {
 
             <div class="settings-item" id="btn-goto-network">
               <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#4f46e5;">📶</div>
+                <div class="settings-item-icon" style="background:#4f46e5;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                </div>
                 <div class="settings-item-text">
                   <div class="settings-item-title">Сеть и интернет</div>
                   <div class="settings-item-sub">Wi-Fi: 4PDA_Modder_5GHz • Частный DNS: AdGuard</div>
@@ -2649,7 +2695,9 @@ function renderSettingsApp(container) {
 
             <div class="settings-item" id="btn-goto-security">
               <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#9333ea;">🛡️</div>
+                <div class="settings-item-icon" style="background:#9333ea;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
                 <div class="settings-item-text">
                   <div class="settings-item-title">Безопасность и Root</div>
                   <div class="settings-item-sub">Play Integrity: Strong • KernelSU: ${GameState.ksuWorking ? 'Активен' : 'Выкл'}</div>
@@ -2660,7 +2708,9 @@ function renderSettingsApp(container) {
 
             <div class="settings-item" id="btn-goto-developer">
               <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#d97706;">🛠️</div>
+                <div class="settings-item-icon" style="background:#d97706;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </div>
                 <div class="settings-item-text">
                   <div class="settings-item-title">Для разработчиков</div>
                   <div class="settings-item-sub">
@@ -2669,7 +2719,7 @@ function renderSettingsApp(container) {
                 </div>
               </div>
               <div class="settings-item-right">
-                ${GameState.developerUnlocked ? '<span style="color:#00e676; font-size:11px;">АКТИВНО</span>' : '<span style="color:#64748b; font-size:11px;">🔒</span>'}
+                ${GameState.developerUnlocked ? '<span style="color:#00e676; font-size:11px;">АКТИВНО</span>' : '<span style="color:#64748b; font-size:11px;">[LOCKED]</span>'}
                 <span class="settings-item-arrow">›</span>
               </div>
             </div>
@@ -2681,7 +2731,9 @@ function renderSettingsApp(container) {
 
             <div class="settings-item" id="btn-goto-about-item">
               <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#475569;">ℹ️</div>
+                <div class="settings-item-icon" style="background:#475569;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </div>
                 <div class="settings-item-text">
                   <div class="settings-item-title">О телефоне</div>
                   <div class="settings-item-sub">POCO X3 Pro • Android 14 • ${curRom.name}</div>
@@ -2692,7 +2744,9 @@ function renderSettingsApp(container) {
 
             <div class="settings-item" id="btn-goto-system">
               <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#dc2626;">🔄</div>
+                <div class="settings-item-icon" style="background:#dc2626;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                </div>
                 <div class="settings-item-text">
                   <div class="settings-item-title">Перезагрузка и сброс</div>
                   <div class="settings-item-sub">Reboot в Recovery/Fastboot • Очистка Dalvik • Format Data</div>
@@ -4209,7 +4263,9 @@ function renderQuests() {
     const item = document.createElement('div');
     item.className = `quest-item ${q.done ? 'completed' : ''}`;
     item.innerHTML = `
-      <div class="q-icon">${q.done ? '✅' : '🎯'}</div>
+      <div class="q-icon">
+        ${q.done ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="#64748b"/></svg>'}
+      </div>
       <div class="q-body">
         <div class="q-title">${q.title}</div>
         <div class="q-desc">${q.desc}</div>
