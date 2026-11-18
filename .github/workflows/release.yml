@@ -24,12 +24,18 @@ jobs:
           body: |
             ⚡ **RomFlasherSimulator.apk** готов к установке!
 
-            ### Что внутри:
-            - 📱 Эмулятор смартфона Poco X3 Pro с Fastboot и TWRP 3.7
-            - 💻 Рабочая станция мододела (консоль ADB/Fastboot, ветка 4PDA, Mi Flash Tool)
-            - 🚀 Интерактивные ОС: Stock HyperOS, PixelOS, LineageOS, crDroid Gaming
-            - 🛠️ Termux с root (su), Magisk v27, СберБанк с Play Integrity и AnTuTu с оверклоком
-            - 🏆 Система квестов и репутации 4PDA
+            ### Что нового в v1.3.0:
+            - 👑 **KernelSU & Custom Kernels**: поддержка KernelSU v0.9.5 (ядерный рут) вместо устаревшего Magisk! Ядра NoGravity (NGK) и StormBreaker OC 3.2GHz!
+            - 🦊 **OrangeFox Recovery R11.1** & **TWRP 3.7**: полноценные рекавери с кастомным терминалом, Aroma-инсталлятором и бекапами!
+            - 🎨 **Уникальный визуал для всех 6 ОС**:
+              • **HyperOS 1.0**: фирменный split-clock, Mi Health виджет, стеклянный Mi Dock.
+              • **PixelOS 14**: Google "At a Glance" погода, 2-строчные Material You часы, панель Google поиска и монохромные иконки.
+              • **LineageOS 21**: чистый минималистичный AOSP, Lineage Trust SELinux статус.
+              • **crDroid 10.5**: киберспортивный Gaming HUD (120 FPS, Adreno 640 @ 825MHz, мониторинг температуры).
+              • **Evolution X 8.5**: типографические часы, Themer с неоновыми акцентами.
+              • **Kali NetHunter**: матричная сетка, CRT хакерский терминал и утилиты аудита.
+            - 📲 **100% Fullscreen AMOLED**: полноэкранная перезагрузка, физические кнопки громкости и питания на торцах экрана, вызов меню ПК.
+            - 🏦 **СберБанк & LSPosed & ViPER4Android**: обход Play Integrity через KernelSU unmount, разгон до 120 FPS в PUBG Mobile!
 
             ### Установка через ADB:
             ```bash

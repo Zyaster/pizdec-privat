@@ -1,6 +1,6 @@
 /**
  * AndroFlash: ROM Flasher & Root Simulator (4PDA Edition)
- * Huge Content Expansion: KernelSU, OrangeFox, Custom Kernels, 6 ROMs, ViPER4Android, LSPosed & Gaming 120 FPS.
+ * Huge Content Expansion: KernelSU, OrangeFox, Custom Kernels, 6 Distinct OSes, ViPER4Android, LSPosed & Gaming 120 FPS.
  */
 
 // --- Audio Synthesizer (Realistic Haptic & Chimes via Web Audio API) ---
@@ -191,10 +191,8 @@ const UI = {
 
   // OS
   osClock: document.getElementById('os-clock'),
-  heroClock: document.getElementById('hero-clock'),
-  heroDate: document.getElementById('hero-date'),
-  heroOsTitle: document.getElementById('hero-os-title'),
-  heroKernelTitle: document.getElementById('hero-kernel-title'),
+  osHeroWidget: document.getElementById('os-hero-widget'),
+  pixelSearchBar: document.getElementById('pixel-search-bar'),
   osKsuBadge: document.getElementById('os-ksu-badge'),
   osMagiskBadge: document.getElementById('os-magisk-badge'),
   osFpsBadge: document.getElementById('os-fps-badge'),
@@ -247,9 +245,21 @@ function initApp() {
   setInterval(() => {
     const now = new Date();
     const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    const hours = String(now.getHours()).padStart(2, '0');
+    const mins = String(now.getMinutes()).padStart(2, '0');
+
     if (UI.osClock) UI.osClock.textContent = timeStr;
-    if (UI.heroClock) UI.heroClock.textContent = timeStr;
     if (UI.recClock) UI.recClock.textContent = timeStr;
+
+    // Update dynamic clock in OS hero widget
+    const dynamicTime = document.getElementById('dyn-clock-time');
+    if (dynamicTime) dynamicTime.textContent = timeStr;
+    const dynH = document.getElementById('dyn-clock-h');
+    const dynM = document.getElementById('dyn-clock-m');
+    if (dynH && dynM) {
+      dynH.textContent = hours;
+      dynM.textContent = mins;
+    }
   }, 1000);
 }
 
@@ -810,11 +820,12 @@ function runRecoveryConsoleLog(lines, callback) {
   step();
 }
 
-// --- OPERATING SYSTEM LAUNCHER & APPS ---
+// --- DRAMATICALLY DISTINCT OS VISUAL ENGINE ---
 function updateOsUI() {
   const os = GameState.rom || 'stock';
   const osEl = UI.screens.OS;
 
+  // Apply root CSS classes for each OS
   osEl.className = 'screen-view active';
   if (os === 'pixel') osEl.classList.add('theme-pixel');
   else if (os === 'lineage') osEl.classList.add('theme-lineage');
@@ -828,21 +839,113 @@ function updateOsUI() {
   UI.osMagiskBadge.classList.toggle('visible', GameState.magiskInstalled && !GameState.ksuWorking);
   UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
 
-  const titles = {
-    stock: 'Xiaomi HyperOS 1.0 (Официальная)',
-    pixel: 'Google Pixel 8 Pro UI',
-    lineage: 'LineageOS 21 AOSP',
-    crdroid: 'crDroid 10.5 Gaming Edition',
-    evolution: 'Evolution X 8.5 (Customizer)',
-    kali: 'Kali NetHunter OS (Security)'
-  };
-  UI.heroOsTitle.textContent = titles[os];
-  UI.heroKernelTitle.textContent = `Ядро: ${GameState.kernelVersion}`;
+  // Dynamic Widgets per Operating System
+  renderOsWidgets(os);
 
-  renderOsAppsGrid();
+  // App Grid with OS specific styling
+  renderOsAppsGrid(os);
 }
 
-function renderOsAppsGrid() {
+function renderOsWidgets(os) {
+  const widget = UI.osHeroWidget;
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  const hours = String(now.getHours()).padStart(2, '0');
+  const mins = String(now.getMinutes()).padStart(2, '0');
+
+  // 1. GOOGLE PIXELOS: At a Glance + Huge Pastel 2-line Material You Clock + Google Search Pill
+  if (os === 'pixel') {
+    UI.pixelSearchBar.style.display = 'flex';
+    widget.innerHTML = `
+      <div style="text-align:left; padding:0 8px; margin-bottom:12px;">
+        <div style="font-size:14px; font-weight:600; color:#d1e4ff;">Среда, 18 ноя • 21°C ⛅</div>
+        <div style="font-size:11px; color:#8e919e; margin-top:2px;">Google Pixel Experience • Чистый Android 14</div>
+      </div>
+      <div style="display:flex; justify-content:center; align-items:center; line-height:0.85; font-size:74px; font-weight:900; color:#a8c7fa; font-family:'Google Sans', sans-serif;">
+        <span id="dyn-clock-h">${hours}</span><br><span id="dyn-clock-m">${mins}</span>
+      </div>
+      <div class="hero-kernel-title" style="color:#8e919e; margin-top:8px;">${GameState.kernelVersion}</div>
+    `;
+    return;
+  }
+
+  // Search pill hidden for other OSes
+  UI.pixelSearchBar.style.display = 'none';
+
+  // 2. CRDROID: Cyberpunk Gaming HUD with 120 FPS & Overclock status
+  if (os === 'crdroid') {
+    widget.innerHTML = `
+      <div class="crdroid-hud-box">
+        <span>⚡ ${GameState.displayRefreshRate} FPS LOCKED</span>
+        <span>🎮 ADRENO 640</span>
+        <span>🔥 ${GameState.kernel === 'stormbreaker' ? '3.2 GHz OC' : '2.96 GHz'}</span>
+        <span>❄️ 38°C</span>
+      </div>
+      <div style="font-family:var(--font-mono); font-size:38px; font-weight:900; color:#ff3366; text-shadow:0 0 15px rgba(255,51,102,0.6);" id="dyn-clock-time">
+        ${timeStr}
+      </div>
+      <div style="font-family:var(--font-mono); font-size:11px; color:#ff99bb; margin-top:4px;">// CRDROID V10.5 GAMING EDITION</div>
+      <div class="hero-kernel-title" style="color:#ff6699;">${GameState.kernelVersion}</div>
+    `;
+    return;
+  }
+
+  // 3. KALI NETHUNTER: Interactive Retro Hacker CRT Terminal Widget
+  if (os === 'kali') {
+    widget.innerHTML = `
+      <div class="kali-terminal-widget">
+        <span style="color:#00f2fe;">root@kali-vayu:~#</span> ./nethunter_init.sh<br>
+        <span style="color:#22c55e;">[+] Chroot ARM64: /data/local/nhsystem mounted</span><br>
+        <span style="color:#22c55e;">[+] Monitor Mode: wlan0mon active</span><br>
+        <span style="color:#e2e8f0;">[SYS] TIME: <b id="dyn-clock-time">${timeStr}</b> | KERNEL: ${GameState.kernelVersion}</span>
+      </div>
+      <div style="font-family:var(--font-mono); font-size:10px; color:#00f2fe; text-align:center;">
+        [ OFFENSIVE SECURITY PEN-TEST PLATFORM ]
+      </div>
+    `;
+    return;
+  }
+
+  // 4. EVOLUTION X: Artistic Neon Violet Typographic Themer Clock
+  if (os === 'evolution') {
+    widget.innerHTML = `
+      <div style="font-size:36px; font-weight:900; background:linear-gradient(135deg, #c084fc, #38bdf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 20px rgba(192,132,252,0.4);" id="dyn-clock-time">
+        ${timeStr}
+      </div>
+      <div style="font-size:11px; font-weight:700; color:#c084fc; letter-spacing:2px; margin-top:2px;">KEEP EVOLVING • ANDROID 14</div>
+      <div style="display:inline-block; background:rgba(192,132,252,0.15); border:1px solid #c084fc; border-radius:12px; padding:2px 10px; font-size:10px; color:#e0e7ff; margin-top:6px;">
+        Evolution Themer: Nebula Violet
+      </div>
+      <div class="hero-kernel-title" style="color:#cbd5e1;">${GameState.kernelVersion}</div>
+    `;
+    return;
+  }
+
+  // 5. LINEAGEOS: Minimalist Clean AOSP + Lineage Trust Badge
+  if (os === 'lineage') {
+    widget.innerHTML = `
+      <div style="font-size:42px; font-weight:700; color:#e6edf3;" id="dyn-clock-time">${timeStr}</div>
+      <div style="font-size:12px; color:#94a3b8; margin-top:2px;">Среда, 18 ноября • 21°C Солнечно</div>
+      <div style="display:inline-flex; align-items:center; gap:6px; background:#064e43; border-radius:14px; padding:3px 10px; font-size:10.5px; color:#6ee7b7; margin-top:8px;">
+        <span>🛡️ Trust:</span> <b>SELinux Enforcing</b>
+      </div>
+      <div class="hero-kernel-title" style="color:#6ee7b7;">${GameState.kernelVersion}</div>
+    `;
+    return;
+  }
+
+  // 6. XIAOMI HYPEROS (Default): Big Thin Split Magazine Clock + Mi Health Pill
+  widget.innerHTML = `
+    <div style="font-size:52px; font-weight:300; letter-spacing:-1px; color:#ffffff;" id="dyn-clock-time">${timeStr}</div>
+    <div style="font-size:12px; color:#cbd5e1; margin-top:2px;">Среда, 18 ноября • Xiaomi HyperOS 1.0</div>
+    <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.15); border-radius:14px; padding:3px 12px; font-size:10.5px; color:#fff; margin-top:8px;">
+      <span>👣 6 420 шагов</span> <span>•</span> <span>8.4 км</span>
+    </div>
+    <div class="hero-kernel-title" style="color:#93c5fd;">${GameState.kernelVersion}</div>
+  `;
+}
+
+function renderOsAppsGrid(os) {
   const grid = UI.osAppGrid;
   grid.innerHTML = '';
 
@@ -854,41 +957,43 @@ function renderOsAppsGrid() {
     { id: 'antutu', name: 'AnTuTu', icon: '🔥', bg: '#dc2626' }
   ];
 
-  // Modern KernelSU Manager!
   if (GameState.ksuWorking) {
     apps.splice(2, 0, { id: 'kernelsu', name: 'KernelSU', icon: '👑', bg: '#15803d' });
   }
 
-  // Magisk Manager
   if (GameState.magiskInstalled && !GameState.ksuWorking) {
     apps.splice(2, 0, { id: 'magisk', name: 'Magisk', icon: '🪄', bg: '#0284c7' });
   }
 
-  // ViPER4Android
   if (GameState.modules.has('ViPER4Android')) {
     apps.push({ id: 'viper', name: 'ViPER4Android', icon: '🎵', bg: '#6366f1' });
   }
 
-  // LSPosed
   if (GameState.modules.has('LSPosed')) {
     apps.push({ id: 'lsposed', name: 'LSPosed', icon: '💉', bg: '#8b5cf6' });
   }
 
-  // crDroid Gaming Hub
-  if (GameState.rom === 'crdroid') {
+  if (os === 'crdroid') {
     apps.push({ id: 'crdroid-mods', name: 'crDroid Hub', icon: '⚡', bg: '#e11d48' });
   }
 
-  // Kali Tools
-  if (GameState.rom === 'kali') {
-    apps.push({ id: 'kali-tools', name: 'NetHunter Tools', icon: '🐉', bg: '#0f766e' });
+  if (os === 'kali') {
+    apps.push({ id: 'kali-tools', name: 'NetHunter', icon: '🐉', bg: '#0f766e' });
   }
 
   apps.forEach(app => {
     const tile = document.createElement('div');
     tile.className = 'app-tile';
+
+    // Different icon backgrounds matching OS theme
+    let bg = app.bg;
+    if (os === 'pixel') bg = '#2a2e3d';
+    if (os === 'kali') bg = '#030a0a';
+    if (os === 'crdroid') bg = '#1f040f';
+    if (os === 'evolution') bg = '#310d54';
+
     tile.innerHTML = `
-      <div class="app-icon-squircle" style="background:${app.bg}">${app.icon}</div>
+      <div class="app-icon-squircle" style="background:${bg}">${app.icon}</div>
       <span class="app-label">${app.name}</span>
     `;
     tile.addEventListener('click', () => {
@@ -984,7 +1089,7 @@ function openFullscreenApp(appId) {
   }
 }
 
-// --- APP: KERNELSU MANAGER (THE STAR OF MODERN ROOT) ---
+// --- APP: KERNELSU MANAGER ---
 function renderKernelSUApp(container) {
   let activeTab = 'status';
 
@@ -1465,7 +1570,6 @@ function triggerSuDialog(provider, onGranted) {
 
 // --- APP: SBERBANK (REAL INTEGRITY CHECK) ---
 function renderBankApp(container) {
-  // KernelSU signature power: if root is unmounted from bank, it passes 100%!
   const isKsuHidden = GameState.ksuWorking && GameState.ksuUnmountRoot.has('bank');
   const isModuleBypassed = GameState.modules.has('PlayIntegrityFix') || GameState.modules.has('Shamiko');
   const isSafe = (!GameState.bootloaderUnlocked && !GameState.ksuWorking && !GameState.magiskInstalled) || isKsuHidden || isModuleBypassed;
@@ -1567,15 +1671,14 @@ function renderAntutuApp(container) {
         document.getElementById('btn-start-antutu').style.display = 'inline-block';
         document.getElementById('btn-start-antutu').textContent = 'Повторить тест';
 
-        let base = 560000; // Stock HyperOS
+        let base = 560000;
         if (GameState.rom === 'pixel') base = 670000;
         if (GameState.rom === 'lineage') base = 730000;
         if (GameState.rom === 'evolution') base = 780000;
         if (GameState.rom === 'crdroid') base = 960000;
 
-        // Custom kernel boosts
         if (GameState.kernel === 'ngk_ksu') base += 140000;
-        if (GameState.kernel === 'stormbreaker') base += 260000; // 3.2 GHz OC!
+        if (GameState.kernel === 'stormbreaker') base += 260000;
 
         GameState.antutuScore = base + Math.floor(Math.random() * 8000);
         document.getElementById('antutu-num').textContent = GameState.antutuScore.toLocaleString();

@@ -269,7 +269,6 @@ html, body {
   color: var(--text-muted);
 }
 
-/* Google Pixel 'G' */
 .pixel-g-logo {
   font-size: 68px;
   font-weight: 900;
@@ -278,14 +277,12 @@ html, body {
   -webkit-text-fill-color: transparent;
 }
 
-/* Lineage arc */
 .lineage-arc-logo {
   font-size: 54px;
   color: #167c80;
   animation: rotate-arc 2s linear infinite;
 }
 
-/* Kali dragon */
 .kali-dragon-logo {
   font-size: 60px;
   filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.8));
@@ -370,12 +367,11 @@ html, body {
   line-height: 1.5;
 }
 
-/* ================= STATE 4: RECOVERY (TWRP & ORANGEFOX) ================= */
+/* ================= STATE 4: RECOVERY ================= */
 #screen-recovery {
   background: var(--twrp-bg);
 }
 
-/* TWRP theme */
 #screen-recovery.theme-twrp .recovery-topbar {
   border-bottom: 2px solid var(--twrp-accent);
 }
@@ -387,7 +383,6 @@ html, body {
   background: linear-gradient(135deg, var(--twrp-accent), #0066cc);
 }
 
-/* OrangeFox theme */
 #screen-recovery.theme-orangefox .recovery-topbar {
   border-bottom: 2px solid var(--ofox-accent);
 }
@@ -593,16 +588,217 @@ html, body {
   margin: 10px 0;
 }
 
-/* ================= STATE 5: ACTIVE OS (100% FULLSCREEN) ================= */
-#screen-os { background: #0f172a; }
+/* ================= STATE 5: DRAMATICALLY DISTINCT OS VISUALS ================= */
+#screen-os {
+  background: #000;
+  transition: background 0.4s ease;
+}
 
-#screen-os.theme-hyperos { background: radial-gradient(circle at 50% 25%, #1e3a8a, #070d1e); }
-#screen-os.theme-pixel { background: radial-gradient(circle at 50% 25%, #312e81, #0c101d); }
-#screen-os.theme-lineage { background: radial-gradient(circle at 50% 25%, #064e3b, #071510); }
-#screen-os.theme-crdroid { background: radial-gradient(circle at 50% 25%, #831843, #15020c); }
-#screen-os.theme-evolution { background: radial-gradient(circle at 50% 25%, #581c87, #0f0728); }
-#screen-os.theme-kali { background: radial-gradient(circle at 50% 25%, #0f766e, #031412); }
+/* 1. XIAOMI HYPEROS: Crystal Blue glass & Mi style */
+#screen-os.theme-hyperos {
+  background: linear-gradient(160deg, #102a5c 0%, #081226 60%, #030611 100%);
+}
+#screen-os.theme-hyperos .os-statusbar {
+  font-family: -apple-system, sans-serif;
+  color: #ffffff;
+}
+#screen-os.theme-hyperos .os-dock-bar {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+#screen-os.theme-hyperos .dock-icon {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+}
+#screen-os.theme-hyperos .app-icon-squircle {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
 
+/* 2. GOOGLE PIXELOS: Pastel Material You & Google Search Bar */
+#screen-os.theme-pixel {
+  background: linear-gradient(165deg, #2a2c3a 0%, #1c1d28 40%, #12131b 100%);
+}
+#screen-os.theme-pixel .os-statusbar {
+  font-family: "Google Sans", -apple-system, sans-serif;
+  color: #d1e4ff;
+}
+#screen-os.theme-pixel .os-dock-bar {
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+  box-shadow: none;
+}
+#screen-os.theme-pixel .dock-icon {
+  background: #323544;
+  border-radius: 50%;
+  color: #d1e4ff;
+}
+#screen-os.theme-pixel .app-icon-squircle {
+  border-radius: 50%;
+  background: #2b2e3b !important;
+  color: #a8c7fa !important;
+  border: 1px solid rgba(168, 199, 250, 0.2);
+}
+#screen-os.theme-pixel .app-label {
+  color: #d1e4ff;
+}
+.pixel-search-bar {
+  display: flex;
+  align-items: center;
+  background: #272a36;
+  border-radius: 28px;
+  padding: 10px 16px;
+  margin: 0 10px 10px;
+  gap: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+.pixel-search-bar .search-g {
+  font-weight: 900;
+  font-size: 18px;
+  background: linear-gradient(135deg, #4285F4, #EA4335, #FBBC05, #34A853);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.pixel-search-bar .search-text {
+  flex: 1;
+  font-size: 11.5px;
+  color: #8e919e;
+}
+.pixel-search-bar .search-icons {
+  display: flex;
+  gap: 8px;
+  font-size: 15px;
+}
+
+/* 3. LINEAGEOS: Clean Minimalist AOSP Teal */
+#screen-os.theme-lineage {
+  background: linear-gradient(155deg, #063c32 0%, #071f1a 50%, #030d0a 100%);
+}
+#screen-os.theme-lineage .os-dock-bar {
+  background: rgba(6, 60, 50, 0.4);
+  border-radius: 18px;
+  border: 1px solid #167c80;
+}
+#screen-os.theme-lineage .app-icon-squircle {
+  border-radius: 50%;
+  border: 2px solid #167c80;
+}
+#screen-os.theme-lineage .dock-icon {
+  background: #064e43;
+  border-radius: 50%;
+}
+
+/* 4. CRDROID: Cyberpunk Gaming 120 FPS HUD */
+#screen-os.theme-crdroid {
+  background: radial-gradient(circle at 50% 30%, #580c27 0%, #1e030e 55%, #080004 100%);
+}
+#screen-os.theme-crdroid .os-statusbar {
+  color: #ff3366;
+  font-family: var(--font-mono);
+}
+#screen-os.theme-crdroid .os-dock-bar {
+  background: #14050b;
+  border-radius: 14px;
+  border: 1.5px solid #ff3366;
+  box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
+}
+#screen-os.theme-crdroid .dock-icon {
+  background: #250714;
+  border: 1px solid #ff3366;
+  border-radius: 10px;
+}
+#screen-os.theme-crdroid .app-icon-squircle {
+  border-radius: 10px;
+  border: 1.5px solid #ff3366;
+  box-shadow: 0 0 12px rgba(255, 51, 102, 0.4);
+}
+.crdroid-hud-box {
+  background: rgba(20, 5, 11, 0.85);
+  border: 1px solid #ff3366;
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-around;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #ff99bb;
+  margin-bottom: 12px;
+  box-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+}
+
+/* 5. EVOLUTION X: Neon Violet Gradient Themer */
+#screen-os.theme-evolution {
+  background: linear-gradient(150deg, #4c1d95 0%, #2e1065 45%, #0f0426 100%);
+}
+#screen-os.theme-evolution .os-dock-bar {
+  background: rgba(76, 29, 149, 0.35);
+  border: 1.5px solid #c084fc;
+  border-radius: 24px;
+  box-shadow: 0 0 25px rgba(192, 132, 252, 0.35);
+}
+#screen-os.theme-evolution .dock-icon {
+  background: #3b0764;
+  border-radius: 14px;
+  border: 1px solid #a855f7;
+}
+#screen-os.theme-evolution .app-icon-squircle {
+  border-radius: 18px;
+  border: 2px solid #c084fc;
+  box-shadow: 0 0 12px rgba(192, 132, 252, 0.4);
+}
+
+/* 6. KALI NETHUNTER: Hacker Cyber Terminal UI */
+#screen-os.theme-kali {
+  background: #040909;
+  background-image:
+    linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+#screen-os.theme-kali .os-statusbar {
+  font-family: var(--font-mono);
+  color: #00f2fe;
+}
+#screen-os.theme-kali .os-dock-bar {
+  background: #081414;
+  border: 1px solid #00f2fe;
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+}
+#screen-os.theme-kali .dock-icon {
+  background: #030a0a;
+  border-radius: 4px;
+  border: 1px solid #00f2fe;
+}
+#screen-os.theme-kali .app-icon-squircle {
+  border-radius: 4px;
+  background: #030909 !important;
+  border: 1px solid #00f2fe;
+  color: #00f2fe !important;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+}
+#screen-os.theme-kali .app-label {
+  font-family: var(--font-mono);
+  color: #00f2fe;
+  font-size: 9.5px;
+}
+.kali-terminal-widget {
+  background: #040a0a;
+  border: 1px solid #00f2fe;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: #39ff14;
+  line-height: 1.5;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+  margin-bottom: 14px;
+}
+
+/* Universal OS Status Bar */
 .os-statusbar {
   height: 36px;
   padding: 6px 18px 0;
@@ -640,25 +836,25 @@ html, body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px 16px 8px;
+  padding: 14px 16px 8px;
   position: relative;
 }
 
 .os-hero-widget {
-  margin-top: 14px;
-  margin-bottom: 24px;
+  margin-top: 10px;
+  margin-bottom: 18px;
   text-align: center;
 }
 
 .hero-time {
-  font-size: 46px;
+  font-size: 48px;
   font-weight: 900;
   letter-spacing: -1px;
 }
 
 .hero-date {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   margin-top: 2px;
 }
 
@@ -702,12 +898,12 @@ html, body {
 .app-icon-squircle {
   width: 52px;
   height: 52px;
-  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s;
 }
 
 .app-label {
@@ -721,21 +917,16 @@ html, body {
 }
 
 .os-dock-bar {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  border-radius: 26px;
   padding: 10px 16px;
   display: flex;
   justify-content: space-around;
   margin-top: auto;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .dock-icon {
   width: 44px;
   height: 44px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -746,7 +937,7 @@ html, body {
 .dock-icon:active { transform: scale(1.15); }
 
 .os-nav-bar {
-  height: 38px;
+  height: 36px;
   display: flex;
   justify-content: space-around;
   align-items: center;

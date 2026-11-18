@@ -233,25 +233,22 @@
     <!-- STATE 5: Active Operating System (100% Fullscreen Interactive Android OS!) -->
     <div id="screen-os" class="screen-view">
       <!-- Fullscreen Status Bar -->
-      <div class="os-statusbar">
+      <div class="os-statusbar" id="os-statusbar">
         <span class="os-time" id="os-clock">14:30</span>
         <div class="os-icons">
           <span class="root-badge ksu-badge" id="os-ksu-badge">KernelSU</span>
           <span class="root-badge magisk-badge" id="os-magisk-badge"># SU</span>
           <span class="fps-badge" id="os-fps-badge">120 Hz</span>
-          <span>📶 5G</span>
-          <span>🔋 98%</span>
+          <span id="os-wifi-icon">📶 5G</span>
+          <span id="os-bat-icon">🔋 98%</span>
         </div>
       </div>
 
       <!-- OS Launcher Desktop -->
-      <div class="os-launcher">
-        <!-- Header Clock / Weather Widget -->
-        <div class="os-hero-widget">
-          <div class="hero-time" id="hero-clock">14:30</div>
-          <div class="hero-date" id="hero-date">Среда, 18 ноября</div>
-          <div class="hero-os-title" id="hero-os-title">Xiaomi HyperOS</div>
-          <div class="hero-kernel-title" id="hero-kernel-title">Kernel: Linux 4.14 Stock</div>
+      <div class="os-launcher" id="os-launcher">
+        <!-- OS Specific Header Area (Dynamic Widget) -->
+        <div class="os-hero-widget" id="os-hero-widget">
+          <!-- Dynamically injected per OS: Pixel At a Glance, HyperOS Clock, crDroid Gaming HUD, Kali Terminal -->
         </div>
 
         <!-- Grid of Installed Apps -->
@@ -259,16 +256,23 @@
           <!-- Populated dynamically based on installed ROM, Kernel & Root mods -->
         </div>
 
+        <!-- Google Pixel Search Pill (Visible in PixelOS) -->
+        <div class="pixel-search-bar" id="pixel-search-bar" style="display:none;">
+          <span class="search-g">G</span>
+          <span class="search-text">Поиск в Google и на устройстве</span>
+          <div class="search-icons"><span>🎤</span><span>📷</span></div>
+        </div>
+
         <!-- Android Bottom App Dock -->
-        <div class="os-dock-bar">
+        <div class="os-dock-bar" id="os-dock-bar">
           <div class="dock-icon" data-open="phone-app" title="Телефон">📞</div>
           <div class="dock-icon" data-open="termux" title="Termux">💻</div>
           <div class="dock-icon" data-open="bank" title="СберБанк">🏦</div>
           <div class="dock-icon" data-open="settings" title="Настройки">⚙️</div>
         </div>
 
-        <!-- Android 3-Button Navigation Bar -->
-        <div class="os-nav-bar">
+        <!-- Android Navigation Bar (Pill gesture or 3-button) -->
+        <div class="os-nav-bar" id="os-nav-bar">
           <button class="nav-key" id="os-key-back">◀</button>
           <button class="nav-key" id="os-key-home">●</button>
           <button class="nav-key" id="os-key-recents">■</button>
