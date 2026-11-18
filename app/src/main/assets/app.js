@@ -111,6 +111,31 @@ const GameState = {
   animationScale: '1.0x',
   forceMsaa: false,
 
+  // Modder Career & 4PDA Community
+  modderReputation: 245,
+  modderRank: 'Куратор темы Poco X3 Pro',
+  solvedForumThreads: new Set(),
+  solvedOrders: new Set(),
+
+  // Hardware Overclocking (FKM)
+  cpuFreq: 2.96, // 1.80 - 3.20 GHz
+  gpuFreq: 675, // 675 - 825 MHz
+  cpuGovernor: 'schedutil', // 'performance', 'powersave', 'schedutil'
+  zramSize: 3, // GB
+  thermalProfile: 'gaming', // 'stock', 'gaming', 'extreme'
+  cpuTemp: 34.2, // degrees C
+
+  // Virtual Filesystem & build.prop for MT Manager & Termux
+  buildProp: {
+    'ro.product.brand': 'POCO',
+    'ro.product.model': 'Poco X3 Pro',
+    'ro.product.device': 'vayu',
+    'ro.build.version.release': '14',
+    'ro.build.display.id': 'UQ1A.240205.002.A1',
+    'debug.sf.fps': '120',
+    'persist.sys.unlimited_gphotos': 'true'
+  },
+
   // Downloads & Storage
   pcDownloads: new Set([
     'PixelOS_vayu_A14.zip',
@@ -1129,9 +1154,12 @@ function renderOsAppsGrid(os) {
 
   const apps = [
     { id: 'settings', name: 'Настройки', icon: '⚙️', bg: '#475569' },
+    { id: 'forum', name: '4PDA Форум', icon: '💬', bg: '#1e3a8a' },
+    { id: 'fkm', name: 'FKM Разгон', icon: '⚡', bg: '#ea580c' },
+    { id: 'mtmanager', name: 'MT Manager', icon: '📂', bg: '#0284c7' },
+    { id: 'pubg', name: 'PUBG Arena', icon: '🎮', bg: '#b45309' },
     { id: 'termux', name: 'Termux', icon: '💻', bg: '#000000' },
     { id: 'bank', name: 'СберБанк', icon: '🏦', bg: '#16a34a' },
-    { id: 'pubg', name: 'PUBG Test', icon: '🎮', bg: '#b45309' },
     { id: 'antutu', name: 'AnTuTu', icon: '🔥', bg: '#dc2626' }
   ];
 
@@ -1201,8 +1229,13 @@ function bindOsNavigation() {
 }
 
 let currentAppBackHandler = null;
+let activePubgAnimationId = null;
 
 function closeFullscreenApp(force = false) {
+  if (activePubgAnimationId) {
+    cancelAnimationFrame(activePubgAnimationId);
+    activePubgAnimationId = null;
+  }
   if (!force && currentAppBackHandler) {
     const handler = currentAppBackHandler;
     currentAppBackHandler = null;
@@ -1228,14 +1261,23 @@ function openFullscreenApp(appId) {
   } else if (appId === 'settings') {
     UI.appWindowTitle.textContent = 'Настройки устройства';
     renderSettingsApp(body);
+  } else if (appId === 'forum') {
+    UI.appWindowTitle.textContent = '4PDA Форум & Биржа заказов';
+    renderForumApp(body);
+  } else if (appId === 'fkm') {
+    UI.appWindowTitle.textContent = 'Franco Kernel Manager (FKM OC)';
+    renderFkmApp(body);
+  } else if (appId === 'mtmanager') {
+    UI.appWindowTitle.textContent = 'MT Manager (build.prop Editor)';
+    renderMtManagerApp(body);
   } else if (appId === 'termux') {
-    UI.appWindowTitle.textContent = 'Termux (CLI)';
+    UI.appWindowTitle.textContent = 'Termux (Bash Shell)';
     renderTermuxApp(body);
   } else if (appId === 'bank') {
     UI.appWindowTitle.textContent = 'СберБанк Онлайн';
     renderBankApp(body);
   } else if (appId === 'pubg') {
-    UI.appWindowTitle.textContent = 'PUBG Mobile FrameRate Test';
+    UI.appWindowTitle.textContent = 'PUBG Mobile 120 FPS Arena';
     renderPubgApp(body);
   } else if (appId === 'viper') {
     UI.appWindowTitle.textContent = 'ViPER4Android FX Audio Engine';
@@ -1507,41 +1549,911 @@ function renderLsposedApp(container) {
   `;
 }
 
-// --- APP: PUBG MOBILE FPS TEST ---
+// --- APP: PLAYABLE PUBG MOBILE 120 FPS MINI-GAME ---
 function renderPubgApp(container) {
-  const is120Supported = GameState.displayRefreshRate === 120 && (GameState.kernel === 'stormbreaker' || GameState.modules.has('Game120FPS') || GameState.rom === 'crdroid');
-  const targetFps = is120Supported ? 120 : 60;
+  if (activePubgAnimationId) {
+    cancelAnimationFrame(activePubgAnimationId);
+    activePubgAnimationId = null;
+  }
+
+  const is120 = GameState.displayRefreshRate === 120 && (GameState.cpuFreq >= 2.96 || GameState.rom === 'crdroid' || GameState.kernel === 'stormbreaker');
+  const maxFps = is120 ? 120 : 60;
 
   container.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:14px;">
-      <div class="pubg-viewfinder">
-        <div style="font-size:13px; font-weight:bold; color:#f59e0b;">PUBG Mobile • Эрангель (4K Ultra HD)</div>
-        <div class="pubg-fps-counter" id="pubg-fps-val">${targetFps} FPS</div>
-        <div style="font-size:11px; color:#cbd5e1;">Рендеринг: Vulkan API • Графика: 90/120 Hz Extreme</div>
+    <div class="pubg-game-wrapper">
+      <div class="pubg-hud-bar">
+        <div>❤️ HP: <b id="pubg-hp-val" style="color:#00e676;">100%</b></div>
+        <div>💀 Очки: <b id="pubg-score-val" style="color:#f59e0b;">0</b></div>
+        <div>⚡ <span id="pubg-fps-indicator" style="color:#38bdf8; font-weight:bold;">${maxFps} FPS</span></div>
+        <div>🌡️ <span id="pubg-temp-val" style="color:#ef4444;">${GameState.cpuTemp.toFixed(1)}°C</span></div>
       </div>
 
-      <div style="background:#1e293b; padding:14px; border-radius:10px; font-size:12px; line-height:1.7;">
-        <b>Статус игрового оверклока:</b><br>
-        • Частота экрана: <b>${GameState.displayRefreshRate} Hz</b><br>
-        • Ядро: <b>${GameState.kernelVersion}</b><br>
-        • 120 FPS Unlocker: <b>${GameState.modules.has('Game120FPS') || is120Supported ? 'Активирован' : 'Не активен (ограничено 60 FPS)'}</b>
+      <div class="pubg-canvas-frame">
+        <canvas id="pubg-canvas" width="340" height="240"></canvas>
+        <div id="pubg-game-over-overlay" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.85); flex-direction:column; align-items:center; justify-content:center; gap:12px; z-index:10;">
+          <div style="font-size:24px; font-weight:900; color:#ef4444;">ВЫ ПОГИБЛИ</div>
+          <div style="font-size:13px; color:#cbd5e1;">Итоговый счет: <b id="final-pubg-score" style="color:#f59e0b;">0</b></div>
+          <button id="btn-pubg-restart" class="rec-big-btn success" style="width:auto; padding:8px 24px;">Возродиться в зоне</button>
+        </div>
       </div>
 
-      ${is120Supported ? `
-        <div style="background:#064e3b; border:1px solid #059669; padding:12px; border-radius:8px; color:#34d399; font-size:12px;">
-          🎉 <b>120 FPS разблокированы!</b> Процессор разогнан, микрофризов нет.
+      <div class="pubg-controls">
+        <div class="pubg-dpad">
+          <div></div>
+          <button class="dpad-btn" id="dpad-up">▲</button>
+          <div></div>
+          <button class="dpad-btn" id="dpad-left">◀</button>
+          <button class="dpad-btn" id="dpad-down">▼</button>
+          <button class="dpad-btn" id="dpad-right">▶</button>
         </div>
-      ` : `
-        <div style="background:#450a0a; border:1px solid #dc2626; padding:12px; border-radius:8px; color:#fca5a5; font-size:12px;">
-          ⚠️ <b>Ограничение 60 FPS:</b> Установите модуль <code>Game_120FPS_Unlocker.zip</code> или прошейте <b>StormBreaker Kernel</b> в рекавери!
+
+        <div style="display:flex; flex-direction:column; gap:4px; font-size:10px; color:#64748b; text-align:center;">
+          <div>Управление: D-Pad / Тап</div>
+          <div>Разгон CPU: <b>${GameState.cpuFreq} GHz</b></div>
+          <div>Частота: <b>${is120 ? '120 FPS Extreme' : '60 FPS Normal'}</b></div>
         </div>
-      `}
+
+        <button class="pubg-fire-btn" id="btn-pubg-fire">
+          🔥 ОГОНЬ
+        </button>
+      </div>
     </div>
   `;
 
-  if (is120Supported) {
-    checkQuest('fps120');
+  const canvas = document.getElementById('pubg-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let player = {
+    x: 170,
+    y: 120,
+    radius: 12,
+    hp: 100,
+    speed: GameState.cpuFreq >= 3.2 ? 3.5 : 2.5,
+    angle: 0
+  };
+
+  let bullets = [];
+  let enemies = [];
+  let particles = [];
+  let score = 0;
+  let isGameOver = false;
+
+  let lastTime = performance.now();
+  let frameCount = 0;
+  let lastFpsUpdate = performance.now();
+  let currentFps = maxFps;
+
+  const keys = { up: false, down: false, left: false, right: false };
+
+  function setupDpadBtn(id, dir) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const start = (e) => { e.preventDefault(); keys[dir] = true; };
+    const end = (e) => { e.preventDefault(); keys[dir] = false; };
+    el.addEventListener('mousedown', start);
+    el.addEventListener('mouseup', end);
+    el.addEventListener('touchstart', start, { passive: false });
+    el.addEventListener('touchend', end);
   }
+  setupDpadBtn('dpad-up', 'up');
+  setupDpadBtn('dpad-down', 'down');
+  setupDpadBtn('dpad-left', 'left');
+  setupDpadBtn('dpad-right', 'right');
+
+  function fireBullet() {
+    if (isGameOver) return;
+    sounds.beep(750, 0.04, 'square', 0.08);
+    sounds.vibrate(15);
+
+    let targetX = player.x + Math.cos(player.angle) * 100;
+    let targetY = player.y + Math.sin(player.angle) * 100;
+    if (enemies.length > 0) {
+      let nearest = enemies[0];
+      let minDist = 9999;
+      enemies.forEach(e => {
+        let d = Math.hypot(e.x - player.x, e.y - player.y);
+        if (d < minDist) { minDist = d; nearest = e; }
+      });
+      targetX = nearest.x;
+      targetY = nearest.y;
+    }
+
+    const angle = Math.atan2(targetY - player.y, targetX - player.x);
+    player.angle = angle;
+    const bSpeed = GameState.cpuFreq >= 3.2 ? 9 : 6.5;
+    bullets.push({
+      x: player.x + Math.cos(angle) * (player.radius + 4),
+      y: player.y + Math.sin(angle) * (player.radius + 4),
+      vx: Math.cos(angle) * bSpeed,
+      vy: Math.sin(angle) * bSpeed,
+      radius: 3.5
+    });
+
+    if (GameState.cpuFreq >= 3.2) {
+      bullets.push({
+        x: player.x + Math.cos(angle + 0.15) * (player.radius + 4),
+        y: player.y + Math.sin(angle + 0.15) * (player.radius + 4),
+        vx: Math.cos(angle + 0.15) * bSpeed,
+        vy: Math.sin(angle + 0.15) * bSpeed,
+        radius: 3
+      });
+    }
+  }
+
+  const fireBtn = document.getElementById('btn-pubg-fire');
+  fireBtn.addEventListener('click', (e) => { e.preventDefault(); fireBullet(); });
+  fireBtn.addEventListener('touchstart', (e) => { e.preventDefault(); fireBullet(); }, { passive: false });
+
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const clickX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const clickY = (e.clientY - rect.top) * (canvas.height / rect.height);
+    player.angle = Math.atan2(clickY - player.y, clickX - player.x);
+    fireBullet();
+  });
+
+  let spawnTimer = 0;
+  function spawnEnemy() {
+    const edge = Math.floor(Math.random() * 4);
+    let x = 0, y = 0;
+    if (edge === 0) { x = Math.random() * canvas.width; y = -10; }
+    else if (edge === 1) { x = canvas.width + 10; y = Math.random() * canvas.height; }
+    else if (edge === 2) { x = Math.random() * canvas.width; y = canvas.height + 10; }
+    else { x = -10; y = Math.random() * canvas.height; }
+
+    enemies.push({
+      x: x,
+      y: y,
+      hp: 2,
+      maxHp: 2,
+      speed: 1.0 + Math.random() * 0.8,
+      radius: 11
+    });
+  }
+
+  function addParticles(x, y, color) {
+    for (let i = 0; i < 8; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const spd = 1 + Math.random() * 3;
+      particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(a) * spd,
+        vy: Math.sin(a) * spd,
+        life: 1.0,
+        color: color
+      });
+    }
+  }
+
+  function loop(timestamp) {
+    if (!document.getElementById('pubg-canvas')) return;
+
+    const delta = timestamp - lastTime;
+    lastTime = timestamp;
+    frameCount++;
+
+    if (timestamp - lastFpsUpdate >= 400) {
+      const measured = Math.round((frameCount * 1000) / (timestamp - lastFpsUpdate));
+      currentFps = Math.min(measured, maxFps);
+      frameCount = 0;
+      lastFpsUpdate = timestamp;
+      const fpsEl = document.getElementById('pubg-fps-indicator');
+      if (fpsEl) {
+        fpsEl.textContent = `${currentFps} FPS`;
+        fpsEl.style.color = currentFps >= 110 ? '#00e676' : (currentFps >= 55 ? '#38bdf8' : '#f59e0b');
+      }
+    }
+
+    if (!isGameOver) {
+      if (keys.up && player.y > player.radius) player.y -= player.speed;
+      if (keys.down && player.y < canvas.height - player.radius) player.y += player.speed;
+      if (keys.left && player.x > player.radius) player.x -= player.speed;
+      if (keys.right && player.x < canvas.width - player.radius) player.x += player.speed;
+
+      spawnTimer += delta;
+      if (spawnTimer >= (GameState.cpuFreq >= 3.2 ? 900 : 1300)) {
+        spawnTimer = 0;
+        spawnEnemy();
+      }
+
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+          bullets.splice(i, 1);
+          continue;
+        }
+
+        for (let j = enemies.length - 1; j >= 0; j--) {
+          const e = enemies[j];
+          if (Math.hypot(b.x - e.x, b.y - e.y) < b.radius + e.radius) {
+            e.hp--;
+            addParticles(b.x, b.y, '#f59e0b');
+            bullets.splice(i, 1);
+            if (e.hp <= 0) {
+              addParticles(e.x, e.y, '#ef4444');
+              enemies.splice(j, 1);
+              score += 100;
+              sounds.beep(220, 0.08, 'triangle', 0.1);
+              const scoreEl = document.getElementById('pubg-score-val');
+              if (scoreEl) scoreEl.textContent = score;
+              if (score >= 500) checkQuest('fps120');
+            }
+            break;
+          }
+        }
+      }
+
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const e = enemies[i];
+        const angle = Math.atan2(player.y - e.y, player.x - e.x);
+        e.x += Math.cos(angle) * e.speed;
+        e.y += Math.sin(angle) * e.speed;
+
+        if (Math.hypot(player.x - e.x, player.y - e.y) < player.radius + e.radius) {
+          player.hp -= 15;
+          sounds.beep(140, 0.12, 'sawtooth', 0.15);
+          sounds.vibrate(40);
+          addParticles(player.x, player.y, '#ff3366');
+          enemies.splice(i, 1);
+          const hpEl = document.getElementById('pubg-hp-val');
+          if (hpEl) {
+            hpEl.textContent = `${Math.max(0, player.hp)}%`;
+            hpEl.style.color = player.hp > 50 ? '#00e676' : (player.hp > 25 ? '#f59e0b' : '#ef4444');
+          }
+
+          if (player.hp <= 0) {
+            isGameOver = true;
+            sounds.errorTone();
+            document.getElementById('pubg-game-over-overlay').style.display = 'flex';
+            document.getElementById('final-pubg-score').textContent = score;
+          }
+        }
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.04;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    ctx.fillStyle = '#060a12';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = 'rgba(30, 45, 70, 0.4)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 30) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += 30) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+
+    particles.forEach(p => {
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.life;
+      ctx.fillRect(p.x - 2, p.y - 2, 4, 4);
+    });
+    ctx.globalAlpha = 1.0;
+
+    ctx.fillStyle = GameState.cpuFreq >= 3.2 ? '#00f2fe' : '#fbbf24';
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = ctx.fillStyle;
+    bullets.forEach(b => {
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+
+    enemies.forEach(e => {
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fee2e2';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#000';
+      ctx.fillRect(e.x - 3, e.y - 2, 2, 2);
+      ctx.fillRect(e.x + 1, e.y - 2, 2, 2);
+    });
+
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.angle);
+
+    ctx.fillStyle = '#64748b';
+    ctx.fillRect(0, -3, 16, 6);
+
+    ctx.fillStyle = '#0284c7';
+    ctx.beginPath();
+    ctx.arc(0, 0, player.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.restore();
+
+    activePubgAnimationId = requestAnimationFrame(loop);
+  }
+
+  activePubgAnimationId = requestAnimationFrame(loop);
+
+  document.getElementById('btn-pubg-restart').onclick = () => {
+    sounds.click();
+    player.hp = 100;
+    player.x = 170;
+    player.y = 120;
+    bullets = [];
+    enemies = [];
+    particles = [];
+    score = 0;
+    isGameOver = false;
+    document.getElementById('pubg-game-over-overlay').style.display = 'none';
+    document.getElementById('pubg-hp-val').textContent = '100%';
+    document.getElementById('pubg-score-val').textContent = '0';
+  };
+}
+
+// --- APP: FRANCO KERNEL MANAGER (FKM OC) ---
+function renderFkmApp(container) {
+  function render() {
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="background:#151c2a; border:1px solid #233147; border-radius:14px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b>Qualcomm Snapdragon 860</b>
+            <span style="font-size:10px; color:#00e676; font-weight:800; background:rgba(0,230,118,0.15); padding:2px 8px; border-radius:10px;">8 CORES ONLINE</span>
+          </div>
+
+          <div class="fkm-core-grid">
+            <div class="fkm-core-card">
+              <div class="fkm-core-label">Core 0-1</div>
+              <div class="fkm-core-mhz">1.8 GHz</div>
+            </div>
+            <div class="fkm-core-card">
+              <div class="fkm-core-label">Core 2-3</div>
+              <div class="fkm-core-mhz">1.8 GHz</div>
+            </div>
+            <div class="fkm-core-card">
+              <div class="fkm-core-label">Core 4-6</div>
+              <div class="fkm-core-mhz">2.42 GHz</div>
+            </div>
+            <div class="fkm-core-card" style="border-color:#38bdf8;">
+              <div class="fkm-core-label" style="color:#38bdf8;">Prime 7</div>
+              <div class="fkm-core-mhz" style="color:#00f2fe;">${GameState.cpuFreq.toFixed(2)} GHz</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px; color:#94a3b8; display:flex; justify-content:space-between; margin-top:6px;">
+            <span>Текущее ядро: <b style="color:#fff;">${GameState.kernelVersion}</b></span>
+            <span>GPU: <b style="color:#00e676;">${GameState.gpuFreq} MHz</b></span>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-header">Максимальная частота CPU Prime Core</div>
+          <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px;">
+            <div class="settings-tile-grid">
+              <div class="settings-tile ${GameState.cpuFreq === 1.8 ? 'active' : ''}" data-freq="1.8">
+                <div class="settings-tile-title">1.80 GHz</div>
+                <div class="settings-tile-sub">Эко</div>
+              </div>
+              <div class="settings-tile ${GameState.cpuFreq === 2.42 ? 'active' : ''}" data-freq="2.42">
+                <div class="settings-tile-title">2.42 GHz</div>
+                <div class="settings-tile-sub">Штат</div>
+              </div>
+              <div class="settings-tile ${GameState.cpuFreq === 2.96 ? 'active' : ''}" data-freq="2.96">
+                <div class="settings-tile-title">2.96 GHz</div>
+                <div class="settings-tile-sub">Stock Max</div>
+              </div>
+            </div>
+            <div class="settings-tile ${GameState.cpuFreq === 3.20 ? 'active' : ''}" data-freq="3.2" style="border-color:#ef4444; background:rgba(239,68,68,0.1);">
+              <div class="settings-tile-title" style="color:#ef4444;">⚡ 3.20 GHz Extreme OC (StormBreaker)</div>
+              <div class="settings-tile-sub">Максимальный оверклок для 120 FPS в PUBG и рекорда AnTuTu</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-header">Частота Adreno 640 & Говернор</div>
+          <div style="padding:12px 14px; display:flex; flex-direction:column; gap:10px;">
+            <div>
+              <div style="font-size:11px; color:#888; margin-bottom:6px;">Частота GPU:</div>
+              <div style="display:flex; gap:8px;">
+                <button class="fkm-gov-chip ${GameState.gpuFreq === 675 ? 'active' : ''}" data-gpufreq="675">675 MHz (Default)</button>
+                <button class="fkm-gov-chip ${GameState.gpuFreq === 750 ? 'active' : ''}" data-gpufreq="750">750 MHz (Turbo)</button>
+                <button class="fkm-gov-chip ${GameState.gpuFreq === 825 ? 'active' : ''}" data-gpufreq="825">825 MHz (Max OC)</button>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:11px; color:#888; margin-bottom:6px;">CPU Governor (Планировщик):</div>
+              <div style="display:flex; gap:8px;">
+                <button class="fkm-gov-chip ${GameState.cpuGovernor === 'schedutil' ? 'active' : ''}" data-gov="schedutil">schedutil</button>
+                <button class="fkm-gov-chip ${GameState.cpuGovernor === 'performance' ? 'active' : ''}" data-gov="performance">performance</button>
+                <button class="fkm-gov-chip ${GameState.cpuGovernor === 'powersave' ? 'active' : ''}" data-gov="powersave">powersave</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-apply-fkm" class="rec-big-btn success" style="margin-top:6px;">
+          💾 Применить настройки ядра
+        </button>
+      </div>
+    `;
+
+    container.querySelectorAll('[data-freq]').forEach(tile => {
+      tile.onclick = () => {
+        sounds.click();
+        GameState.cpuFreq = parseFloat(tile.dataset.freq);
+        render();
+      };
+    });
+
+    container.querySelectorAll('[data-gpufreq]').forEach(btn => {
+      btn.onclick = () => {
+        sounds.click();
+        GameState.gpuFreq = parseInt(btn.dataset.gpufreq);
+        render();
+      };
+    });
+
+    container.querySelectorAll('[data-gov]').forEach(btn => {
+      btn.onclick = () => {
+        sounds.click();
+        GameState.cpuGovernor = btn.dataset.gov;
+        render();
+      };
+    });
+
+    document.getElementById('btn-apply-fkm').onclick = () => {
+      sounds.bootChime();
+      sounds.vibrate(60);
+      alert(`⚡ FKM: Параметры ядра успешно сохранены!\nCPU: ${GameState.cpuFreq.toFixed(2)} GHz\nGPU: ${GameState.gpuFreq} MHz\nGovernor: ${GameState.cpuGovernor}\n\nPUBG и AnTuTu работают на максимальной производительности!`);
+      if (GameState.cpuFreq >= 3.20) {
+        checkQuest('fps120');
+      }
+    };
+  }
+
+  render();
+}
+
+// --- APP: 4PDA FORUM & CLIENT ORDERS ---
+function renderForumApp(container) {
+  let activeTab = 'threads';
+
+  function render() {
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="forum-tabs">
+          <button class="forum-tab ${activeTab === 'threads' ? 'active' : ''}" data-ftab="threads">💬 Горячие темы</button>
+          <button class="forum-tab ${activeTab === 'orders' ? 'active' : ''}" data-ftab="orders">💼 Биржа заказов</button>
+          <button class="forum-tab ${activeTab === 'profile' ? 'active' : ''}" data-ftab="profile">👑 Профиль (${GameState.modderReputation} rep)</button>
+        </div>
+
+        <div id="forum-content"></div>
+      </div>
+    `;
+
+    container.querySelectorAll('[data-ftab]').forEach(tab => {
+      tab.onclick = () => {
+        sounds.click();
+        activeTab = tab.dataset.ftab;
+        render();
+      };
+    });
+
+    const body = document.getElementById('forum-content');
+
+    if (activeTab === 'threads') {
+      renderThreads(body);
+    } else if (activeTab === 'orders') {
+      renderOrders(body);
+    } else {
+      renderProfile(body);
+    }
+  }
+
+  function renderThreads(body) {
+    body.innerHTML = `
+      <div class="forum-thread-card">
+        <div class="forum-user-badge">
+          <span>👤 Noob_Poco_2026</span>
+          <span class="forum-rep-pill">Rep: 2</span>
+          <span style="color:#64748b; font-size:10px; margin-left:auto;">5 мин назад</span>
+        </div>
+        <div style="font-weight:700; color:#fff; font-size:13px;">
+          SOS! Окирпичил Poco X3 Pro после прошивки PixelOS! Висит Qualcomm CrashDump!
+        </div>
+        <div style="font-size:11px; color:#cbd5e1; line-height:1.4;">
+          Мужики, прошил архив с флешки, не нажал Format Data и словил черный экран с дампом. Что делать, плату менять?!
+        </div>
+        ${GameState.solvedForumThreads.has('thread1') ? `
+          <div style="background:#064e3b; border:1px solid #059669; padding:8px 12px; border-radius:6px; color:#34d399; font-size:11px;">
+            ✓ Вы ответили: «Переведи в Fastboot, открой TWRP и сделай Format Data yes». Автор поблагодарил (+25 Репутации)!
+          </div>
+        ` : `
+          <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
+            <button class="forum-reply-option" id="btn-ans-1a">
+              🟢 «Зажми Power + Vol- для входа в Fastboot, зайди в TWRP и нажми Format Data с вводом 'yes'»
+            </button>
+            <button class="forum-reply-option" id="btn-ans-1b">
+              🔴 «Выбрось в помойку и не трогай прошивки, если читать шапку не умеешь»
+            </button>
+          </div>
+        `}
+      </div>
+
+      <div class="forum-thread-card">
+        <div class="forum-user-badge">
+          <span>👤 Cybersport_Dimon</span>
+          <span class="forum-rep-pill">Rep: 84</span>
+          <span style="color:#64748b; font-size:10px; margin-left:auto;">12 мин назад</span>
+        </div>
+        <div style="font-weight:700; color:#fff; font-size:13px;">
+          Какое ядро шить для стабильных 120 FPS в PUBG без троттлинга?
+        </div>
+        <div style="font-size:11px; color:#cbd5e1; line-height:1.4;">
+          Стоковое ядро MIUI дропает кадры до 45 фпс при перестрелках. Посоветуйте проверенный вариант.
+        </div>
+        ${GameState.solvedForumThreads.has('thread2') ? `
+          <div style="background:#064e3b; border:1px solid #059669; padding:8px 12px; border-radius:6px; color:#34d399; font-size:11px;">
+            ✓ Вы ответили: «Шей StormBreaker Kernel с разгоном до 3.2 ГГц и GPU 825 МГц». Модератор закрепил в шапке (+30 Репутации)!
+          </div>
+        ` : `
+          <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
+            <button class="forum-reply-option" id="btn-ans-2a">
+              🟢 «Прошей StormBreaker Kernel через TWRP: разгон до 3.20 GHz Prime и Adreno 825 MHz держат стабильные 120 FPS»
+            </button>
+            <button class="forum-reply-option" id="btn-ans-2b">
+              🔴 «Положи телефон в морозилку во время катки»
+            </button>
+          </div>
+        `}
+      </div>
+
+      <div class="forum-thread-card">
+        <div class="forum-user-badge">
+          <span>👤 Alexey_Banker</span>
+          <span class="forum-rep-pill">Rep: 42</span>
+          <span style="color:#64748b; font-size:10px; margin-left:auto;">28 мин назад</span>
+        </div>
+        <div style="font-weight:700; color:#fff; font-size:13px;">
+          СберБанк видит Magisk даже со Shamiko! Как пройти Play Integrity?
+        </div>
+        ${GameState.solvedForumThreads.has('thread3') ? `
+          <div style="background:#064e3b; border:1px solid #059669; padding:8px 12px; border-radius:6px; color:#34d399; font-size:11px;">
+            ✓ Вы ответили: «Переходи на KernelSU и активируй Unmount Root для Сбера». Решение признано лучшим (+35 Репутации)!
+          </div>
+        ` : `
+          <div style="display:flex; flex-direction:column; gap:6px; margin-top:4px;">
+            <button class="forum-reply-option" id="btn-ans-3a">
+              🟢 «Переходи на KernelSU: ядерный рут изолируется из namespace приложения через функцию Unmount, Сбер видит чистую систему»
+            </button>
+            <button class="forum-reply-option" id="btn-ans-3b">
+              🔴 «Удали СберБанк и пользуйся браузером»
+            </button>
+          </div>
+        `}
+      </div>
+    `;
+
+    const ans1a = document.getElementById('btn-ans-1a');
+    if (ans1a) ans1a.onclick = () => {
+      sounds.bootChime();
+      sounds.vibrate(50);
+      GameState.modderReputation += 25;
+      GameState.solvedForumThreads.add('thread1');
+      alert('🎉 Автор темы: «Огромное человеческое спасибо, брат! Сделал Format Data в TWRP и телефон воскрес! Лови + в репу!»');
+      render();
+    };
+
+    const ans2a = document.getElementById('btn-ans-2a');
+    if (ans2a) ans2a.onclick = () => {
+      sounds.bootChime();
+      sounds.vibrate(50);
+      GameState.modderReputation += 30;
+      GameState.solvedForumThreads.add('thread2');
+      alert('🎉 Модератор 4PDA: «Отличный совет! Добавлено в FAQ по разгону Poco X3 Pro! Репутация повышена!»');
+      render();
+    };
+
+    const ans3a = document.getElementById('btn-ans-3a');
+    if (ans3a) ans3a.onclick = () => {
+      sounds.bootChime();
+      sounds.vibrate(50);
+      GameState.modderReputation += 35;
+      GameState.solvedForumThreads.add('thread3');
+      alert('🎉 Сообщество 4PDA: «Проверено на практике, KernelSU Unmount действительно обходит MEETS_STRONG_INTEGRITY!»');
+      render();
+    };
+  }
+
+  function renderOrders(body) {
+    body.innerHTML = `
+      <div style="font-size:12px; color:#94a3b8; margin-bottom:8px;">
+        Выполняйте реальные заказы пользователей на прошивку для повышения моддерского ранга:
+      </div>
+
+      <div class="forum-thread-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <b style="color:#60a5fa;">Заказ #1: Прошить чистый PixelOS 14</b>
+          <span style="color:#00e676; font-size:11px; font-weight:800;">+200 XP • +40 Rep</span>
+        </div>
+        <div style="font-size:11px; color:#cbd5e1;">
+          Клиент: Иван • Требование: Установить прошивку PixelOS через Fastboot или Рекавери.
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+          <span style="font-size:11px; color:${GameState.rom === 'pixel' ? '#00e676' : '#f59e0b'};">
+            Статус: ${GameState.rom === 'pixel' ? '✓ PixelOS установлена' : 'Не выполнено (текущая: ' + GameState.rom + ')'}
+          </span>
+          <button class="rec-big-btn success" id="btn-submit-order-1" style="width:auto; padding:6px 14px; margin:0;" ${GameState.rom === 'pixel' && !GameState.solvedOrders.has('order1') ? '' : 'disabled'}>
+            ${GameState.solvedOrders.has('order1') ? '✓ Сдан' : 'Сдать заказ'}
+          </button>
+        </div>
+      </div>
+
+      <div class="forum-thread-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <b style="color:#60a5fa;">Заказ #2: KernelSU & 120 FPS для геймера</b>
+          <span style="color:#00e676; font-size:11px; font-weight:800;">+300 XP • +50 Rep</span>
+        </div>
+        <div style="font-size:11px; color:#cbd5e1;">
+          Клиент: Максим • Требование: Прошить ядро с KernelSU и включить 120 Гц в настройках.
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+          <span style="font-size:11px; color:${GameState.ksuWorking && GameState.displayRefreshRate === 120 ? '#00e676' : '#f59e0b'};">
+            Статус: ${GameState.ksuWorking && GameState.displayRefreshRate === 120 ? '✓ Ядро KSU + 120Hz готовы' : 'Не выполнено'}
+          </span>
+          <button class="rec-big-btn success" id="btn-submit-order-2" style="width:auto; padding:6px 14px; margin:0;" ${GameState.ksuWorking && GameState.displayRefreshRate === 120 && !GameState.solvedOrders.has('order2') ? '' : 'disabled'}>
+            ${GameState.solvedOrders.has('order2') ? '✓ Сдан' : 'Сдать заказ'}
+          </button>
+        </div>
+      </div>
+
+      <div class="forum-thread-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <b style="color:#60a5fa;">Заказ #3: Настройка СберБанка (Play Integrity)</b>
+          <span style="color:#00e676; font-size:11px; font-weight:800;">+250 XP • +35 Rep</span>
+        </div>
+        <div style="font-size:11px; color:#cbd5e1;">
+          Клиент: Артем • Требование: Изолировать рут от банковского приложения в KernelSU Manager.
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+          <span style="font-size:11px; color:${GameState.ksuUnmountRoot.has('bank') ? '#00e676' : '#f59e0b'};">
+            Статус: ${GameState.ksuUnmountRoot.has('bank') ? '✓ Root отмонтирован' : 'Не выполнено'}
+          </span>
+          <button class="rec-big-btn success" id="btn-submit-order-3" style="width:auto; padding:6px 14px; margin:0;" ${GameState.ksuUnmountRoot.has('bank') && !GameState.solvedOrders.has('order3') ? '' : 'disabled'}>
+            ${GameState.solvedOrders.has('order3') ? '✓ Сдан' : 'Сдать заказ'}
+          </button>
+        </div>
+      </div>
+    `;
+
+    const sub1 = document.getElementById('btn-submit-order-1');
+    if (sub1) sub1.onclick = () => {
+      sounds.bootChime();
+      sounds.vibrate(60);
+      GameState.solvedOrders.add('order1');
+      GameState.modderReputation += 40;
+      alert('🎉 Заказ #1 выполнен! Клиент в восторге от плавности PixelOS 14. +40 к репутации 4PDA!');
+      render();
+    };
+
+    const sub2 = document.getElementById('btn-submit-order-2');
+    if (sub2) sub2.onclick = () => {
+      sounds.bootChime();
+      sounds.vibrate(60);
+      GameState.solvedOrders.add('order2');
+      GameState.modderReputation += 50;
+      alert('🎉 Заказ #2 выполнен! В PUBG стабильные 120 FPS без просадок. +50 к репутации 4PDA!');
+      render();
+    };
+
+    const sub3 = document.getElementById('btn-submit-order-3');
+    if (sub3) sub3.onclick = () => {
+      sounds.bootChime();
+      sounds.vibrate(60);
+      GameState.solvedOrders.add('order3');
+      GameState.modderReputation += 35;
+      alert('🎉 Заказ #3 выполнен! СберБанк запускается без предупреждений. +35 к репутации 4PDA!');
+      render();
+    };
+  }
+
+  function renderProfile(body) {
+    let rank = 'Новичок 4PDA';
+    if (GameState.modderReputation > 50) rank = 'Форумчанин';
+    if (GameState.modderReputation > 150) rank = 'Актив темы';
+    if (GameState.modderReputation > 250) rank = 'Куратор темы Poco X3 Pro';
+    if (GameState.modderReputation > 350) rank = '👑 Легенда 4PDA';
+    GameState.modderRank = rank;
+
+    body.innerHTML = `
+      <div style="text-align:center; padding:20px; background:#151c2a; border-radius:14px; border:1px solid #233147;">
+        <div style="font-size:52px;">👑</div>
+        <div style="font-size:18px; font-weight:900; color:#fff; margin-top:8px;">Zyaster</div>
+        <div style="font-size:13px; color:#38bdf8; font-weight:700; margin-top:2px;">${rank}</div>
+        
+        <div style="display:flex; justify-content:center; gap:20px; margin-top:16px;">
+          <div>
+            <div style="font-size:24px; font-weight:900; color:#00e676;">+${GameState.modderReputation}</div>
+            <div style="font-size:11px; color:#888;">Репутация на форуме</div>
+          </div>
+          <div>
+            <div style="font-size:24px; font-weight:900; color:#f59e0b;">${GameState.solvedOrders.size} / 3</div>
+            <div style="font-size:11px; color:#888;">Сдано заказов</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  render();
+}
+
+// --- APP: MT MANAGER (ROOT EXPLORER & BUILD.PROP EDITOR) ---
+function renderMtManagerApp(container) {
+  let currentDir = '/system';
+  let isEditingBuildProp = false;
+
+  function render() {
+    if (isEditingBuildProp) {
+      renderBuildPropEditor();
+      return;
+    }
+
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; height:100%;">
+        <div style="display:flex; align-items:center; gap:8px; background:#0d131f; padding:8px 12px; border-radius:8px; border:1px solid #1e293b; font-family:var(--font-mono); font-size:12px; color:#38bdf8; margin-bottom:10px;">
+          <span>📂</span>
+          <span style="flex:1;">${currentDir}</span>
+          ${currentDir !== '/' ? `<button id="btn-mt-up" style="background:#1e293b; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:11px; cursor:pointer;">▲ Вверх</button>` : ''}
+        </div>
+
+        <div style="flex:1; background:#090d14; border:1px solid #1a2333; border-radius:10px; overflow-y:auto;">
+          ${renderFileList()}
+        </div>
+
+        <div style="font-size:11px; color:#64748b; margin-top:8px;">
+          Нажмите на <b>build.prop</b> для редактирования системных свойств модели и разгона.
+        </div>
+      </div>
+    `;
+
+    const btnUp = document.getElementById('btn-mt-up');
+    if (btnUp) btnUp.onclick = () => {
+      sounds.click();
+      const parts = currentDir.split('/').filter(Boolean);
+      parts.pop();
+      currentDir = '/' + parts.join('/');
+      if (currentDir === '') currentDir = '/';
+      render();
+    };
+
+    container.querySelectorAll('.mt-file-row').forEach(row => {
+      row.onclick = () => {
+        sounds.click();
+        const type = row.dataset.type;
+        const name = row.dataset.name;
+        if (type === 'dir') {
+          currentDir = currentDir === '/' ? `/${name}` : `${currentDir}/${name}`;
+          render();
+        } else if (name === 'build.prop') {
+          isEditingBuildProp = true;
+          render();
+        } else {
+          alert(`Файл: [${name}] открыт для чтения.`);
+        }
+      };
+    });
+  }
+
+  function renderFileList() {
+    let items = [];
+    if (currentDir === '/') {
+      items = [
+        { name: 'sdcard', type: 'dir', icon: '📁' },
+        { name: 'system', type: 'dir', icon: '📁' },
+        { name: 'data', type: 'dir', icon: '📁' },
+        { name: 'vendor', type: 'dir', icon: '📁' }
+      ];
+    } else if (currentDir === '/system') {
+      items = [
+        { name: 'bin', type: 'dir', icon: '📁' },
+        { name: 'etc', type: 'dir', icon: '📁' },
+        { name: 'lib64', type: 'dir', icon: '📁' },
+        { name: 'build.prop', type: 'file', icon: '📄', sub: 'Редактор свойств системы' }
+      ];
+    } else if (currentDir === '/sdcard') {
+      items = [
+        { name: 'Download', type: 'dir', icon: '📁' },
+        { name: 'TWRP', type: 'dir', icon: '📁' },
+        { name: 'Android', type: 'dir', icon: '📁' },
+        { name: 'recovery.log', type: 'file', icon: '📋' }
+      ];
+    } else {
+      items = [
+        { name: 'app', type: 'dir', icon: '📁' },
+        { name: 'adb', type: 'dir', icon: '📁' }
+      ];
+    }
+
+    return items.map(item => `
+      <div class="mt-file-row" data-type="${item.type}" data-name="${item.name}">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:16px;">${item.icon}</span>
+          <div>
+            <div style="font-weight:700; color:${item.name === 'build.prop' ? '#00f2fe' : '#fff'}; font-size:12px;">${item.name}</div>
+            ${item.sub ? `<div style="font-size:10px; color:#888;">${item.sub}</div>` : ''}
+          </div>
+        </div>
+        <span style="color:#475569; font-size:12px;">›</span>
+      </div>
+    `).join('');
+  }
+
+  function renderBuildPropEditor() {
+    const textContent = Object.keys(GameState.buildProp)
+      .map(k => `${k}=${GameState.buildProp[k]}`)
+      .join('\n');
+
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; height:100%; gap:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <b style="color:#00f2fe; font-size:13px;">Редактор /system/build.prop</b>
+          <button id="btn-mt-cancel" style="background:transparent; border:none; color:#888; cursor:pointer;">Отмена</button>
+        </div>
+
+        <textarea id="mt-editor-input" class="mt-editor-box">${textContent}</textarea>
+
+        <button id="btn-mt-save" class="rec-big-btn success">
+          💾 Сохранить изменения и обновить свойства
+        </button>
+      </div>
+    `;
+
+    document.getElementById('btn-mt-cancel').onclick = () => {
+      sounds.click();
+      isEditingBuildProp = false;
+      render();
+    };
+
+    document.getElementById('btn-mt-save').onclick = () => {
+      sounds.bootChime();
+      sounds.vibrate(60);
+      const val = document.getElementById('mt-editor-input').value;
+      const lines = val.split('\n');
+      lines.forEach(line => {
+        const parts = line.split('=');
+        if (parts.length >= 2) {
+          const k = parts[0].trim();
+          const v = parts.slice(1).join('=').trim();
+          GameState.buildProp[k] = v;
+          if (k === 'ro.product.model') {
+            GameState.model = v;
+          }
+        }
+      });
+      alert(`🎉 build.prop сохранен!\nМодель устройства теперь: ${GameState.model}\nСвойства системы обновлены.`);
+      isEditingBuildProp = false;
+      render();
+    };
+  }
+
+  render();
 }
 
 // --- APP: SETTINGS (Full-Fledged Android 14 System Settings) ---
@@ -2704,26 +3616,28 @@ function renderSettingsApp(container) {
   render();
 }
 
-// --- APP: TERMUX ---
+// --- APP: RICH LINUX BASH TERMUX ---
 function renderTermuxApp(container) {
   let isSuSession = false;
   container.innerHTML = `
     <div style="display:flex; flex-direction:column; height:100%;">
-      <div id="termux-output" style="flex:1; background:#000; color:#39ff14; font-family:monospace; font-size:12px; padding:12px; border-radius:8px; overflow-y:auto; white-space:pre-wrap; margin-bottom:10px; height:280px;">
-Welcome to Termux!
-Type 'help', 'ksu', 'su', or 'neofetch'.
+      <div id="termux-output" style="flex:1; background:#000; color:#39ff14; font-family:monospace; font-size:11.5px; padding:12px; border-radius:8px; overflow-y:auto; white-space:pre-wrap; margin-bottom:10px; height:280px; line-height:1.4;">
+Welcome to Termux on POCO X3 Pro (vayu)!
+Type 'help' for available commands.
+Type 'su' or 'ksu' to request root permissions.
       </div>
       <div style="display:flex; gap:8px;">
         <span id="termux-prompt" style="font-family:monospace; font-size:13px; color:#00f2fe; align-self:center;">$</span>
-        <input type="text" id="termux-input" style="flex:1; background:#111; border:1px solid #333; color:#fff; font-family:monospace; font-size:12px; padding:8px 10px; border-radius:6px;" placeholder="su, ksu, neofetch, uname -a" autocomplete="off">
+        <input type="text" id="termux-input" style="flex:1; background:#111; border:1px solid #333; color:#fff; font-family:monospace; font-size:12px; padding:8px 10px; border-radius:6px;" placeholder="help, neofetch, su, ls, free, uname" autocomplete="off">
         <button id="termux-btn-send" style="background:#238636; color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer;">↵</button>
       </div>
       <div style="display:flex; gap:6px; margin-top:8px; overflow-x:auto;">
-        <button class="q-btn" data-tcmd="ksu">ksu</button>
-        <button class="q-btn" data-tcmd="su">su</button>
+        <button class="q-btn" data-tcmd="help">help</button>
         <button class="q-btn" data-tcmd="neofetch">neofetch</button>
-        <button class="q-btn" data-tcmd="uname -a">uname -a</button>
-        <button class="q-btn" data-tcmd="reboot">reboot</button>
+        <button class="q-btn" data-tcmd="su">su</button>
+        <button class="q-btn" data-tcmd="ls /sdcard">ls /sdcard</button>
+        <button class="q-btn" data-tcmd="free -m">free -m</button>
+        <button class="q-btn" data-tcmd="ps">ps</button>
       </div>
     </div>
   `;
@@ -2738,9 +3652,30 @@ Type 'help', 'ksu', 'su', or 'neofetch'.
     output.textContent += `\n${prompt.textContent} ${cmd}\n`;
     sounds.click();
 
-    if (cmd === 'clear') {
+    const parts = cmd.split(' ');
+    const main = parts[0].toLowerCase();
+    const arg = parts.slice(1).join(' ');
+
+    if (main === 'clear') {
       output.textContent = '';
-    } else if (cmd === 'su' || cmd === 'ksu') {
+    } else if (main === 'help') {
+      output.textContent += `Available shell commands:
+  help       - Print this help message
+  neofetch   - Display system info & ASCII art
+  su / ksu   - Escalate to superuser (root)
+  whoami     - Print current user ID
+  id         - Print UID and GID info
+  uname -a   - Print Linux kernel version
+  ls [path]  - List directory contents
+  cat [file] - Display file contents
+  free -m    - Display RAM and swap memory
+  df -h      - Display disk partition usage
+  ps / top   - Display running processes
+  getprop    - Get Android build properties
+  setprop    - Set Android build property
+  reboot     - Reboot system [recovery|bootloader]
+  clear      - Clear terminal window\n`;
+    } else if (main === 'su' || main === 'ksu') {
       if (GameState.ksuWorking) {
         if (!GameState.ksuSuperuserApps.has('termux')) {
           triggerSuDialog('KernelSU', () => {
@@ -2770,36 +3705,91 @@ Type 'help', 'ksu', 'su', or 'neofetch'.
         sounds.errorTone();
         output.textContent += 'Permission denied: no root found. Flash KernelSU or Magisk in Recovery!\n';
       }
-    } else if (cmd === 'neofetch') {
-      output.textContent += `
-       .-.          OS: ${GameState.rom || 'stock'} (Android 14)
-      /   \\         Host: Xiaomi Poco X3 Pro (vayu)
-     |     |        Kernel: ${GameState.kernelVersion}
-     |     |        Uptime: 42 mins
-      \\   /         Display: 2400x1080 @ ${GameState.displayRefreshRate}Hz
-       '-'          CPU: Qualcomm Snapdragon 860 (8) @ 2.96GHz
-                    Root: ${GameState.ksuWorking ? 'KernelSU v0.9.5' : (GameState.magiskInstalled ? 'Magisk v27.0' : 'None')}
-                    Memory: 4120MiB / 8192MiB
-      \n`;
-    } else if (cmd === 'id') {
+    } else if (main === 'whoami') {
+      output.textContent += isSuSession ? 'root\n' : 'u0_a142\n';
+    } else if (main === 'id') {
       output.textContent += isSuSession ? 'uid=0(root) gid=0(root) groups=0(root),context=u:r:kernel:s0\n' : 'uid=10148(u0_a148) gid=10148(u0_a148)\n';
-    } else if (cmd === 'uname -a') {
-      output.textContent += `${GameState.kernelVersion} aarch64 Android\n`;
-    } else if (cmd === 'reboot') {
-      closeFullscreenApp();
-      bootDevice();
+    } else if (main === 'uname') {
+      output.textContent += `Linux localhost ${GameState.kernelVersion} #1 SMP PREEMPT aarch64 Android\n`;
+    } else if (main === 'free') {
+      output.textContent += `              total        used        free      shared     buff/cache   available
+Mem:           7842        3412        2140         128           2290        4150
+Swap:          3072         410        2662\n`;
+    } else if (main === 'df') {
+      output.textContent += `Filesystem           Size     Used    Avail   Use%  Mounted on
+/dev/block/dm-0      4.2G     3.8G     400M    90%  /system
+/dev/block/dm-1      1.8G     1.6G     200M    88%  /vendor
+/dev/block/sda32     225G      54G     171G    24%  /data
+/data/media          225G      54G     171G    24%  /sdcard\n`;
+    } else if (main === 'ps' || main === 'top') {
+      output.textContent += `USER       PID  %CPU %MEM   VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1   0.0  0.1  2.1M  1.1M ?        Ss   12:00   0:02 init
+root       412   1.2  0.4 12.4M  4.2M ?        S    12:00   0:15 /system/bin/surfaceflinger
+system     890   4.2  8.2  1.8G  640M ?        Sl   12:01   1:42 system_server
+u0_a142   2412   2.1  1.4  420M  110M pts/0    R+   12:10   0:05 /data/data/com.termux/files/usr/bin/bash\n`;
+    } else if (main === 'ls') {
+      const p = arg || '/sdcard';
+      if (p.includes('sdcard')) {
+        const files = Array.from(new Set([...GameState.phoneStorage, ...GameState.pcDownloads, 'Android', 'DCIM', 'Download', 'TWRP']));
+        output.textContent += files.join('   ') + '\n';
+      } else {
+        output.textContent += 'bin   etc   lib64   build.prop   framework   app   xbin\n';
+      }
+    } else if (main === 'cat') {
+      if (arg.includes('build.prop')) {
+        output.textContent += Object.keys(GameState.buildProp).map(k => `${k}=${GameState.buildProp[k]}`).join('\n') + '\n';
+      } else if (arg.includes('cpuinfo')) {
+        output.textContent += `Processor\t: AArch64 Processor rev 14 (aarch64)
+Hardware\t: Qualcomm Technologies, Inc SM8150 (Snapdragon 860)
+Features\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp\n`;
+      } else {
+        output.textContent += `cat: ${arg}: No such file or directory\n`;
+      }
+    } else if (main === 'neofetch') {
+      output.textContent += `
+       .-.          u0_a142@vayu
+      /   \\         --------------------
+     |     |        OS: Android 14 (${GameState.rom || 'Stock'})
+     |     |        Host: ${GameState.model}
+     |     |        Kernel: ${GameState.kernelVersion}
+      \\   /         Uptime: 2 hours, 14 mins
+       '-'          CPU: Snapdragon 860 @ ${GameState.cpuFreq}GHz (8 cores)
+                    GPU: Adreno 640 @ ${GameState.gpuFreq}MHz
+                    Memory: 3412MiB / 7842MiB
+                    Root: ${GameState.ksuWorking ? 'KernelSU v0.9.5' : (GameState.magiskInstalled ? 'Magisk v27' : 'None')}\n`;
+    } else if (main === 'reboot') {
+      if (arg === 'recovery') {
+        output.textContent += 'Rebooting into recovery...\n';
+        setTimeout(bootToRecovery, 500);
+      } else if (arg === 'bootloader' || arg === 'fastboot') {
+        output.textContent += 'Rebooting into bootloader...\n';
+        setTimeout(bootToFastboot, 500);
+      } else {
+        output.textContent += 'Rebooting system...\n';
+        setTimeout(bootDevice, 500);
+      }
     } else {
-      output.textContent += `sh: ${cmd}: command not found\n`;
+      output.textContent += `sh: command not found: ${main}. Type 'help' for command list.\n`;
     }
 
     output.scrollTop = output.scrollHeight;
     input.value = '';
   };
 
-  document.getElementById('termux-btn-send').addEventListener('click', () => exec(input.value));
-  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') exec(input.value); });
-  container.querySelectorAll('.q-btn[data-tcmd]').forEach(b => {
-    b.addEventListener('click', () => exec(b.dataset.tcmd));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      exec(input.value);
+    }
+  });
+
+  document.getElementById('termux-btn-send').addEventListener('click', () => {
+    exec(input.value);
+  });
+
+  container.querySelectorAll('.q-btn').forEach(btn => {
+    btn.onclick = () => {
+      exec(btn.dataset.tcmd);
+    };
   });
 }
 
