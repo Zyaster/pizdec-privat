@@ -108,7 +108,10 @@
     <div id="screen-recovery" class="screen-view theme-twrp">
       <!-- Recovery Top Bar -->
       <div class="recovery-topbar" id="recovery-topbar">
-        <div class="rec-logo-badge" id="rec-brand-title">Team Win Recovery Project 3.7</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="rec-top-back-btn" id="rec-top-back-btn" title="Назад в меню">◀</button>
+          <div class="rec-logo-badge" id="rec-brand-title">Team Win Recovery Project 3.7</div>
+        </div>
         <div class="rec-stats">
           <span id="rec-clock">12:34</span>
           <span>🔋 98%</span>
@@ -170,7 +173,7 @@
           <div class="rec-file-tree" id="rec-file-tree">
             <!-- Dynamically populated files -->
           </div>
-          <button class="rec-nav-back" data-back="main">Назад</button>
+          <button class="rec-nav-back" data-back="main">◀ Назад в главное меню</button>
         </div>
 
         <!-- Recovery Page: Confirm Flash (Swipe to Flash) -->
@@ -189,14 +192,17 @@
               <span class="rec-slider-text">Свайп для подтверждения прошивки</span>
             </div>
           </div>
-          <button class="rec-nav-back" data-back="install">Отмена</button>
+          <button class="rec-nav-back" data-back="install">◀ Назад к списку файлов</button>
         </div>
 
         <!-- Recovery Page: Live Flashing Console -->
         <div class="rec-page" id="rec-page-console" style="display:none;">
           <div class="rec-page-header">Executing Update Script</div>
           <div class="rec-log-console" id="rec-log-console"></div>
-          <button class="rec-big-btn success" id="btn-rec-reboot-system" style="display:none;">Reboot System</button>
+          <div style="display:flex; gap:10px; width:100%; margin-top:8px;">
+            <button class="rec-nav-back" data-back="main" id="btn-rec-console-back" style="flex:1;">◀ Назад в меню</button>
+            <button class="rec-big-btn success" id="btn-rec-reboot-system" style="flex:1; display:none;">Reboot System</button>
+          </div>
         </div>
 
         <!-- Recovery Page: Wipe / Format Data -->
@@ -212,21 +218,103 @@
             <input type="text" id="format-yes-input" class="format-input" placeholder="yes" autocomplete="off">
             <button class="rec-big-btn danger" id="btn-confirm-format-data">Форматировать Data</button>
           </div>
-          <button class="rec-nav-back" data-back="main">Назад</button>
+          <button class="rec-nav-back" data-back="main">◀ Назад в главное меню</button>
+        </div>
+
+        <!-- Recovery Page: Backup -->
+        <div class="rec-page" id="rec-page-backup" style="display:none;">
+          <div class="rec-page-header">Backup Partitions (Nandroid)</div>
+          <div style="background:#161922; border:1px solid #283040; border-radius:10px; padding:12px; margin-bottom:12px; font-size:12px;">
+            <div style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Выберите разделы для резервного копирования в /sdcard/TWRP/BACKUPS:</div>
+            <label style="display:flex; align-items:center; gap:8px; padding:5px 0;"><input type="checkbox" checked> <span>Boot (Ядро / KSU) • 64 MB</span></label>
+            <label style="display:flex; align-items:center; gap:8px; padding:5px 0;"><input type="checkbox" checked> <span>Super / System (ОС) • 4 120 MB</span></label>
+            <label style="display:flex; align-items:center; gap:8px; padding:5px 0;"><input type="checkbox" checked> <span>Vendor / Product • 1 840 MB</span></label>
+            <label style="display:flex; align-items:center; gap:8px; padding:5px 0;"><input type="checkbox"> <span>Data (Данные пользователя) • 12 400 MB</span></label>
+          </div>
+          <button class="rec-big-btn success" id="btn-do-backup">Создать бэкап Nandroid</button>
+          <button class="rec-nav-back" data-back="main">◀ Назад в главное меню</button>
+        </div>
+
+        <!-- Recovery Page: Restore -->
+        <div class="rec-page" id="rec-page-restore" style="display:none;">
+          <div class="rec-page-header">Restore Backup (Восстановление)</div>
+          <div style="background:#161922; border:1px solid #283040; border-radius:10px; padding:12px; margin-bottom:12px; font-size:12px;">
+            <div style="padding:10px; background:#222a3a; border-radius:8px; cursor:pointer;" id="item-restore-backup">
+              <b>💾 Poco_X3_Pro_Stock_HyperOS_Nandroid.tar</b>
+              <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Размер: 5.8 ГБ • Разделы: Boot, System, Vendor</div>
+            </div>
+          </div>
+          <button class="rec-nav-back" data-back="main">◀ Назад в главное меню</button>
+        </div>
+
+        <!-- Recovery Page: Mount -->
+        <div class="rec-page" id="rec-page-mount" style="display:none;">
+          <div class="rec-page-header">Mount Partitions (Монтирование)</div>
+          <div style="background:#161922; border:1px solid #283040; border-radius:10px; padding:12px; margin-bottom:12px; font-size:12px;">
+            <label style="display:flex; align-items:center; gap:8px; padding:5px 0;"><input type="checkbox" checked> <span>/system (Монтировать как R/W)</span></label>
+            <label style="display:flex; align-items:center; gap:8px; padding:5px 0;"><input type="checkbox" checked> <span>/vendor</span></label>
+            <label style="display:flex; align-items:center; gap:8px; padding:5px 0;"><input type="checkbox" checked> <span>/data</span></label>
+            <label style="display:flex; align-items:center; gap:8px; padding:5px 0;"><input type="checkbox"> <span>/metadata</span></label>
+          </div>
+          <button class="rec-big-btn" id="btn-toggle-mtp">Включить режим MTP для ПК</button>
+          <button class="rec-nav-back" data-back="main">◀ Назад в главное меню</button>
+        </div>
+
+        <!-- Recovery Page: Settings -->
+        <div class="rec-page" id="rec-page-settings" style="display:none;">
+          <div class="rec-page-header">Recovery Settings (Настройки рекавери)</div>
+          <div style="background:#161922; border:1px solid #283040; border-radius:10px; padding:12px; margin-bottom:12px; font-size:12px; display:flex; flex-direction:column; gap:10px;">
+            <div>Яркость подсветки: <b>85%</b></div>
+            <div>Виброотклик кнопок: <b>Включен (30ms)</b></div>
+            <div>Проверка цифровой подписи ZIP: <b>Отключена</b></div>
+            <div>Часовой пояс: <b>GMT+3 (Москва)</b></div>
+          </div>
+          <button class="rec-nav-back" data-back="main">◀ Назад в главное меню</button>
+        </div>
+
+        <!-- Recovery Page: Advanced -->
+        <div class="rec-page" id="rec-page-advanced" style="display:none;">
+          <div class="rec-page-header">Advanced Tools (Расширенные инструменты)</div>
+          <div class="reboot-grid">
+            <button class="rec-big-btn" id="btn-adv-terminal">💻 Terminal (Командная строка sh)</button>
+            <button class="rec-big-btn" id="btn-adv-fix-permissions">🛡️ Восстановить SELinux контексты</button>
+            <button class="rec-big-btn" id="btn-adv-copy-log">📋 Скопировать лог прошивки в /sdcard</button>
+          </div>
+          <button class="rec-nav-back" data-back="main">◀ Назад в главное меню</button>
         </div>
 
         <!-- Recovery Page: Reboot -->
         <div class="rec-page" id="rec-page-reboot" style="display:none;">
-          <div class="rec-page-header">Reboot Menu</div>
+          <div class="rec-page-header">Reboot Menu (Перезагрузка)</div>
           <div class="reboot-grid">
-            <button class="rec-big-btn" id="rb-system">System</button>
-            <button class="rec-big-btn" id="rb-recovery">Recovery</button>
-            <button class="rec-big-btn" id="rb-bootloader">Bootloader (Fastboot)</button>
-            <button class="rec-big-btn" id="rb-poweroff">Power Off</button>
+            <button class="rec-big-btn" id="rb-system">System (В систему)</button>
+            <button class="rec-big-btn" id="rb-recovery">Recovery (Перезапуск рекавери)</button>
+            <button class="rec-big-btn" id="rb-bootloader">Bootloader (Режим Fastboot)</button>
+            <button class="rec-big-btn" id="rb-poweroff">Power Off (Выключить телефон)</button>
           </div>
-          <button class="rec-nav-back" data-back="main">Назад</button>
+          <button class="rec-nav-back" data-back="main">◀ Назад в главное меню</button>
         </div>
 
+      </div>
+
+      <!-- Recovery Bottom Navigation Bar (Authentic TWRP 3.7 / OrangeFox) -->
+      <div class="recovery-navbar" id="recovery-navbar">
+        <button class="rec-nav-btn rec-btn-back" id="rec-bottom-back" title="Назад">
+          <span class="rec-nav-icon">◀</span>
+          <span class="rec-nav-label">Back</span>
+        </button>
+        <button class="rec-nav-btn" id="rec-bottom-home" title="Главное меню">
+          <span class="rec-nav-icon">🏠</span>
+          <span class="rec-nav-label">Home</span>
+        </button>
+        <button class="rec-nav-btn" id="rec-bottom-console" title="Консоль / Лог">
+          <span class="rec-nav-icon">≡</span>
+          <span class="rec-nav-label">Log</span>
+        </button>
+        <button class="rec-nav-btn" id="rec-bottom-reboot" title="Перезагрузка">
+          <span class="rec-nav-icon">🔄</span>
+          <span class="rec-nav-label">Reboot</span>
+        </button>
       </div>
     </div>
 

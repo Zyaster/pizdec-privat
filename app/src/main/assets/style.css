@@ -400,12 +400,94 @@ html, body {
 .recovery-topbar {
   height: 48px;
   background: #0a0a0a;
-  padding: 0 16px;
+  padding: 0 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 12px;
   font-weight: bold;
+}
+
+.rec-top-back-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 17px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.rec-top-back-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(0.92);
+}
+
+.recovery-navbar {
+  height: 52px;
+  background: #08080a;
+  border-top: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 6px;
+  z-index: 20;
+}
+
+#screen-recovery.theme-twrp .recovery-navbar {
+  border-top: 1px solid rgba(0, 150, 255, 0.35);
+  background: #06090e;
+}
+
+#screen-recovery.theme-orangefox .recovery-navbar {
+  border-top: 1px solid rgba(255, 87, 34, 0.35);
+  background: #0c0806;
+}
+
+.rec-nav-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: 8px;
+  transition: all 0.15s;
+  min-width: 58px;
+}
+
+.rec-nav-btn:active, .rec-nav-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.rec-nav-btn.rec-btn-back {
+  color: var(--accent-cyan);
+  font-weight: bold;
+}
+#screen-recovery.theme-orangefox .rec-nav-btn.rec-btn-back {
+  color: var(--ofox-accent);
+}
+
+.rec-nav-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.rec-nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .rec-stats { display: flex; gap: 12px; color: #aaa; }

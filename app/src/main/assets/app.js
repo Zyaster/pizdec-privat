@@ -185,6 +185,11 @@ const UI = {
     confirm: document.getElementById('rec-page-confirm'),
     console: document.getElementById('rec-page-console'),
     wipe: document.getElementById('rec-page-wipe'),
+    backup: document.getElementById('rec-page-backup'),
+    restore: document.getElementById('rec-page-restore'),
+    mount: document.getElementById('rec-page-mount'),
+    settings: document.getElementById('rec-page-settings'),
+    advanced: document.getElementById('rec-page-advanced'),
     reboot: document.getElementById('rec-page-reboot')
   },
   recFileTree: document.getElementById('rec-file-tree'),
@@ -457,7 +462,77 @@ function applyRecoveryTheme() {
   }
 }
 
+let currentRecoveryPage = 'main';
+
+function handleRecoveryBack() {
+  sounds.click();
+  sounds.vibrate(20);
+  if (currentRecoveryPage === 'confirm') {
+    openRecoverySubpage('install');
+  } else if (currentRecoveryPage === 'console') {
+    openRecoverySubpage('main');
+  } else if (currentRecoveryPage !== 'main') {
+    openRecoverySubpage('main');
+  } else {
+    // If user is on the main recovery screen, ask if they want to reboot to System
+    if (confirm('Перезагрузиться в систему (Reboot System)?')) {
+      bootDevice();
+    }
+  }
+}
+
+function openRecoverySubpage(pageName) {
+  currentRecoveryPage = pageName;
+  Object.keys(UI.recPages).forEach(k => {
+    if (UI.recPages[k]) UI.recPages[k].style.display = 'none';
+  });
+  if (UI.recPages[pageName]) {
+    UI.recPages[pageName].style.display = 'flex';
+  }
+}
+
 function bindRecovery() {
+  // Top Back Button in Recovery
+  const topBack = document.getElementById('rec-top-back-btn');
+  if (topBack) {
+    topBack.addEventListener('click', handleRecoveryBack);
+  }
+
+  // Bottom Navigation Bar Buttons
+  const btmBack = document.getElementById('rec-bottom-back');
+  if (btmBack) {
+    btmBack.addEventListener('click', handleRecoveryBack);
+  }
+
+  const btmHome = document.getElementById('rec-bottom-home');
+  if (btmHome) {
+    btmHome.addEventListener('click', () => {
+      sounds.click();
+      sounds.vibrate(20);
+      openRecoverySubpage('main');
+    });
+  }
+
+  const btmConsole = document.getElementById('rec-bottom-console');
+  if (btmConsole) {
+    btmConsole.addEventListener('click', () => {
+      sounds.click();
+      sounds.vibrate(20);
+      if (currentRecoveryPage === 'console') openRecoverySubpage('main');
+      else openRecoverySubpage('console');
+    });
+  }
+
+  const btmReboot = document.getElementById('rec-bottom-reboot');
+  if (btmReboot) {
+    btmReboot.addEventListener('click', () => {
+      sounds.click();
+      sounds.vibrate(20);
+      openRecoverySubpage('reboot');
+    });
+  }
+
+  // Main 8 tiles
   document.querySelectorAll('.rec-tile[data-action]').forEach(tile => {
     tile.addEventListener('click', () => {
       sounds.click();
@@ -467,22 +542,27 @@ function bindRecovery() {
         openRecoverySubpage('install');
       } else if (action === 'wipe') {
         openRecoverySubpage('wipe');
+      } else if (action === 'backup') {
+        openRecoverySubpage('backup');
+      } else if (action === 'restore') {
+        openRecoverySubpage('restore');
+      } else if (action === 'mount') {
+        openRecoverySubpage('mount');
+      } else if (action === 'settings') {
+        openRecoverySubpage('settings');
+      } else if (action === 'advanced') {
+        openRecoverySubpage('advanced');
       } else if (action === 'reboot') {
         openRecoverySubpage('reboot');
-      } else if (action === 'backup') {
-        alert('Бэкап: Создан Nandroid-образ разделов Boot, DTBO, System, Vendor на MicroSD!');
-      } else if (action === 'restore') {
-        alert('Восстановление: Нажмите на сохраненный бэкап для развертывания.');
-      } else {
-        alert(`Функция [${action.toUpperCase()}] готова.`);
       }
     });
   });
 
+  // All in-page Back buttons
   document.querySelectorAll('.rec-nav-back').forEach(btn => {
     btn.addEventListener('click', () => {
       sounds.click();
-      const target = btn.dataset.back;
+      const target = btn.dataset.back || 'main';
       openRecoverySubpage(target);
     });
   });
@@ -492,6 +572,103 @@ function bindRecovery() {
   document.getElementById('rb-recovery').addEventListener('click', () => { sounds.click(); bootToRecovery(); });
   document.getElementById('rb-bootloader').addEventListener('click', () => { sounds.click(); bootToFastboot(); });
   document.getElementById('rb-poweroff').addEventListener('click', () => { sounds.click(); setScreenState('OFF'); });
+
+  // Backup subpage action
+  const btnDoBackup = document.getElementById('btn-do-backup');
+  if (btnDoBackup) {
+    btnDoBackup.addEventListener('click', () => {
+      sounds.click();
+      openRecoverySubpage('console');
+      runRecoveryConsoleLog([
+        'Backing up Boot partition (64 MB)...',
+        'Backing up Super / System image (4120 MB)...',
+        'Backing up Vendor image (1840 MB)...',
+        'Generating MD5 checksums...',
+        'Nandroid backup saved to /sdcard/TWRP/BACKUPS/vayu_backup.tar',
+        'Backup Completed successfully in 3.8s!'
+      ], () => {
+        UI.btnRecRebootSystem.style.display = 'block';
+      });
+    });
+  }
+
+  // Restore subpage action
+  const itemRestore = document.getElementById('item-restore-backup');
+  if (itemRestore) {
+    itemRestore.addEventListener('click', () => {
+      sounds.click();
+      if (confirm('Восстановить бэкап Stock HyperOS? Текущие разделы будут перезаписаны.')) {
+        openRecoverySubpage('console');
+        runRecoveryConsoleLog([
+          'Restoring Boot partition from backup...',
+          'Restoring System and Vendor images...',
+          'Verifying MD5 checksum...',
+          'Restoring SELinux contexts...',
+          'Nandroid Restore completed successfully!'
+        ], () => {
+          GameState.rom = 'stock';
+          GameState.kernel = 'stock';
+          GameState.kernelVersion = 'Linux 4.14.336-stock';
+          GameState.ksuWorking = false;
+          UI.btnRecRebootSystem.style.display = 'block';
+        });
+      }
+    });
+  }
+
+  // Mount subpage action
+  const btnToggleMtp = document.getElementById('btn-toggle-mtp');
+  if (btnToggleMtp) {
+    btnToggleMtp.addEventListener('click', () => {
+      sounds.click();
+      sounds.vibrate(30);
+      alert('MTP: Режим передачи файлов по USB активирован. Память /sdcard подключена к ПК.');
+    });
+  }
+
+  // Advanced subpage actions
+  const btnAdvTerm = document.getElementById('btn-adv-terminal');
+  if (btnAdvTerm) {
+    btnAdvTerm.addEventListener('click', () => {
+      sounds.click();
+      openRecoverySubpage('console');
+      runRecoveryConsoleLog([
+        'TWRP Recovery Terminal CLI (sh 5.1)',
+        '# id',
+        'uid=0(root) gid=0(root) groups=0(root) context=u:r:recovery:s0',
+        '# uname -a',
+        `Linux localhost ${GameState.kernelVersion} #1 SMP PREEMPT aarch64`,
+        '# mount -o remount,rw /system',
+        '# echo "Ready for recovery scripting"'
+      ], () => {
+        UI.btnRecRebootSystem.style.display = 'none';
+      });
+    });
+  }
+
+  const btnAdvPerm = document.getElementById('btn-adv-fix-permissions');
+  if (btnAdvPerm) {
+    btnAdvPerm.addEventListener('click', () => {
+      sounds.click();
+      openRecoverySubpage('console');
+      runRecoveryConsoleLog([
+        'Fixing SELinux file contexts on /data and /system...',
+        'Restoring permissions on /system/bin/sh...',
+        'Contexts restored successfully!'
+      ], () => {
+        UI.btnRecRebootSystem.style.display = 'none';
+      });
+    });
+  }
+
+  const btnAdvLog = document.getElementById('btn-adv-copy-log');
+  if (btnAdvLog) {
+    btnAdvLog.addEventListener('click', () => {
+      sounds.click();
+      sounds.vibrate(25);
+      alert('📋 Лог recovery.log успешно скопирован в /sdcard/recovery.log!');
+    });
+  }
 
   // Wipe subpage
   UI.btnShowFormatData.addEventListener('click', () => {
@@ -542,15 +719,6 @@ function bindRecovery() {
   });
 
   initRecoverySwipeSlider();
-}
-
-function openRecoverySubpage(pageName) {
-  Object.keys(UI.recPages).forEach(k => {
-    if (UI.recPages[k]) UI.recPages[k].style.display = 'none';
-  });
-  if (UI.recPages[pageName]) {
-    UI.recPages[pageName].style.display = 'flex';
-  }
 }
 
 function renderRecoveryFiles() {
