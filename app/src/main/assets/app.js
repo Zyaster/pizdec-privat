@@ -1,6 +1,6 @@
 /**
  * AndroFlash: ROM Flasher & Root Simulator (4PDA Edition)
- * 100% Fullscreen, Immersive & Ultra-Realistic Android OS & Modding Engine.
+ * Huge Content Expansion: KernelSU, OrangeFox, Custom Kernels, 6 ROMs, ViPER4Android, LSPosed & Gaming 120 FPS.
  */
 
 // --- Audio Synthesizer (Realistic Haptic & Chimes via Web Audio API) ---
@@ -47,7 +47,7 @@ class SoundManager {
     this.beep(440, 0.06, 'sawtooth', 0.08);
     setTimeout(() => this.beep(880, 0.1, 'sine', 0.1), 70);
   }
-  twrpSwipeTone() {
+  swipeTone() {
     this.beep(520, 0.1, 'sine', 0.12);
     setTimeout(() => this.beep(784, 0.18, 'sine', 0.12), 100);
   }
@@ -66,54 +66,75 @@ class SoundManager {
 
 const sounds = new SoundManager();
 
-// --- Global Simulation State ---
+// --- Complete Global Simulation State ---
 const GameState = {
   model: 'Poco X3 Pro (vayu)',
   serial: 'e7c8491a',
   battery: 98,
   usbConnected: true,
   bootloaderUnlocked: false,
-  recovery: 'stock',     // 'stock' | 'twrp'
-  rom: 'stock',          // 'stock' | 'pixel' | 'lineage' | 'crdroid' | null
-  romCleanInstalled: true, // Dirty flash without format data triggers Qualcomm CrashDump!
-  isRooted: false,
-  magiskZygisk: false,
-  playIntegrityModule: false,
-  screenState: 'OS',     // 'OFF' | 'FASTBOOT' | 'BOOTING' | 'CRASHDUMP' | 'TWRP' | 'OS'
 
-  // Developer settings
+  // Recovery
+  recoveryType: 'twrp', // 'twrp' | 'orangefox'
+  recoveryInstalled: true,
+
+  // Kernel & Modern Root Architecture
+  kernel: 'stock', // 'stock' | 'ngk_ksu' | 'stormbreaker'
+  kernelVersion: 'Linux 4.14.336-stock',
+  ksuWorking: false, // True if kernel has KernelSU hook
+  ksuSuperuserApps: new Set(['termux']),
+  ksuUnmountRoot: new Set(['bank']), // Signature KernelSU feature: root unmounted from banking apps!
+  magiskInstalled: false,
+  magiskZygisk: false,
+
+  // Active Modules
+  modules: new Set(),
+
+  // ROM & System
+  rom: 'stock', // 'stock' | 'pixel' | 'lineage' | 'crdroid' | 'evolution' | 'kali' | null
+  romCleanInstalled: true, // Dirty flash without format data triggers Qualcomm CrashDump!
+  screenState: 'OS', // 'OFF' | 'FASTBOOT' | 'BOOTING' | 'CRASHDUMP' | 'RECOVERY' | 'OS'
+
+  // Display & Performance
+  displayRefreshRate: 120, // 60 or 120 Hz
+  antutuScore: 0,
   developerUnlocked: false,
   buildTapCount: 0,
 
-  // Benchmark
-  antutuScore: 0,
-
   // Downloads & Storage
-  pcDownloads: new Set(['PixelOS_vayu_A14.zip', 'twrp_3.7.0.img']),
+  pcDownloads: new Set([
+    'PixelOS_vayu_A14.zip',
+    'NGK_KernelSU_v5.2.zip',
+    'KernelSU_Manager.apk',
+    'PlayIntegrityFix_v16.zip',
+    'twrp_3.7.0.img'
+  ]),
   phoneStorage: new Set(),
 
-  // Quests
+  // Quests & Progression
   quests: [
     { id: 'usb', title: '🔌 Подключение к ПК', desc: 'Убедитесь, что USB кабель подключен к ПК', exp: 50, done: true },
     { id: 'unlock', title: '🔓 Разблокировка загрузчика', desc: 'Перейдите в Fastboot и введите fastboot oem unlock', exp: 150, done: false },
-    { id: 'twrp', title: '🦊 Прошивка TWRP Recovery', desc: 'Прошейте образ twrp_3.7.0.img через Fastboot', exp: 200, done: false },
-    { id: 'wipe', title: '🧹 Очистка Format Data', desc: 'Сделайте Format Data в TWRP для избежания бутлупа', exp: 150, done: false },
-    { id: 'flash_rom', title: '🚀 Установка кастомной ОС', desc: 'Установите PixelOS, LineageOS или crDroid через TWRP', exp: 300, done: false },
-    { id: 'root', title: '🧙 Полный Root (Magisk)', desc: 'Прошейте Magisk.zip в TWRP и активируйте права суперпользователя', exp: 250, done: false },
-    { id: 'bank', title: '🛡️ Обход банковских защит', desc: 'Активируйте Play Integrity Fix в Magisk и пройдите проверку банка', exp: 300, done: false },
-    { id: 'crdroid_oc', title: '🔥 Оверклок 1,000,000+ очков', desc: 'Запустите AnTuTu на crDroid с Magisk и выбейте рекорд', exp: 500, done: false }
+    { id: 'recovery', title: '🦊 Прошивка рекавери', desc: 'Прошейте TWRP или OrangeFox через Fastboot', exp: 200, done: false },
+    { id: 'wipe', title: '🧹 Очистка Format Data', desc: 'Сделайте Format Data в рекавери для избежания бутлупа', exp: 150, done: false },
+    { id: 'flash_rom', title: '🚀 Установка кастомной ОС', desc: 'Прошейте PixelOS, crDroid, Evolution X или Kali NetHunter', exp: 300, done: false },
+    { id: 'ksu_kernel', title: '👑 Установка ядра с KernelSU', desc: 'Прошейте NoGravityKernel или StormBreaker с поддержкой KSU', exp: 350, done: false },
+    { id: 'ksu_root', title: '🛡️ Активация прав KernelSU', desc: 'Откройте KernelSU Manager и предоставьте root приложению Termux', exp: 250, done: false },
+    { id: 'modules', title: '🧩 Установка модулей Zygisk', desc: 'Установите Play Integrity Fix, Shamiko или ViPER4Android', exp: 200, done: false },
+    { id: 'bank', title: '🏦 Обход банковских защит', desc: 'Изолируйте root через KernelSU или активируйте Play Integrity Fix', exp: 300, done: false },
+    { id: 'fps120', title: '🎮 Разгон PUBG до 120 FPS', desc: 'Запустите игровой тест на crDroid с разогнанным ядром', exp: 400, done: false },
+    { id: 'antutu_record', title: '🔥 Рекорд AnTuTu (1,000,000+)', desc: 'Выбейте миллион очков на StormBreaker Kernel с оверклоком', exp: 500, done: false }
   ]
 };
 
 // --- DOM References ---
 const UI = {
-  // Screens
   screens: {
     OFF: document.getElementById('screen-off'),
     FASTBOOT: document.getElementById('screen-fastboot'),
     BOOTING: document.getElementById('screen-booting'),
     CRASHDUMP: document.getElementById('screen-crashdump'),
-    TWRP: document.getElementById('screen-twrp'),
+    RECOVERY: document.getElementById('screen-recovery'),
     OS: document.getElementById('screen-os')
   },
 
@@ -131,6 +152,8 @@ const UI = {
   pcViews: {
     terminal: document.getElementById('tab-terminal'),
     forum: document.getElementById('tab-forum'),
+    kernels: document.getElementById('tab-kernels'),
+    modules: document.getElementById('tab-modules'),
     miflash: document.getElementById('tab-miflash'),
     quests: document.getElementById('tab-quests')
   },
@@ -142,22 +165,24 @@ const UI = {
   bootUnlockedIcon: document.getElementById('boot-unlocked-icon'),
   bootAnimCenter: document.getElementById('boot-anim-center'),
 
-  // TWRP
-  twrpClock: document.getElementById('twrp-clock'),
-  twrpPages: {
-    main: document.getElementById('twrp-page-main'),
-    install: document.getElementById('twrp-page-install'),
-    confirm: document.getElementById('twrp-page-confirm'),
-    console: document.getElementById('twrp-page-console'),
-    wipe: document.getElementById('twrp-page-wipe'),
-    reboot: document.getElementById('twrp-page-reboot')
+  // Recovery (TWRP / OrangeFox)
+  screenRecovery: document.getElementById('screen-recovery'),
+  recBrandTitle: document.getElementById('rec-brand-title'),
+  recClock: document.getElementById('rec-clock'),
+  recPages: {
+    main: document.getElementById('rec-page-main'),
+    install: document.getElementById('rec-page-install'),
+    confirm: document.getElementById('rec-page-confirm'),
+    console: document.getElementById('rec-page-console'),
+    wipe: document.getElementById('rec-page-wipe'),
+    reboot: document.getElementById('rec-page-reboot')
   },
-  twrpFileTree: document.getElementById('twrp-file-tree'),
+  recFileTree: document.getElementById('rec-file-tree'),
   confirmTargetName: document.getElementById('confirm-target-name'),
   confirmFileTitle: document.getElementById('confirm-file-title'),
-  twrpSliderHandle: document.getElementById('twrp-slider-handle'),
-  twrpLogConsole: document.getElementById('twrp-log-console'),
-  btnTwrpRebootSystem: document.getElementById('btn-twrp-reboot-system'),
+  recSliderHandle: document.getElementById('rec-slider-handle'),
+  recLogConsole: document.getElementById('rec-log-console'),
+  btnRecRebootSystem: document.getElementById('btn-rec-reboot-system'),
   btnShowFormatData: document.getElementById('btn-show-format-data'),
   formatDataDialog: document.getElementById('format-data-dialog'),
   formatYesInput: document.getElementById('format-yes-input'),
@@ -169,14 +194,21 @@ const UI = {
   heroClock: document.getElementById('hero-clock'),
   heroDate: document.getElementById('hero-date'),
   heroOsTitle: document.getElementById('hero-os-title'),
-  osRootBadge: document.getElementById('os-root-badge'),
+  heroKernelTitle: document.getElementById('hero-kernel-title'),
+  osKsuBadge: document.getElementById('os-ksu-badge'),
+  osMagiskBadge: document.getElementById('os-magisk-badge'),
+  osFpsBadge: document.getElementById('os-fps-badge'),
   osAppGrid: document.getElementById('os-app-grid'),
   osAppWindow: document.getElementById('os-app-window'),
   appWindowTitle: document.getElementById('app-window-title'),
   appWindowContent: document.getElementById('app-window-content'),
   appWindowBack: document.getElementById('app-window-back'),
   appWindowClose: document.getElementById('app-window-close'),
+
+  // Superuser Dialog
   magiskSuPrompt: document.getElementById('magisk-su-prompt'),
+  suPromptTitle: document.getElementById('su-prompt-title'),
+  suPromptDesc: document.getElementById('su-prompt-desc'),
   suCountdown: document.getElementById('su-countdown'),
   suBtnGrant: document.getElementById('su-btn-grant'),
   suBtnDeny: document.getElementById('su-btn-deny'),
@@ -205,7 +237,7 @@ function initApp() {
   bindPcTerminal();
   bindForumDownloads();
   bindMiFlash();
-  bindTwrp();
+  bindRecovery();
   bindOsNavigation();
   renderQuests();
   updateOsUI();
@@ -217,7 +249,7 @@ function initApp() {
     const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
     if (UI.osClock) UI.osClock.textContent = timeStr;
     if (UI.heroClock) UI.heroClock.textContent = timeStr;
-    if (UI.twrpClock) UI.twrpClock.textContent = timeStr;
+    if (UI.recClock) UI.recClock.textContent = timeStr;
   }, 1000);
 }
 
@@ -235,6 +267,8 @@ function setScreenState(newState) {
       UI.fbDeviceState.textContent = GameState.bootloaderUnlocked ? 'unlocked' : 'locked';
       UI.fbDeviceState.className = GameState.bootloaderUnlocked ? 'state-unlocked' : 'state-locked';
     }
+  } else if (newState === 'RECOVERY') {
+    applyRecoveryTheme();
   } else if (newState === 'OS') {
     updateOsUI();
   }
@@ -277,13 +311,10 @@ function checkKeyCombos() {
   clearTimeout(keyTimer);
   keyTimer = setTimeout(() => {
     if (keyStates.power && keyStates.volDown) {
-      // Power + Vol- => FASTBOOT
       bootToFastboot();
     } else if (keyStates.power && keyStates.volUp) {
-      // Power + Vol+ => RECOVERY (TWRP)
       bootToRecovery();
     } else if (keyStates.power) {
-      // Power => REBOOT / POWER ON
       togglePower();
     }
   }, 450);
@@ -304,15 +335,15 @@ function bootToFastboot() {
 
 function bootToRecovery() {
   sounds.vibrate(80);
-  if (GameState.recovery === 'twrp') {
-    setScreenState('TWRP');
-    openTwrpSubpage('main');
+  if (GameState.recoveryInstalled) {
+    setScreenState('RECOVERY');
+    openRecoverySubpage('main');
     sounds.bootChime();
-    termLog('Recovery: Запущен TeamWin Recovery Project (TWRP)', 'info');
-    checkQuest('twrp');
+    termLog(`Recovery: Запущен ${GameState.recoveryType === 'orangefox' ? 'OrangeFox Recovery Project R11.1' : 'TeamWin Recovery Project 3.7'}`, 'info');
+    checkQuest('recovery');
   } else {
-    termLog('Stock Recovery: TWRP не установлен! Прошейте twrp_3.7.0.img через Fastboot.', 'warning');
-    alert('⚠️ Stock Recovery: У вас не установлен TWRP!\n\nПрошейте recovery через Fastboot:\nfastboot flash recovery twrp_3.7.0.img');
+    termLog('Stock Recovery: Кастомное рекавери не установлено! Прошейте twrp_3.7.0.img или orangefox_R11.1.img через Fastboot.', 'warning');
+    alert('⚠️ Stock Recovery: У вас не установлено кастомное рекавери!\n\nПрошейте TWRP или OrangeFox через Fastboot:\nfastboot flash recovery twrp_3.7.0.img');
     bootDevice();
   }
 }
@@ -322,35 +353,46 @@ function bootDevice() {
   setScreenState('BOOTING');
   sounds.bootChime();
 
-  // Show unlocked icon if bootloader is unlocked
   if (UI.bootUnlockedIcon) {
     UI.bootUnlockedIcon.classList.toggle('visible', GameState.bootloaderUnlocked);
   }
 
-  // Render authentic boot animations based on installed ROM
   const center = UI.bootAnimCenter;
   center.innerHTML = '';
 
   if (GameState.rom === 'pixel') {
     center.innerHTML = `
       <div class="pixel-g-logo">G</div>
-      <div class="logo-sub-text">Google Pixel</div>
+      <div class="logo-sub-text">Google Pixel • Android 14</div>
     `;
   } else if (GameState.rom === 'lineage') {
     center.innerHTML = `
       <div class="lineage-arc-logo">◯</div>
       <div class="logo-big-text" style="color:#167c80;">LineageOS</div>
+      <div class="logo-sub-text">LineageOS 21 (AOSP)</div>
     `;
   } else if (GameState.rom === 'crdroid') {
     center.innerHTML = `
       <div style="font-size:54px;">👾</div>
       <div class="logo-big-text" style="color:#e11d48;">crDroid</div>
-      <div class="logo-sub-text" style="color:#ff3366;">GAMING EDITION</div>
+      <div class="logo-sub-text" style="color:#ff3366;">GAMING EDITION 120 FPS</div>
+    `;
+  } else if (GameState.rom === 'evolution') {
+    center.innerHTML = `
+      <div style="font-size:54px;">🧬</div>
+      <div class="logo-big-text" style="color:#a855f7;">Evolution X</div>
+      <div class="logo-sub-text">Keep Evolving • Android 14</div>
+    `;
+  } else if (GameState.rom === 'kali') {
+    center.innerHTML = `
+      <div class="kali-dragon-logo">🐉</div>
+      <div class="logo-big-text" style="color:#00f2fe;">Kali NetHunter</div>
+      <div class="logo-sub-text">Offensive Security Edition</div>
     `;
   } else if (GameState.rom === 'stock') {
     center.innerHTML = `
       <div class="logo-big-text" style="color:#ff9900;">POCO</div>
-      <div class="logo-sub-text">Xiaomi HyperOS</div>
+      <div class="logo-sub-text">Xiaomi HyperOS 1.0</div>
     `;
   } else {
     center.innerHTML = `
@@ -363,15 +405,14 @@ function bootDevice() {
     if (!GameState.rom) {
       sounds.errorTone();
       setScreenState('FASTBOOT');
-      alert('Ошибка: Операционная система не установлена! Прошейте прошивку через TWRP или Mi Flash.');
+      alert('Ошибка: Операционная система не найдена! Прошейте прошивку через рекавери или Mi Flash.');
       return;
     }
 
     if (!GameState.romCleanInstalled) {
-      // Bootloop due to dirty flash! Fullscreen Qualcomm CrashDump!
       sounds.errorTone();
       setScreenState('CRASHDUMP');
-      termLog('CRASHDUMP: Device bootloop! Kernel panic: Data encryption mismatch. Сделайте Format Data в TWRP!', 'error');
+      termLog('CRASHDUMP: Device bootloop! Kernel panic: Data encryption mismatch. Сделайте Format Data в рекавери!', 'error');
       return;
     }
 
@@ -381,43 +422,52 @@ function bootDevice() {
   }, 2400);
 }
 
-// --- TWRP RECOVERY ENGINE (100% AUTHENTIC) ---
-let currentTwrpFile = null;
+// --- RECOVERY ENGINE (TWRP & ORANGEFOX HYBRID) ---
+let currentRecFile = null;
 let isDraggingSlider = false;
 
-function bindTwrp() {
-  // Tile navigation
-  document.querySelectorAll('.twrp-tile[data-action]').forEach(tile => {
+function applyRecoveryTheme() {
+  const el = UI.screenRecovery;
+  if (GameState.recoveryType === 'orangefox') {
+    el.className = 'screen-view active theme-orangefox';
+    UI.recBrandTitle.textContent = '🦊 OrangeFox Recovery Project R11.1';
+  } else {
+    el.className = 'screen-view active theme-twrp';
+    UI.recBrandTitle.textContent = 'Team Win Recovery Project 3.7.0';
+  }
+}
+
+function bindRecovery() {
+  document.querySelectorAll('.rec-tile[data-action]').forEach(tile => {
     tile.addEventListener('click', () => {
       sounds.click();
       const action = tile.dataset.action;
       if (action === 'install') {
-        renderTwrpFiles();
-        openTwrpSubpage('install');
+        renderRecoveryFiles();
+        openRecoverySubpage('install');
       } else if (action === 'wipe') {
-        openTwrpSubpage('wipe');
+        openRecoverySubpage('wipe');
       } else if (action === 'reboot') {
-        openTwrpSubpage('reboot');
+        openRecoverySubpage('reboot');
       } else if (action === 'backup') {
-        alert('TWRP: Резервная копия разделов Boot, System и Vendor сохранена в /sdcard/TWRP/BACKUPS/');
+        alert('Бэкап: Создан Nandroid-образ разделов Boot, DTBO, System, Vendor на MicroSD!');
       } else if (action === 'restore') {
-        alert('TWRP: Резервных копий не обнаружено.');
+        alert('Восстановление: Нажмите на сохраненный бэкап для развертывания.');
       } else {
-        alert(`TWRP: Функция [${action.toUpperCase()}] готова.`);
+        alert(`Функция [${action.toUpperCase()}] готова.`);
       }
     });
   });
 
-  // Nav back buttons
-  document.querySelectorAll('.twrp-nav-back').forEach(btn => {
+  document.querySelectorAll('.rec-nav-back').forEach(btn => {
     btn.addEventListener('click', () => {
       sounds.click();
       const target = btn.dataset.back;
-      openTwrpSubpage(target);
+      openRecoverySubpage(target);
     });
   });
 
-  // Reboot subpage
+  // Reboot buttons
   document.getElementById('rb-system').addEventListener('click', () => { sounds.click(); bootDevice(); });
   document.getElementById('rb-recovery').addEventListener('click', () => { sounds.click(); bootToRecovery(); });
   document.getElementById('rb-bootloader').addEventListener('click', () => { sounds.click(); bootToFastboot(); });
@@ -432,86 +482,91 @@ function bindTwrp() {
   UI.btnConfirmFormatData.addEventListener('click', () => {
     const val = UI.formatYesInput.value.trim().toLowerCase();
     if (val === 'yes') {
-      sounds.twrpSwipeTone();
+      sounds.swipeTone();
       UI.formatDataDialog.style.display = 'none';
       UI.formatYesInput.value = '';
-      openTwrpSubpage('console');
-      runTwrpConsoleLog([
+      openRecoverySubpage('console');
+      runRecoveryConsoleLog([
         'Formatting /data and /storage...',
-        'Formatting /data using ext4...',
+        'Formatting /data using ext4 / f2fs...',
         'Formatting cache partition...',
-        'Removing encryption keys and dm-verity hooks...',
+        'Removing encryption keys and dm-verity...',
         'Updating partition details...',
-        'Format Data completed successfully!'
+        'Format Data completed successfully! Ready for clean install.'
       ], () => {
         GameState.romCleanInstalled = true;
         checkQuest('wipe');
-        UI.btnTwrpRebootSystem.style.display = 'block';
+        UI.btnRecRebootSystem.style.display = 'block';
       });
     } else {
       sounds.errorTone();
-      alert('Для форматирования введите слово "yes" в поле ввода!');
+      alert('Для форматирования введите слово "yes"!');
     }
   });
 
   UI.btnDalvikWipe.addEventListener('click', () => {
     sounds.click();
-    openTwrpSubpage('console');
-    runTwrpConsoleLog([
+    openRecoverySubpage('console');
+    runRecoveryConsoleLog([
       'Wiping Dalvik / ART Cache...',
       'Wiping Cache partition...',
-      'Done. Cache cleaned in 1.2s'
+      'Done. Cache cleaned in 1.1s'
     ], () => {
-      UI.btnTwrpRebootSystem.style.display = 'block';
+      UI.btnRecRebootSystem.style.display = 'block';
     });
   });
 
-  UI.btnTwrpRebootSystem.addEventListener('click', () => {
+  UI.btnRecRebootSystem.addEventListener('click', () => {
     sounds.click();
     bootDevice();
   });
 
-  initTwrpSwipeSlider();
+  initRecoverySwipeSlider();
 }
 
-function openTwrpSubpage(pageName) {
-  Object.keys(UI.twrpPages).forEach(k => {
-    if (UI.twrpPages[k]) UI.twrpPages[k].style.display = 'none';
+function openRecoverySubpage(pageName) {
+  Object.keys(UI.recPages).forEach(k => {
+    if (UI.recPages[k]) UI.recPages[k].style.display = 'none';
   });
-  if (UI.twrpPages[pageName]) {
-    UI.twrpPages[pageName].style.display = 'flex';
+  if (UI.recPages[pageName]) {
+    UI.recPages[pageName].style.display = 'flex';
   }
 }
 
-function renderTwrpFiles() {
-  UI.twrpFileTree.innerHTML = '';
+function renderRecoveryFiles() {
+  UI.recFileTree.innerHTML = '';
   const files = Array.from(new Set([...GameState.phoneStorage, ...GameState.pcDownloads]));
 
   if (files.length === 0) {
-    UI.twrpFileTree.innerHTML = '<div style="padding:16px; color:#888; font-size:12px;">(Папка /sdcard пуста! Скачайте прошивки на 4PDA или передайте через adb push)</div>';
+    UI.recFileTree.innerHTML = '<div style="padding:16px; color:#888; font-size:12px;">(Папка /sdcard пуста! Скачайте прошивки или ядра на 4PDA или передайте через adb push)</div>';
     return;
   }
 
   files.forEach(filename => {
-    if (filename.endsWith('.zip') || filename.endsWith('.img')) {
+    if (filename.endsWith('.zip') || filename.endsWith('.img') || filename.endsWith('.apk')) {
       const row = document.createElement('div');
-      row.className = 'twrp-file-row';
-      row.innerHTML = `<span>📦</span> <b>${filename}</b>`;
+      row.className = 'rec-file-row';
+      let icon = '📦';
+      if (filename.includes('Kernel')) icon = '⚡';
+      if (filename.includes('Fix') || filename.includes('Shamiko')) icon = '🛡️';
+      if (filename.endsWith('.apk')) icon = '📱';
+
+      row.innerHTML = `<span>${icon}</span> <b>${filename}</b>`;
       row.addEventListener('click', () => {
         sounds.click();
-        currentTwrpFile = filename;
+        currentRecFile = filename;
         UI.confirmTargetName.textContent = filename;
         UI.confirmFileTitle.textContent = `Install ${filename}`;
-        resetTwrpSlider();
-        openTwrpSubpage('confirm');
+        resetRecoverySlider();
+        openRecoverySubpage('confirm');
       });
-      UI.twrpFileTree.appendChild(row);
+      UI.recFileTree.appendChild(row);
     }
   });
 }
 
-function initTwrpSwipeSlider() {
-  const handle = UI.twrpSliderHandle;
+function initRecoverySwipeSlider() {
+  const handle = UI.recSliderHandle;
   const track = handle.parentElement;
   let startX = 0;
   let currentX = 0;
@@ -532,9 +587,9 @@ function initTwrpSwipeSlider() {
     if (currentX >= maxDrag - 12) {
       isDraggingSlider = false;
       handle.style.transform = `translateX(${maxDrag}px)`;
-      sounds.twrpSwipeTone();
+      sounds.swipeTone();
       sounds.vibrate(70);
-      executeTwrpFlash(currentTwrpFile);
+      executeRecoveryFlash(currentRecFile);
     }
   };
 
@@ -553,65 +608,139 @@ function initTwrpSwipeSlider() {
   window.addEventListener('touchend', onEnd);
 }
 
-function resetTwrpSlider() {
-  UI.twrpSliderHandle.style.transition = 'none';
-  UI.twrpSliderHandle.style.transform = 'translateX(0px)';
+function resetRecoverySlider() {
+  UI.recSliderHandle.style.transition = 'none';
+  UI.recSliderHandle.style.transform = 'translateX(0px)';
 }
 
-function executeTwrpFlash(filename) {
-  openTwrpSubpage('console');
-  UI.btnTwrpRebootSystem.style.display = 'none';
+function executeRecoveryFlash(filename) {
+  openRecoverySubpage('console');
+  UI.btnRecRebootSystem.style.display = 'none';
 
   let logs = [];
-  if (filename === 'Magisk_v27.0.zip') {
+
+  // KERNEL FLASHING WITH KERNELSU!
+  if (filename.includes('NGK_KernelSU')) {
     logs = [
       `Installing zip file '/sdcard/${filename}'`,
-      'Checking for Digest file...',
-      '************************',
-      ' Magisk v27.0 Installer ',
-      '************************',
-      '- Mounting /system, /vendor',
-      '- Target CPU: arm64-v8a',
+      'NoGravityKernel Installer v5.2',
+      '- Unpacking boot image and dtb...',
+      '- Detecting Linux kernel 4.14.336-vayu...',
+      '- Injecting KernelSU v0.9.5 syscall hooks into kernel space...',
+      '- Patching SELinux policy in memory...',
+      '- Repacking boot.img with KernelSU driver...',
+      '- Flashing boot partition...',
+      'Done! KernelSU Native Root is now active in Kernel!'
+    ];
+    GameState.kernel = 'ngk_ksu';
+    GameState.kernelVersion = 'Linux 4.14.336-NGK-KernelSU #52 SMP';
+    GameState.ksuWorking = true;
+    checkQuest('ksu_kernel');
+  } else if (filename.includes('StormBreaker')) {
+    logs = [
+      `Installing zip file '/sdcard/${filename}'`,
+      'StormBreaker Kernel v9 Installer (Overclock Edition)',
+      '- Applying CPU overclock: Prime Core 3.2 GHz unlocked!',
+      '- GPU Adreno 640 overclocked to 825 MHz',
+      '- Injecting KernelSU v0.9.5 kernel hook...',
+      '- Locking display refresh rate to 120Hz native...',
+      '- Flashing new boot partition...',
+      'Done! Maximum gaming power unleashed.'
+    ];
+    GameState.kernel = 'stormbreaker';
+    GameState.kernelVersion = 'Linux 4.14.336-StormBreaker-OC-3.2GHz #9';
+    GameState.ksuWorking = true;
+    GameState.displayRefreshRate = 120;
+    checkQuest('ksu_kernel');
+  } else if (filename.includes('KernelSU_Manager')) {
+    logs = [
+      `Installing '/sdcard/${filename}'`,
+      '- Installing KernelSU Manager application to /system/priv-app...',
+      'Done! KernelSU Manager is ready.'
+    ];
+    GameState.ksuWorking = true;
+    checkQuest('ksu_root');
+  } else if (filename === 'Magisk_v27.0.zip') {
+    logs = [
+      `Installing zip file '/sdcard/${filename}'`,
+      'Magisk v27.0 Installer',
       '- Patching ramdisk in boot.img...',
-      '- Flashing patched boot partition...',
       '- Installing Magisk su binaries...',
       'Done! Magisk Superuser installed.'
     ];
-    GameState.isRooted = true;
-    checkQuest('root');
-  } else if (filename === 'PlayIntegrityFix_v16.zip') {
+    GameState.magiskInstalled = true;
+  } else if (filename.includes('PlayIntegrityFix')) {
     logs = [
-      `Installing zip file '/sdcard/${filename}'`,
-      'Play Integrity Fix by chiteroman',
-      '- Injecting keystore hook...',
-      '- Bypassing SafetyNet hardware attestation...',
-      '- Spoofing Pixel 8 Pro build fingerprint...',
-      'Done! SafetyNet & Play Integrity passed.'
+      `Installing module '/sdcard/${filename}'`,
+      'Play Integrity Fix v16 by chiteroman',
+      '- Spoofing Pixel 8 Pro fingerprint...',
+      '- Overriding KeyStore attestation...',
+      'Done! MEETS_DEVICE_INTEGRITY passed.'
     ];
-    GameState.playIntegrityModule = true;
+    GameState.modules.add('PlayIntegrityFix');
+    checkQuest('modules');
     checkQuest('bank');
-  } else if (filename.startsWith('PixelOS')) {
+  } else if (filename.includes('Shamiko')) {
     logs = [
-      `Installing zip file '/sdcard/${filename}'`,
+      `Installing module '/sdcard/${filename}'`,
+      'Shamiko v1.0.1 by LSPosed Developers',
+      '- Enabling Zygisk root hiding daemon...',
+      '- DenyList is now invisible to detection engines.',
+      'Done!'
+    ];
+    GameState.modules.add('Shamiko');
+    checkQuest('modules');
+    checkQuest('bank');
+  } else if (filename.includes('ViPER4Android')) {
+    logs = [
+      `Installing module '/sdcard/${filename}'`,
+      'ViPER4Android FX Sound Engine',
+      '- Injecting audio_effects.xml configuration...',
+      '- Installing V4A DSP driver...',
+      'Done! Studio sound quality active.'
+    ];
+    GameState.modules.add('ViPER4Android');
+    checkQuest('modules');
+  } else if (filename.includes('LSPosed')) {
+    logs = [
+      `Installing module '/sdcard/${filename}'`,
+      'LSPosed Framework (Zygisk Release)',
+      '- Hooking zygote process startup...',
+      'Done! Xposed module injection is ready.'
+    ];
+    GameState.modules.add('LSPosed');
+    checkQuest('modules');
+  } else if (filename.includes('Game_120FPS')) {
+    logs = [
+      `Installing module '/sdcard/${filename}'`,
+      '120 FPS Game Unlocker',
+      '- Spoofing device model to ASUS ROG Phone 8 Pro...',
+      '- Unlocking ultra frame rate in PUBG and Call of Duty...',
+      'Done!'
+    ];
+    GameState.modules.add('Game120FPS');
+    checkQuest('modules');
+    checkQuest('fps120');
+  }
+
+  // ROM FLASHING
+  else if (filename.startsWith('PixelOS')) {
+    logs = [
+      `Installing ROM '/sdcard/${filename}'`,
       'Target: PixelOS Android 14 (vayu)',
-      '- Unpacking system.new.dat.br...',
-      '- Patching system image...',
-      '- Flashing vendor & product partitions...',
-      '- Installing Google Apps (GApps)...',
-      '- Updating partition tables...',
+      '- Flashing system, vendor & product partitions...',
+      '- Installing Google Apps & Monet Engine...',
       'Script succeeded: result was [1.000000]'
     ];
     GameState.rom = 'pixel';
-    GameState.romCleanInstalled = false; // Requires format data to avoid bootloop!
+    GameState.romCleanInstalled = false; // requires format data!
     checkQuest('flash_rom');
   } else if (filename.startsWith('LineageOS')) {
     logs = [
-      `Installing zip file '/sdcard/${filename}'`,
+      `Installing ROM '/sdcard/${filename}'`,
       'Target: LineageOS 21.0 (AOSP 14)',
-      '- Verifying system signatures...',
       '- Flashing payload.bin partitions...',
-      '- Installing LineageOS Trust HAL...',
-      '- Removing telemetry bloatware...',
+      '- Installing LineageOS Trust subsystem...',
       'Installation complete!'
     ];
     GameState.rom = 'lineage';
@@ -619,14 +748,36 @@ function executeTwrpFlash(filename) {
     checkQuest('flash_rom');
   } else if (filename.startsWith('crDroid')) {
     logs = [
-      `Installing zip file '/sdcard/${filename}'`,
+      `Installing ROM '/sdcard/${filename}'`,
       'Target: crDroid v10.5 Gaming Edition',
       '- Applying gaming thermal governor...',
-      '- Enabling 120Hz display refresh rate mod...',
-      '- Flashing crDroid kernel with overclock support...',
-      '- Done! Maximum FPS unlocked.'
+      '- Unlocking 120Hz display refresh rate...',
+      'Done! Maximum FPS unlocked.'
     ];
     GameState.rom = 'crdroid';
+    GameState.romCleanInstalled = false;
+    checkQuest('flash_rom');
+  } else if (filename.startsWith('EvolutionX')) {
+    logs = [
+      `Installing ROM '/sdcard/${filename}'`,
+      'Target: Evolution X 8.5 (The Customizer)',
+      '- Flashing Evolution Themer & System UI...',
+      '- Injecting custom status bar styles and lockscreens...',
+      'Installation succeeded!'
+    ];
+    GameState.rom = 'evolution';
+    GameState.romCleanInstalled = false;
+    checkQuest('flash_rom');
+  } else if (filename.startsWith('Kali_NetHunter')) {
+    logs = [
+      `Installing ROM '/sdcard/${filename}'`,
+      'Target: Kali NetHunter Android 14 (PenTest Edition)',
+      '- Unpacking Kali chroot environment...',
+      '- Installing Metasploit, Nmap, Wireshark and Aircrack-ng...',
+      '- Configuring USB OTG WiFi monitor mode drivers...',
+      'Done! Mobile PenTesting station ready.'
+    ];
+    GameState.rom = 'kali';
     GameState.romCleanInstalled = false;
     checkQuest('flash_rom');
   } else {
@@ -638,20 +789,20 @@ function executeTwrpFlash(filename) {
     ];
   }
 
-  runTwrpConsoleLog(logs, () => {
-    UI.btnTwrpRebootSystem.style.display = 'block';
+  runRecoveryConsoleLog(logs, () => {
+    UI.btnRecRebootSystem.style.display = 'block';
   });
 }
 
-function runTwrpConsoleLog(lines, callback) {
-  UI.twrpLogConsole.textContent = '';
+function runRecoveryConsoleLog(lines, callback) {
+  UI.recLogConsole.textContent = '';
   let i = 0;
   function step() {
     if (i < lines.length) {
-      UI.twrpLogConsole.textContent += lines[i] + '\n';
-      UI.twrpLogConsole.scrollTop = UI.twrpLogConsole.scrollHeight;
+      UI.recLogConsole.textContent += lines[i] + '\n';
+      UI.recLogConsole.scrollTop = UI.recLogConsole.scrollHeight;
       i++;
-      setTimeout(step, 130);
+      setTimeout(step, 120);
     } else {
       if (callback) callback();
     }
@@ -668,17 +819,25 @@ function updateOsUI() {
   if (os === 'pixel') osEl.classList.add('theme-pixel');
   else if (os === 'lineage') osEl.classList.add('theme-lineage');
   else if (os === 'crdroid') osEl.classList.add('theme-crdroid');
+  else if (os === 'evolution') osEl.classList.add('theme-evolution');
+  else if (os === 'kali') osEl.classList.add('theme-kali');
   else osEl.classList.add('theme-hyperos');
 
-  UI.osRootBadge.classList.toggle('visible', GameState.isRooted);
+  // Badges in statusbar
+  UI.osKsuBadge.classList.toggle('visible', GameState.ksuWorking);
+  UI.osMagiskBadge.classList.toggle('visible', GameState.magiskInstalled && !GameState.ksuWorking);
+  UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
 
   const titles = {
-    stock: 'Xiaomi HyperOS / MIUI',
+    stock: 'Xiaomi HyperOS 1.0 (Официальная)',
     pixel: 'Google Pixel 8 Pro UI',
     lineage: 'LineageOS 21 AOSP',
-    crdroid: 'crDroid 10.5 Gaming'
+    crdroid: 'crDroid 10.5 Gaming Edition',
+    evolution: 'Evolution X 8.5 (Customizer)',
+    kali: 'Kali NetHunter OS (Security)'
   };
   UI.heroOsTitle.textContent = titles[os];
+  UI.heroKernelTitle.textContent = `Ядро: ${GameState.kernelVersion}`;
 
   renderOsAppsGrid();
 }
@@ -691,16 +850,38 @@ function renderOsAppsGrid() {
     { id: 'settings', name: 'Настройки', icon: '⚙️', bg: '#475569' },
     { id: 'termux', name: 'Termux', icon: '💻', bg: '#000000' },
     { id: 'bank', name: 'СберБанк', icon: '🏦', bg: '#16a34a' },
-    { id: 'antutu', name: 'AnTuTu', icon: '🔥', bg: '#dc2626' },
-    { id: 'camera', name: 'Камера', icon: '📷', bg: '#2563eb' }
+    { id: 'pubg', name: 'PUBG Test', icon: '🎮', bg: '#b45309' },
+    { id: 'antutu', name: 'AnTuTu', icon: '🔥', bg: '#dc2626' }
   ];
 
-  if (GameState.isRooted) {
+  // Modern KernelSU Manager!
+  if (GameState.ksuWorking) {
+    apps.splice(2, 0, { id: 'kernelsu', name: 'KernelSU', icon: '👑', bg: '#15803d' });
+  }
+
+  // Magisk Manager
+  if (GameState.magiskInstalled && !GameState.ksuWorking) {
     apps.splice(2, 0, { id: 'magisk', name: 'Magisk', icon: '🪄', bg: '#0284c7' });
   }
 
+  // ViPER4Android
+  if (GameState.modules.has('ViPER4Android')) {
+    apps.push({ id: 'viper', name: 'ViPER4Android', icon: '🎵', bg: '#6366f1' });
+  }
+
+  // LSPosed
+  if (GameState.modules.has('LSPosed')) {
+    apps.push({ id: 'lsposed', name: 'LSPosed', icon: '💉', bg: '#8b5cf6' });
+  }
+
+  // crDroid Gaming Hub
   if (GameState.rom === 'crdroid') {
-    apps.push({ id: 'crdroid-mods', name: 'crDroid Hub', icon: '⚡', bg: '#7c3aed' });
+    apps.push({ id: 'crdroid-mods', name: 'crDroid Hub', icon: '⚡', bg: '#e11d48' });
+  }
+
+  // Kali Tools
+  if (GameState.rom === 'kali') {
+    apps.push({ id: 'kali-tools', name: 'NetHunter Tools', icon: '🐉', bg: '#0f766e' });
   }
 
   apps.forEach(app => {
@@ -719,7 +900,6 @@ function renderOsAppsGrid() {
 }
 
 function bindOsNavigation() {
-  // Dock items
   document.querySelectorAll('.dock-icon[data-open]').forEach(btn => {
     btn.addEventListener('click', () => {
       sounds.click();
@@ -729,23 +909,12 @@ function bindOsNavigation() {
     });
   });
 
-  // App window back & close
   UI.appWindowBack.addEventListener('click', closeFullscreenApp);
   UI.appWindowClose.addEventListener('click', closeFullscreenApp);
 
-  // Bottom 3-button keys
-  document.getElementById('os-key-back').addEventListener('click', () => {
-    sounds.click();
-    closeFullscreenApp();
-  });
-  document.getElementById('os-key-home').addEventListener('click', () => {
-    sounds.click();
-    closeFullscreenApp();
-  });
-  document.getElementById('os-key-recents').addEventListener('click', () => {
-    sounds.click();
-    sounds.vibrate(20);
-  });
+  document.getElementById('os-key-back').addEventListener('click', () => { sounds.click(); closeFullscreenApp(); });
+  document.getElementById('os-key-home').addEventListener('click', () => { sounds.click(); closeFullscreenApp(); });
+  document.getElementById('os-key-recents').addEventListener('click', () => { sounds.click(); sounds.vibrate(20); });
 }
 
 function closeFullscreenApp() {
@@ -757,54 +926,340 @@ function openFullscreenApp(appId) {
   const body = UI.appWindowContent;
   body.innerHTML = '';
 
-  if (appId === 'settings') {
-    UI.appWindowTitle.textContent = 'О телефоне';
-    renderSettingsApp(body);
-  } else if (appId === 'termux') {
-    UI.appWindowTitle.textContent = 'Termux (Linux Terminal)';
-    renderTermuxApp(body);
+  if (appId === 'kernelsu') {
+    UI.appWindowTitle.textContent = 'KernelSU Manager v0.9.5';
+    renderKernelSUApp(body);
   } else if (appId === 'magisk') {
     UI.appWindowTitle.textContent = 'Magisk Manager v27.0';
     renderMagiskApp(body);
+  } else if (appId === 'settings') {
+    UI.appWindowTitle.textContent = 'Настройки устройства';
+    renderSettingsApp(body);
+  } else if (appId === 'termux') {
+    UI.appWindowTitle.textContent = 'Termux (CLI)';
+    renderTermuxApp(body);
   } else if (appId === 'bank') {
     UI.appWindowTitle.textContent = 'СберБанк Онлайн';
     renderBankApp(body);
+  } else if (appId === 'pubg') {
+    UI.appWindowTitle.textContent = 'PUBG Mobile FrameRate Test';
+    renderPubgApp(body);
+  } else if (appId === 'viper') {
+    UI.appWindowTitle.textContent = 'ViPER4Android FX Audio Engine';
+    renderViperApp(body);
+  } else if (appId === 'lsposed') {
+    UI.appWindowTitle.textContent = 'LSPosed Framework (Zygisk)';
+    renderLsposedApp(body);
   } else if (appId === 'antutu') {
     UI.appWindowTitle.textContent = 'AnTuTu Benchmark v10';
     renderAntutuApp(body);
-  } else if (appId === 'camera') {
-    UI.appWindowTitle.textContent = 'Камера Sony 48MP';
-    body.innerHTML = `
-      <div style="text-align:center; padding:30px 10px;">
-        <div style="width:100%; height:260px; background:#000; border-radius:16px; border:1px solid #333; display:flex; align-items:center; justify-content:center; color:#666;">
-          📷 [Видоискатель камеры 48MP HDR RAW]
-        </div>
-        <p style="margin-top:16px; color:#888; font-size:12px;">Google Camera Mod активирован. Сенсор: Sony IMX582.</p>
-      </div>
-    `;
   } else if (appId === 'crdroid-mods') {
-    UI.appWindowTitle.textContent = 'crDroid Settings';
+    UI.appWindowTitle.textContent = 'crDroid Gaming Settings';
     body.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:12px;">
         <div style="background:#1e2538; padding:14px; border-radius:10px;">
-          <b>🎮 Game Turbo Overclock</b>
-          <p style="color:#00e676; font-size:12px; margin-top:4px;">Частота экрана зафиксирована на 120Hz</p>
+          <b>🎮 Game Turbo 120Hz</b>
+          <p style="color:#22c55e; font-size:12px; margin-top:4px;">Частота обновления дисплея зафиксирована на 120 Hz</p>
         </div>
         <div style="background:#1e2538; padding:14px; border-radius:10px;">
-          <b>⚡ Профиль CPU</b>
-          <p style="color:#ff9900; font-size:12px; margin-top:4px;">Snapdragon 860: 2.96 GHz (Performance mode)</p>
+          <b>⚡ Профиль CPU Overclock</b>
+          <p style="color:#ff9900; font-size:12px; margin-top:4px;">${GameState.kernel === 'stormbreaker' ? 'Частота 3.2 GHz (StormBreaker Extreme)' : 'Частота 2.96 GHz (Standard)'}</p>
+        </div>
+      </div>
+    `;
+  } else if (appId === 'kali-tools') {
+    UI.appWindowTitle.textContent = 'Kali NetHunter Suite';
+    body.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="background:#0f172a; padding:14px; border-radius:10px; border:1px solid #0f766e;">
+          <b>🐉 NetHunter Chroot Terminal</b>
+          <p style="color:#00f2fe; font-size:12px; margin-top:4px;">Запустите Termux и введите 'nethunter' или 'nh' для входа в root chroot!</p>
+        </div>
+        <div style="background:#0f172a; padding:14px; border-radius:10px;">
+          <b>📶 Беспроводные атаки</b>
+          <p style="color:#94a3b8; font-size:12px;">Драйверы Atheros / RTL8812AU загружены в ядро.</p>
         </div>
       </div>
     `;
   }
 }
 
+// --- APP: KERNELSU MANAGER (THE STAR OF MODERN ROOT) ---
+function renderKernelSUApp(container) {
+  let activeTab = 'status';
+
+  const renderInner = () => {
+    container.innerHTML = `
+      <div class="ksu-card">
+        <div class="ksu-header-badge">
+          <div class="ksu-icon-big">👑</div>
+          <div>
+            <b style="font-size:16px;">KernelSU</b>
+            <div><span class="ksu-status-tag ${GameState.ksuWorking ? '' : 'not-installed'}">${GameState.ksuWorking ? 'Работает (LKM Kernel Mode)' : 'Не установлено'}</span></div>
+          </div>
+        </div>
+        <div style="margin-top:12px; font-size:11.5px; color:#cbd5e1; line-height:1.6;">
+          <b>Ядро:</b> ${GameState.kernelVersion}<br>
+          <b>Версия KSU:</b> v0.9.5 (11872)<br>
+          <b>Режим безопасности:</b> Kernel Hooked Syscalls
+        </div>
+      </div>
+
+      <div class="ksu-tabs-row">
+        <button class="ksu-tab-pill ${activeTab === 'status' ? 'active' : ''}" id="ksu-tab-btn-status">Главная</button>
+        <button class="ksu-tab-pill ${activeTab === 'su' ? 'active' : ''}" id="ksu-tab-btn-su">Суперпользователь</button>
+        <button class="ksu-tab-pill ${activeTab === 'modules' ? 'active' : ''}" id="ksu-tab-btn-modules">Модули</button>
+      </div>
+
+      <div id="ksu-tab-content"></div>
+    `;
+
+    document.getElementById('ksu-tab-btn-status').onclick = () => { activeTab = 'status'; renderInner(); };
+    document.getElementById('ksu-tab-btn-su').onclick = () => { activeTab = 'su'; renderInner(); };
+    document.getElementById('ksu-tab-btn-modules').onclick = () => { activeTab = 'modules'; renderInner(); };
+
+    const content = document.getElementById('ksu-tab-content');
+    if (activeTab === 'status') {
+      content.innerHTML = `
+        <div style="background:#1e293b; padding:14px; border-radius:10px; font-size:12px; line-height:1.6;">
+          <b>Особенности KernelSU:</b><br>
+          • Root работает полностью внутри пространства ядра (Kernel Space).<br>
+          • Приложения без root-доступа даже не могут обнаружить бинарник <code>su</code>!<br>
+          • <b>Unmount модулей:</b> Вы можете полностью скрыть root от банковских приложений в 1 клик.
+        </div>
+      `;
+    } else if (activeTab === 'su') {
+      content.innerHTML = `
+        <div style="margin-bottom:8px; font-size:11.5px; color:#888;">Приложения с правами Superuser и изоляция:</div>
+        <div class="ksu-app-item">
+          <div>
+            <b>Termux (com.termux)</b>
+            <div style="font-size:10px; color:#aaa;">UID: 10148 • Доступ к sh/su</div>
+          </div>
+          <input type="checkbox" id="chk-su-termux" ${GameState.ksuSuperuserApps.has('termux') ? 'checked' : ''} style="width:20px; height:20px; cursor:pointer;">
+        </div>
+
+        <div class="ksu-app-item">
+          <div>
+            <b>СберБанк (ru.sberbankmobile)</b>
+            <div style="font-size:10px; color:#22c55e;">Изолировать root (Unmount)</div>
+          </div>
+          <input type="checkbox" id="chk-unmount-bank" ${GameState.ksuUnmountRoot.has('bank') ? 'checked' : ''} style="width:20px; height:20px; cursor:pointer;">
+        </div>
+
+        <div class="ksu-app-item">
+          <div>
+            <b>PUBG Mobile (com.tencent.ig)</b>
+            <div style="font-size:10px; color:#22c55e;">Изолировать root от античита</div>
+          </div>
+          <input type="checkbox" id="chk-unmount-pubg" ${GameState.ksuUnmountRoot.has('pubg') ? 'checked' : ''} style="width:20px; height:20px; cursor:pointer;">
+        </div>
+      `;
+
+      document.getElementById('chk-su-termux').onchange = (e) => {
+        sounds.click();
+        if (e.target.checked) GameState.ksuSuperuserApps.add('termux');
+        else GameState.ksuSuperuserApps.delete('termux');
+        checkQuest('ksu_root');
+      };
+      document.getElementById('chk-unmount-bank').onchange = (e) => {
+        sounds.click();
+        if (e.target.checked) GameState.ksuUnmountRoot.add('bank');
+        else GameState.ksuUnmountRoot.delete('bank');
+        checkQuest('bank');
+      };
+      document.getElementById('chk-unmount-pubg').onchange = (e) => {
+        sounds.click();
+        if (e.target.checked) GameState.ksuUnmountRoot.add('pubg');
+        else GameState.ksuUnmountRoot.delete('pubg');
+      };
+    } else if (activeTab === 'modules') {
+      const activeList = Array.from(GameState.modules);
+      if (activeList.length === 0) {
+        content.innerHTML = '<div style="color:#888; font-size:12px; padding:12px;">(Модули не установлены. Прошейте PlayIntegrityFix или Shamiko в рекавери!)</div>';
+      } else {
+        content.innerHTML = activeList.map(m => `
+          <div class="ksu-app-item">
+            <div>
+              <b>🧩 ${m}</b>
+              <div style="font-size:10px; color:#22c55e;">Модуль активен</div>
+            </div>
+            <span style="color:#22c55e; font-size:12px; font-weight:bold;">Вкл</span>
+          </div>
+        `).join('');
+      }
+    }
+  };
+
+  renderInner();
+}
+
+// --- APP: MAGISK MANAGER ---
+function renderMagiskApp(container) {
+  container.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div style="background:#1b2336; border:1px solid #2d3b5c; border-radius:12px; padding:18px; text-align:center;">
+        <div style="font-size:38px;">🪄</div>
+        <b style="font-size:16px; display:block; margin-top:6px;">Magisk v27.0</b>
+        <span style="color:#00e676; font-size:12px;">Установлен (Ramdisk Patch)</span>
+      </div>
+
+      <div style="background:#1b2336; border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <b>Zygisk</b>
+          <div style="font-size:11px; color:#888;">Запуск модулей в системном процессе Zygote</div>
+        </div>
+        <input type="checkbox" id="chk-zygisk" ${GameState.magiskZygisk ? 'checked' : ''} style="width:20px; height:20px; cursor:pointer;">
+      </div>
+
+      <div style="background:#1b2336; border-radius:12px; padding:14px;">
+        <b>Установленные модули:</b>
+        <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+          ${Array.from(GameState.modules).map(m => `
+            <div style="background:#243048; padding:10px; border-radius:8px; font-size:12px; display:flex; justify-content:space-between;">
+              <span>🛡️ ${m}</span>
+              <span style="color:#00e676; font-weight:bold;">Активен</span>
+            </div>
+          `).join('') || '<div style="color:#888; font-size:12px;">(Нет активных модулей)</div>'}
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('chk-zygisk').addEventListener('change', (e) => {
+    sounds.click();
+    GameState.magiskZygisk = e.target.checked;
+    sounds.vibrate(30);
+    alert(GameState.magiskZygisk ? 'Zygisk включен! Требуется перезагрузка.' : 'Zygisk выключен.');
+  });
+}
+
+// --- APP: VIPER4ANDROID FX ---
+function renderViperApp(container) {
+  container.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="background:#192233; padding:14px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <b style="font-size:15px; color:#6366f1;">Master Power</b>
+          <div style="font-size:11px; color:#aaa;">Главный звуковой процессор V4A</div>
+        </div>
+        <input type="checkbox" checked style="width:22px; height:22px;">
+      </div>
+
+      <div class="viper-slider-row">
+        <div>
+          <b>ViPER Bass (Усиление низких)</b>
+          <div style="font-size:10px; color:#888;">Natural Bass / 60 Hz</div>
+        </div>
+        <input type="range" min="0" max="100" value="85">
+      </div>
+
+      <div class="viper-slider-row">
+        <div>
+          <b>ViPER Clarity (Кристальный звук)</b>
+          <div style="font-size:10px; color:#888;">Ozone+ High-definition</div>
+        </div>
+        <input type="range" min="0" max="100" value="70">
+      </div>
+
+      <div style="background:#192233; padding:14px; border-radius:12px;">
+        <b>10-полосный эквалайзер:</b>
+        <div style="display:flex; justify-content:space-around; align-items:flex-end; height:100px; margin-top:12px;">
+          <div style="width:12px; height:60px; background:#6366f1; border-radius:4px;"></div>
+          <div style="width:12px; height:80px; background:#6366f1; border-radius:4px;"></div>
+          <div style="width:12px; height:45px; background:#6366f1; border-radius:4px;"></div>
+          <div style="width:12px; height:55px; background:#6366f1; border-radius:4px;"></div>
+          <div style="width:12px; height:75px; background:#6366f1; border-radius:4px;"></div>
+          <div style="width:12px; height:90px; background:#6366f1; border-radius:4px;"></div>
+          <div style="width:12px; height:65px; background:#6366f1; border-radius:4px;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:9px; color:#888; margin-top:6px;">
+          <span>31Hz</span><span>125Hz</span><span>500Hz</span><span>2kHz</span><span>8kHz</span><span>16kHz</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// --- APP: LSPOSED FRAMEWORK ---
+function renderLsposedApp(container) {
+  container.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="background:#1e1b4b; border:1px solid #4338ca; padding:16px; border-radius:12px; text-align:center;">
+        <div style="font-size:36px;">💉</div>
+        <b style="font-size:16px; display:block; margin-top:4px;">LSPosed v1.9.2</b>
+        <span style="color:#22c55e; font-size:12px;">Zygote Hooking Active</span>
+      </div>
+
+      <div style="background:#1e293b; padding:14px; border-radius:12px;">
+        <b>Активированные Xposed модули:</b>
+        <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+          <div style="background:#0f172a; padding:10px; border-radius:8px; display:flex; justify-content:space-between;">
+            <div>
+              <b>Core Patch</b>
+              <div style="font-size:10px; color:#aaa;">Отключение проверки подписи APK</div>
+            </div>
+            <span style="color:#22c55e; font-weight:bold;">Вкл</span>
+          </div>
+          <div style="background:#0f172a; padding:10px; border-radius:8px; display:flex; justify-content:space-between;">
+            <div>
+              <b>Disable-Flag-Secure</b>
+              <div style="font-size:10px; color:#aaa;">Скриншоты в банковских приложениях</div>
+            </div>
+            <span style="color:#22c55e; font-weight:bold;">Вкл</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// --- APP: PUBG MOBILE FPS TEST ---
+function renderPubgApp(container) {
+  const is120Supported = GameState.displayRefreshRate === 120 && (GameState.kernel === 'stormbreaker' || GameState.modules.has('Game120FPS') || GameState.rom === 'crdroid');
+  const targetFps = is120Supported ? 120 : 60;
+
+  container.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="pubg-viewfinder">
+        <div style="font-size:13px; font-weight:bold; color:#f59e0b;">PUBG Mobile • Эрангель (4K Ultra HD)</div>
+        <div class="pubg-fps-counter" id="pubg-fps-val">${targetFps} FPS</div>
+        <div style="font-size:11px; color:#cbd5e1;">Рендеринг: Vulkan API • Графика: 90/120 Hz Extreme</div>
+      </div>
+
+      <div style="background:#1e293b; padding:14px; border-radius:10px; font-size:12px; line-height:1.7;">
+        <b>Статус игрового оверклока:</b><br>
+        • Частота экрана: <b>${GameState.displayRefreshRate} Hz</b><br>
+        • Ядро: <b>${GameState.kernelVersion}</b><br>
+        • 120 FPS Unlocker: <b>${GameState.modules.has('Game120FPS') || is120Supported ? 'Активирован' : 'Не активен (ограничено 60 FPS)'}</b>
+      </div>
+
+      ${is120Supported ? `
+        <div style="background:#064e3b; border:1px solid #059669; padding:12px; border-radius:8px; color:#34d399; font-size:12px;">
+          🎉 <b>120 FPS разблокированы!</b> Процессор разогнан, микрофризов нет.
+        </div>
+      ` : `
+        <div style="background:#450a0a; border:1px solid #dc2626; padding:12px; border-radius:8px; color:#fca5a5; font-size:12px;">
+          ⚠️ <b>Ограничение 60 FPS:</b> Установите модуль <code>Game_120FPS_Unlocker.zip</code> или прошейте <b>StormBreaker Kernel</b> в рекавери!
+        </div>
+      `}
+    </div>
+  `;
+
+  if (is120Supported) {
+    checkQuest('fps120');
+  }
+}
+
+// --- APP: SETTINGS ---
 function renderSettingsApp(container) {
   const osNames = {
     stock: 'Xiaomi HyperOS 1.0.4.0 (Официальная)',
     pixel: 'PixelOS 14 (Pixel Experience)',
     lineage: 'LineageOS 21 (Android 14)',
-    crdroid: 'crDroid 10.5 (Gaming Edition)'
+    crdroid: 'crDroid 10.5 (Gaming Edition)',
+    evolution: 'Evolution X 8.5 (The Customizer)',
+    kali: 'Kali NetHunter Android 14'
   };
 
   container.innerHTML = `
@@ -813,20 +1268,35 @@ function renderSettingsApp(container) {
         <div style="font-size:11px; color:#888;">Модель устройства</div>
         <b style="font-size:15px;">${GameState.model}</b>
       </div>
+
       <div style="background:#1c2333; padding:14px; border-radius:10px;">
         <div style="font-size:11px; color:#888;">Текущая прошивка</div>
         <b style="font-size:14px;">${osNames[GameState.rom || 'stock']}</b>
       </div>
+
       <div style="background:#1c2333; padding:14px; border-radius:10px;">
-        <div style="font-size:11px; color:#888;">Версия ядра</div>
-        <code>Linux 4.14.336-vayu-perf #1 SMP PREEMPT</code>
+        <div style="font-size:11px; color:#888;">Ядро (Kernel)</div>
+        <code style="color:#00f2fe;">${GameState.kernelVersion}</code>
       </div>
+
+      <div style="background:#1c2333; padding:14px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <b>Частота экрана (Display Hz)</b>
+          <div style="font-size:11px; color:#888;">Плавность интерфейса</div>
+        </div>
+        <select id="sel-hz" style="background:#090d14; color:#fff; border:1px solid #334155; padding:6px; border-radius:6px; font-weight:bold;">
+          <option value="60" ${GameState.displayRefreshRate === 60 ? 'selected' : ''}>60 Hz (Энергосбережение)</option>
+          <option value="120" ${GameState.displayRefreshRate === 120 ? 'selected' : ''}>120 Hz (Плавный режим)</option>
+        </select>
+      </div>
+
       <div style="background:#1c2333; padding:14px; border-radius:10px;">
         <div style="font-size:11px; color:#888;">Статус загрузчика (Bootloader)</div>
         <b style="color:${GameState.bootloaderUnlocked ? '#00e676' : '#ff3366'};">
           ${GameState.bootloaderUnlocked ? 'Разблокирован (Unlocked)' : 'Заблокирован (Locked)'}
         </b>
       </div>
+
       <div id="settings-build-box" style="background:#1c2333; padding:14px; border-radius:10px; cursor:pointer;">
         <div style="font-size:11px; color:#888;">Номер сборки (Тапните 7 раз)</div>
         <b>UQ1A.240205.002.A1 (4PDA-Mod)</b>
@@ -836,6 +1306,13 @@ function renderSettingsApp(container) {
       </div>
     </div>
   `;
+
+  document.getElementById('sel-hz').onchange = (e) => {
+    sounds.click();
+    GameState.displayRefreshRate = parseInt(e.target.value);
+    UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
+    sounds.vibrate(20);
+  };
 
   document.getElementById('settings-build-box').addEventListener('click', () => {
     sounds.click();
@@ -858,27 +1335,25 @@ function renderSettingsApp(container) {
   });
 }
 
+// --- APP: TERMUX ---
 function renderTermuxApp(container) {
   let isSuSession = false;
   container.innerHTML = `
     <div style="display:flex; flex-direction:column; height:100%;">
       <div id="termux-output" style="flex:1; background:#000; color:#39ff14; font-family:monospace; font-size:12px; padding:12px; border-radius:8px; overflow-y:auto; white-space:pre-wrap; margin-bottom:10px; height:280px;">
 Welcome to Termux!
-Wiki: https://wiki.termux.com
-Community forum: https://termux.com/community
-
-Type 'help' or 'su' to request root access.
+Type 'help', 'ksu', 'su', or 'neofetch'.
       </div>
       <div style="display:flex; gap:8px;">
         <span id="termux-prompt" style="font-family:monospace; font-size:13px; color:#00f2fe; align-self:center;">$</span>
-        <input type="text" id="termux-input" style="flex:1; background:#111; border:1px solid #333; color:#fff; font-family:monospace; font-size:12px; padding:8px 10px; border-radius:6px;" placeholder="su, uname -a, id, reboot" autocomplete="off">
+        <input type="text" id="termux-input" style="flex:1; background:#111; border:1px solid #333; color:#fff; font-family:monospace; font-size:12px; padding:8px 10px; border-radius:6px;" placeholder="su, ksu, neofetch, uname -a" autocomplete="off">
         <button id="termux-btn-send" style="background:#238636; color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer;">↵</button>
       </div>
       <div style="display:flex; gap:6px; margin-top:8px; overflow-x:auto;">
+        <button class="q-btn" data-tcmd="ksu">ksu</button>
         <button class="q-btn" data-tcmd="su">su</button>
+        <button class="q-btn" data-tcmd="neofetch">neofetch</button>
         <button class="q-btn" data-tcmd="uname -a">uname -a</button>
-        <button class="q-btn" data-tcmd="getprop ro.product.model">getprop</button>
-        <button class="q-btn" data-tcmd="id">id</button>
         <button class="q-btn" data-tcmd="reboot">reboot</button>
       </div>
     </div>
@@ -896,30 +1371,54 @@ Type 'help' or 'su' to request root access.
 
     if (cmd === 'clear') {
       output.textContent = '';
-    } else if (cmd === 'su') {
-      if (!GameState.isRooted) {
-        sounds.errorTone();
-        output.textContent += 'Permission denied: no su binary found. Flash Magisk in TWRP!\n';
-      } else {
-        triggerMagiskSuModal(() => {
+    } else if (cmd === 'su' || cmd === 'ksu') {
+      if (GameState.ksuWorking) {
+        if (!GameState.ksuSuperuserApps.has('termux')) {
+          triggerSuDialog('KernelSU', () => {
+            GameState.ksuSuperuserApps.add('termux');
+            isSuSession = true;
+            prompt.textContent = '#';
+            prompt.style.color = '#ff3366';
+            output.textContent += 'Superuser access granted via KernelSU!\n';
+            sounds.bootChime();
+            checkQuest('ksu_root');
+          });
+        } else {
+          isSuSession = true;
+          prompt.textContent = '#';
+          prompt.style.color = '#ff3366';
+          output.textContent += 'KernelSU: uid=0(root) active.\n';
+        }
+      } else if (GameState.magiskInstalled) {
+        triggerSuDialog('Magisk', () => {
           isSuSession = true;
           prompt.textContent = '#';
           prompt.style.color = '#ff3366';
           output.textContent += 'Superuser access granted via Magisk su binary!\n';
           sounds.bootChime();
         });
+      } else {
+        sounds.errorTone();
+        output.textContent += 'Permission denied: no root found. Flash KernelSU or Magisk in Recovery!\n';
       }
+    } else if (cmd === 'neofetch') {
+      output.textContent += `
+       .-.          OS: ${GameState.rom || 'stock'} (Android 14)
+      /   \\         Host: Xiaomi Poco X3 Pro (vayu)
+     |     |        Kernel: ${GameState.kernelVersion}
+     |     |        Uptime: 42 mins
+      \\   /         Display: 2400x1080 @ ${GameState.displayRefreshRate}Hz
+       '-'          CPU: Qualcomm Snapdragon 860 (8) @ 2.96GHz
+                    Root: ${GameState.ksuWorking ? 'KernelSU v0.9.5' : (GameState.magiskInstalled ? 'Magisk v27.0' : 'None')}
+                    Memory: 4120MiB / 8192MiB
+      \n`;
     } else if (cmd === 'id') {
-      output.textContent += isSuSession ? 'uid=0(root) gid=0(root) groups=0(root),context=u:r:magisk:s0\n' : 'uid=10148(u0_a148) gid=10148(u0_a148)\n';
+      output.textContent += isSuSession ? 'uid=0(root) gid=0(root) groups=0(root),context=u:r:kernel:s0\n' : 'uid=10148(u0_a148) gid=10148(u0_a148)\n';
     } else if (cmd === 'uname -a') {
-      output.textContent += 'Linux localhost 4.14.336-vayu-perf #1 SMP PREEMPT aarch64 Android\n';
-    } else if (cmd.startsWith('getprop')) {
-      output.textContent += `[ro.product.model]: [${GameState.model}]\n[ro.build.version.release]: [14]\n`;
+      output.textContent += `${GameState.kernelVersion} aarch64 Android\n`;
     } else if (cmd === 'reboot') {
       closeFullscreenApp();
       bootDevice();
-    } else if (cmd === 'help') {
-      output.textContent += 'Available: su, id, uname -a, getprop, reboot, clear\n';
     } else {
       output.textContent += `sh: ${cmd}: command not found\n`;
     }
@@ -935,8 +1434,10 @@ Type 'help' or 'su' to request root access.
   });
 }
 
-function triggerMagiskSuModal(onGranted) {
+function triggerSuDialog(provider, onGranted) {
   UI.magiskSuPrompt.style.display = 'block';
+  UI.suPromptTitle.textContent = `${provider} Superuser Request`;
+  UI.suPromptDesc.textContent = `Приложение Termux запрашивает root через ${provider}!`;
   sounds.vibrate(60);
   let timeLeft = 10;
   const timer = setInterval(() => {
@@ -962,49 +1463,12 @@ function triggerMagiskSuModal(onGranted) {
   };
 }
 
-function renderMagiskApp(container) {
-  container.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:14px;">
-      <div style="background:#1b2336; border:1px solid #2d3b5c; border-radius:12px; padding:18px; text-align:center;">
-        <div style="font-size:38px;">🪄</div>
-        <b style="font-size:16px; display:block; margin-top:6px;">Magisk v27.0</b>
-        <span style="color:#00e676; font-size:12px;">Установлен (Systemless Root)</span>
-      </div>
-
-      <div style="background:#1b2336; border-radius:12px; padding:14px; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <b>Zygisk</b>
-          <div style="font-size:11px; color:#888;">Запуск модулей в системном процессе Zygote</div>
-        </div>
-        <input type="checkbox" id="chk-zygisk" ${GameState.magiskZygisk ? 'checked' : ''} style="width:20px; height:20px; cursor:pointer;">
-      </div>
-
-      <div style="background:#1b2336; border-radius:12px; padding:14px;">
-        <b>Установленные модули:</b>
-        <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
-          ${GameState.playIntegrityModule ? `
-            <div style="background:#243048; padding:10px; border-radius:8px; font-size:12px; display:flex; justify-content:space-between;">
-              <span>🛡️ Play Integrity Fix v16.0</span>
-              <span style="color:#00e676; font-weight:bold;">Активен</span>
-            </div>
-          ` : `
-            <div style="color:#888; font-size:12px;">(Нет активных модулей. Прошейте PlayIntegrityFix_v16.zip в TWRP!)</div>
-          `}
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('chk-zygisk').addEventListener('change', (e) => {
-    sounds.click();
-    GameState.magiskZygisk = e.target.checked;
-    sounds.vibrate(30);
-    alert(GameState.magiskZygisk ? 'Zygisk включен! Требуется перезагрузка.' : 'Zygisk выключен.');
-  });
-}
-
+// --- APP: SBERBANK (REAL INTEGRITY CHECK) ---
 function renderBankApp(container) {
-  const isBypassed = (!GameState.bootloaderUnlocked && !GameState.isRooted) || GameState.playIntegrityModule;
+  // KernelSU signature power: if root is unmounted from bank, it passes 100%!
+  const isKsuHidden = GameState.ksuWorking && GameState.ksuUnmountRoot.has('bank');
+  const isModuleBypassed = GameState.modules.has('PlayIntegrityFix') || GameState.modules.has('Shamiko');
+  const isSafe = (!GameState.bootloaderUnlocked && !GameState.ksuWorking && !GameState.magiskInstalled) || isKsuHidden || isModuleBypassed;
 
   container.innerHTML = `
     <div style="text-align:center; padding:20px 10px;">
@@ -1021,7 +1485,7 @@ function renderBankApp(container) {
     const box = document.getElementById('bank-result-box');
     if (!box) return;
 
-    if (isBypassed) {
+    if (isSafe) {
       sounds.bootChime();
       box.style.background = '#064e3b';
       box.style.border = '1px solid #059669';
@@ -1030,10 +1494,10 @@ function renderBankApp(container) {
         <p style="font-size:12px; margin-top:6px; color:#d1fae5;">
           • MEETS_DEVICE_INTEGRITY: true<br>
           • MEETS_BASIC_INTEGRITY: true<br>
-          • Проверка SafetyNet пройдена успешно!
+          • ${isKsuHidden ? 'KernelSU: Root изолирован и размонтирован из пространства имен банка!' : 'Play Integrity Fix активен.'}
         </p>
         <div style="margin-top:14px; background:rgba(0,0,0,0.3); padding:12px; border-radius:8px; text-align:center;">
-          <span style="font-size:11px; color:#aaa;">Текущий баланс:</span>
+          <span style="font-size:11px; color:#aaa;">Текущий баланс карты:</span>
           <div style="font-size:24px; font-weight:bold; color:#10b981;">1 337 228 ₽</div>
         </div>
       `;
@@ -1047,13 +1511,16 @@ function renderBankApp(container) {
         <p style="font-size:12px; margin-top:6px; color:#fecaca;">
           Обнаружен Root или разблокированный Bootloader!<br>
           Play Integrity: FAILED (NO_INTEGRITY)<br><br>
-          <b>Как исправить:</b> Установите модуль <code>PlayIntegrityFix_v16.zip</code> в TWRP!
+          <b>Как исправить:</b><br>
+          • В <b>KernelSU Manager</b> включите «Изолировать root» для СберБанка!<br>
+          • Или установите модуль <code>PlayIntegrityFix.zip</code> в рекавери!
         </p>
       `;
     }
-  }, 1000);
+  }, 900);
 }
 
+// --- APP: ANTUTU BENCHMARK ---
 function renderAntutuApp(container) {
   container.innerHTML = `
     <div style="text-align:center; padding:16px;">
@@ -1068,7 +1535,7 @@ function renderAntutuApp(container) {
         <span style="font-size:12px; color:#888;">Баллов в общем зачете</span>
       </div>
 
-      <button id="btn-start-antutu" class="twrp-big-btn" style="background:#dc2626; border-color:#ef4444; width:85%; margin:auto;">
+      <button id="btn-start-antutu" class="rec-big-btn" style="background:#dc2626; border-color:#ef4444; width:85%; margin:auto;">
         Запустить тестирование
       </button>
 
@@ -1100,13 +1567,15 @@ function renderAntutuApp(container) {
         document.getElementById('btn-start-antutu').style.display = 'inline-block';
         document.getElementById('btn-start-antutu').textContent = 'Повторить тест';
 
-        let base = 560000;
-        if (GameState.rom === 'pixel') base = 650000;
-        if (GameState.rom === 'lineage') base = 720000;
-        if (GameState.rom === 'crdroid') {
-          base = 980000;
-          if (GameState.isRooted) base = 1142500;
-        }
+        let base = 560000; // Stock HyperOS
+        if (GameState.rom === 'pixel') base = 670000;
+        if (GameState.rom === 'lineage') base = 730000;
+        if (GameState.rom === 'evolution') base = 780000;
+        if (GameState.rom === 'crdroid') base = 960000;
+
+        // Custom kernel boosts
+        if (GameState.kernel === 'ngk_ksu') base += 140000;
+        if (GameState.kernel === 'stormbreaker') base += 260000; // 3.2 GHz OC!
 
         GameState.antutuScore = base + Math.floor(Math.random() * 8000);
         document.getElementById('antutu-num').textContent = GameState.antutuScore.toLocaleString();
@@ -1114,15 +1583,15 @@ function renderAntutuApp(container) {
         sounds.vibrate(100);
 
         if (GameState.antutuScore > 1000000) {
-          checkQuest('crdroid_oc');
-          alert(`🔥 Рекорд! ${GameState.antutuScore.toLocaleString()} баллов! Процессор разогнан на crDroid Gaming!`);
+          checkQuest('antutu_record');
+          alert(`🔥 Рекорд! ${GameState.antutuScore.toLocaleString()} баллов! Процессор разогнан на кастомном ядре!`);
         }
       }
     }, 700);
   });
 }
 
-// --- FLOATING PC STATION & 4PDA OVERLAY ---
+// --- PC STATION & 4PDA OVERLAY ---
 function bindPcHud() {
   UI.hudPcToggle.addEventListener('click', () => {
     sounds.click();
@@ -1134,7 +1603,6 @@ function bindPcHud() {
     UI.pcOverlay.classList.remove('active');
   });
 
-  // Tab switching inside PC station
   UI.pcTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       sounds.click();
@@ -1191,14 +1659,14 @@ function executePcCommand(cmd) {
   const arg = parts[2] ? parts[2].toLowerCase() : '';
 
   if (tool === 'help') {
-    termLog('--- Доступные команды прошивки ---', 'info');
-    termLog('fastboot devices - список устройств в режиме fastboot', 'info');
+    termLog('--- Команды Fastboot & ADB ---', 'info');
+    termLog('fastboot devices - список устройств в Fastboot', 'info');
     termLog('fastboot oem unlock - разблокировка загрузчика (Bootloader)', 'info');
-    termLog('fastboot flash recovery <файл.img> - прошивка TWRP', 'info');
+    termLog('fastboot flash recovery <файл.img> - прошивка TWRP или OrangeFox', 'info');
+    termLog('fastboot flash boot <файл.img> - прошивка ядра (KernelSU boot)', 'info');
     termLog('fastboot reboot [recovery|bootloader] - перезагрузка', 'info');
-    termLog('adb devices - список устройств в OS/TWRP', 'info');
+    termLog('adb devices - список устройств в OS/Рекавери', 'info');
     termLog('adb push <файл> /sdcard/ - загрузка файлов в телефон', 'info');
-    termLog('adb reboot [recovery|bootloader] - перезагрузка через adb', 'info');
     termLog('cls / clear - очистить консоль', 'info');
     return;
   }
@@ -1208,7 +1676,7 @@ function executePcCommand(cmd) {
     return;
   }
 
-  // FASTBOOT COMMANDS
+  // FASTBOOT
   if (tool === 'fastboot') {
     if (GameState.screenState !== 'FASTBOOT') {
       sounds.errorTone();
@@ -1221,12 +1689,10 @@ function executePcCommand(cmd) {
     } else if (sub === 'oem' && arg === 'unlock') {
       sounds.bootChime();
       GameState.bootloaderUnlocked = true;
-      termLog('...', 'info');
       termLog('(bootloader) Unlocking bootloader...', 'warning');
       termLog('(bootloader) Erasing userdata partition...', 'warning');
       termLog('OKAY [  3.412s]', 'success');
-      termLog('finished. total time: 3.412s', 'success');
-      termLog('Загрузчик успешно разблокирован!', 'info');
+      termLog('finished. Загрузчик успешно разблокирован!', 'info');
       setScreenState('FASTBOOT');
       checkQuest('unlock');
     } else if (sub === 'flash') {
@@ -1237,13 +1703,25 @@ function executePcCommand(cmd) {
           termLog('Сначала разблокируйте загрузчик: fastboot oem unlock', 'warning');
           return;
         }
-        termLog(`Sending 'recovery' (65536 KB)...`, 'info');
-        termLog('OKAY [  1.210s]', 'success');
-        termLog(`Writing 'recovery'...`, 'info');
-        termLog('OKAY [  0.840s]', 'success');
-        GameState.recovery = 'twrp';
-        termLog('finished. TWRP Recovery успешно установлен!', 'success');
-        checkQuest('twrp');
+        const file = parts[3] || 'twrp_3.7.0.img';
+        if (file.includes('orangefox')) {
+          GameState.recoveryType = 'orangefox';
+          termLog(`Writing 'recovery' with OrangeFox Recovery R11.1...`, 'info');
+        } else {
+          GameState.recoveryType = 'twrp';
+          termLog(`Writing 'recovery' with TWRP 3.7.0...`, 'info');
+        }
+        termLog('OKAY [  1.420s]', 'success');
+        GameState.recoveryInstalled = true;
+        checkQuest('recovery');
+      } else if (arg === 'boot') {
+        termLog(`Sending 'boot' (65536 KB)...`, 'info');
+        termLog(`Writing 'boot' with KernelSU patched kernel...`, 'info');
+        termLog('OKAY [  1.120s]', 'success');
+        GameState.kernel = 'ngk_ksu';
+        GameState.kernelVersion = 'Linux 4.14.336-NGK-KernelSU';
+        GameState.ksuWorking = true;
+        checkQuest('ksu_kernel');
       } else {
         termLog(`fastboot flash: неизвестный раздел [${arg}]`, 'error');
       }
@@ -1264,11 +1742,11 @@ function executePcCommand(cmd) {
     return;
   }
 
-  // ADB COMMANDS
+  // ADB
   if (tool === 'adb') {
-    if (GameState.screenState !== 'OS' && GameState.screenState !== 'TWRP') {
+    if (GameState.screenState !== 'OS' && GameState.screenState !== 'RECOVERY') {
       sounds.errorTone();
-      termLog('error: device offline (Телефон должен быть в OS или TWRP)', 'warning');
+      termLog('error: device offline (Телефон должен быть в OS или Рекавери)', 'warning');
       return;
     }
 
@@ -1316,7 +1794,7 @@ function bindMiFlash() {
     sounds.click();
     if (!GameState.usbConnected || GameState.screenState !== 'FASTBOOT') {
       sounds.errorTone();
-      alert('Mi Flash: Устройство не обнаружено в Fastboot! Подключите USB и войдите в Fastboot.');
+      alert('Mi Flash: Устройство не найдено в Fastboot! Подключите USB и войдите в Fastboot.');
       return;
     }
 
@@ -1337,9 +1815,11 @@ function bindMiFlash() {
 
         GameState.rom = 'stock';
         GameState.romCleanInstalled = true;
-        GameState.recovery = 'stock';
-        GameState.isRooted = false;
-        GameState.playIntegrityModule = false;
+        GameState.kernel = 'stock';
+        GameState.kernelVersion = 'Linux 4.14.336-stock';
+        GameState.ksuWorking = false;
+        GameState.magiskInstalled = false;
+        GameState.modules.clear();
 
         const isLock = document.querySelector('input[name="mf-opt"]:checked').value === 'lock';
         if (isLock) GameState.bootloaderUnlocked = false;

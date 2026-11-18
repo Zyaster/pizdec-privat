@@ -8,20 +8,20 @@
 </head>
 <body>
 
-  <!-- ================= FULLSCREEN SMARTPHONE ================= -->
+  <!-- ================= 100% FULLSCREEN SMARTPHONE ================= -->
   <div id="phone-container">
 
-    <!-- Screen Notch / Punch hole camera -->
+    <!-- Camera Punch Hole -->
     <div class="punch-hole-camera"></div>
 
-    <!-- On-screen Hardware Buttons (Translucent on screen edge) -->
+    <!-- On-screen Edge Hardware Buttons (Vol+, Vol-, Power) -->
     <div class="edge-hardware-controls" id="edge-controls">
       <div class="hw-trigger-btn" id="btn-hw-power" title="Питание (Power)">⚡</div>
       <div class="hw-trigger-btn" id="btn-hw-volup" title="Громкость + (Vol +)">+</div>
       <div class="hw-trigger-btn" id="btn-hw-voldown" title="Громкость - (Vol -)">−</div>
     </div>
 
-    <!-- Floating HUD Button to Open PC Station / 4PDA -->
+    <!-- Floating HUD Pill to Open PC Station / 4PDA -->
     <button id="hud-pc-toggle" class="hud-pill-btn">
       <span class="hud-icon">💻</span>
       <span class="hud-label">ПК & 4PDA</span>
@@ -99,64 +99,64 @@
         <div class="cd-instruction">
           ⚠️ <b>Телефон в бутлупе (кирпич)!</b><br>
           Вы прошили кастом поверх другой системы без очистки данных.<br>
-          <b>Решение:</b> Перейдите в Fastboot (Power + Vol-) и сделайте Format Data в TWRP или перепрошейте через Mi Flash!
+          <b>Решение:</b> Перейдите в Fastboot (Power + Vol-) и сделайте Format Data в рекавери или перепрошейте через Mi Flash!
         </div>
       </div>
     </div>
 
-    <!-- STATE 4: TWRP Recovery (100% Fullscreen Authentic TWRP 3.7) -->
-    <div id="screen-twrp" class="screen-view">
-      <!-- TWRP Top Bar -->
-      <div class="twrp-topbar">
-        <div class="twrp-logo-badge">Team Win Recovery Project</div>
-        <div class="twrp-stats">
-          <span id="twrp-clock">12:34</span>
+    <!-- STATE 4: Recovery Mode (TWRP or OrangeFox) -->
+    <div id="screen-recovery" class="screen-view theme-twrp">
+      <!-- Recovery Top Bar -->
+      <div class="recovery-topbar" id="recovery-topbar">
+        <div class="rec-logo-badge" id="rec-brand-title">Team Win Recovery Project 3.7</div>
+        <div class="rec-stats">
+          <span id="rec-clock">12:34</span>
           <span>🔋 98%</span>
         </div>
       </div>
 
-      <!-- TWRP Main Content Area -->
-      <div class="twrp-main-content">
+      <!-- Recovery Content Area -->
+      <div class="recovery-main-content">
 
-        <!-- TWRP Page: 8 Tile Menu -->
-        <div class="twrp-page" id="twrp-page-main">
-          <div class="twrp-tiles-grid">
-            <button class="twrp-tile" data-action="install">
+        <!-- Recovery Page: Main 8 Tiles -->
+        <div class="rec-page" id="rec-page-main">
+          <div class="rec-tiles-grid" id="rec-tiles-grid">
+            <button class="rec-tile" data-action="install">
               <span class="t-icon">📥</span>
               <span class="t-title">Install</span>
               <span class="t-sub">Установка ZIP/IMG</span>
             </button>
-            <button class="twrp-tile" data-action="wipe">
+            <button class="rec-tile" data-action="wipe">
               <span class="t-icon">🧹</span>
               <span class="t-title">Wipe</span>
               <span class="t-sub">Очистка и Format Data</span>
             </button>
-            <button class="twrp-tile" data-action="backup">
+            <button class="rec-tile" data-action="backup">
               <span class="t-icon">💾</span>
               <span class="t-title">Backup</span>
-              <span class="t-sub">Бэкап системы</span>
+              <span class="t-sub">Бэкап разделов</span>
             </button>
-            <button class="twrp-tile" data-action="restore">
+            <button class="rec-tile" data-action="restore">
               <span class="t-icon">♻️</span>
               <span class="t-title">Restore</span>
               <span class="t-sub">Восстановление</span>
             </button>
-            <button class="twrp-tile" data-action="mount">
+            <button class="rec-tile" data-action="mount">
               <span class="t-icon">📁</span>
               <span class="t-title">Mount</span>
               <span class="t-sub">Монтирование разделов</span>
             </button>
-            <button class="twrp-tile" data-action="settings">
+            <button class="rec-tile" data-action="settings">
               <span class="t-icon">⚙️</span>
               <span class="t-title">Settings</span>
-              <span class="t-sub">Настройки TWRP</span>
+              <span class="t-sub">Настройки рекавери</span>
             </button>
-            <button class="twrp-tile" data-action="advanced">
+            <button class="rec-tile" data-action="advanced">
               <span class="t-icon">🔧</span>
               <span class="t-title">Advanced</span>
               <span class="t-sub">Терминал и утилиты</span>
             </button>
-            <button class="twrp-tile" data-action="reboot">
+            <button class="rec-tile" data-action="reboot">
               <span class="t-icon">🔄</span>
               <span class="t-title">Reboot</span>
               <span class="t-sub">Перезагрузка</span>
@@ -164,67 +164,67 @@
           </div>
         </div>
 
-        <!-- TWRP Page: File Selector -->
-        <div class="twrp-page" id="twrp-page-install" style="display:none;">
-          <div class="twrp-page-header">Select Zip or Image from /sdcard</div>
-          <div class="twrp-file-tree" id="twrp-file-tree">
+        <!-- Recovery Page: File Selector -->
+        <div class="rec-page" id="rec-page-install" style="display:none;">
+          <div class="rec-page-header">Select Zip or Image from /sdcard</div>
+          <div class="rec-file-tree" id="rec-file-tree">
             <!-- Dynamically populated files -->
           </div>
-          <button class="twrp-nav-back" data-back="main">Назад</button>
+          <button class="rec-nav-back" data-back="main">Назад</button>
         </div>
 
-        <!-- TWRP Page: Confirm Flash (Swipe to Flash!) -->
-        <div class="twrp-page" id="twrp-page-confirm" style="display:none;">
-          <div class="twrp-page-header" id="confirm-file-title">Install Zip</div>
+        <!-- Recovery Page: Confirm Flash (Swipe to Flash) -->
+        <div class="rec-page" id="rec-page-confirm" style="display:none;">
+          <div class="rec-page-header" id="confirm-file-title">Install Zip</div>
           <div class="confirm-box">
             <div class="confirm-row"><span>Target:</span> <b id="confirm-target-name">PixelOS_vayu_A14.zip</b></div>
             <div class="confirm-row"><span>Location:</span> <b>/sdcard/</b></div>
-            <div class="confirm-row"><span>MD5 Check:</span> <b style="color:#00e676;">Verified OK</b></div>
+            <div class="confirm-row"><span>Signature:</span> <b style="color:#00e676;">Verified OK</b></div>
             <div class="confirm-warn">Прошивка изменит системные разделы устройства.</div>
           </div>
 
-          <div class="twrp-slider-wrapper">
-            <div class="twrp-slider-track">
-              <div class="twrp-slider-handle" id="twrp-slider-handle">➔</div>
-              <span class="twrp-slider-text">Свайп для подтверждения прошивки</span>
+          <div class="rec-slider-wrapper">
+            <div class="rec-slider-track">
+              <div class="rec-slider-handle" id="rec-slider-handle">➔</div>
+              <span class="rec-slider-text">Свайп для подтверждения прошивки</span>
             </div>
           </div>
-          <button class="twrp-nav-back" data-back="install">Отмена</button>
+          <button class="rec-nav-back" data-back="install">Отмена</button>
         </div>
 
-        <!-- TWRP Page: Live Flashing Console -->
-        <div class="twrp-page" id="twrp-page-console" style="display:none;">
-          <div class="twrp-page-header">Executing Update Script</div>
-          <div class="twrp-log-console" id="twrp-log-console"></div>
-          <button class="twrp-big-btn success" id="btn-twrp-reboot-system" style="display:none;">Reboot System</button>
+        <!-- Recovery Page: Live Flashing Console -->
+        <div class="rec-page" id="rec-page-console" style="display:none;">
+          <div class="rec-page-header">Executing Update Script</div>
+          <div class="rec-log-console" id="rec-log-console"></div>
+          <button class="rec-big-btn success" id="btn-rec-reboot-system" style="display:none;">Reboot System</button>
         </div>
 
-        <!-- TWRP Page: Wipe / Format Data -->
-        <div class="twrp-page" id="twrp-page-wipe" style="display:none;">
-          <div class="twrp-page-header">Wipe (Очистка)</div>
+        <!-- Recovery Page: Wipe / Format Data -->
+        <div class="rec-page" id="rec-page-wipe" style="display:none;">
+          <div class="rec-page-header">Wipe (Очистка)</div>
           <div class="wipe-actions">
-            <button class="twrp-big-btn danger" id="btn-show-format-data">Format Data (Удалить шифрование)</button>
-            <button class="twrp-big-btn" id="btn-dalvik-wipe">Advanced Wipe (Кэш / Dalvik)</button>
+            <button class="rec-big-btn danger" id="btn-show-format-data">Format Data (Сброс шифрования)</button>
+            <button class="rec-big-btn" id="btn-dalvik-wipe">Advanced Wipe (Кэш / Dalvik)</button>
           </div>
 
           <div id="format-data-dialog" class="format-dialog" style="display:none;">
             <p>Внимание! Для предотвращения бутлупа и сброса шифрования введите "yes":</p>
             <input type="text" id="format-yes-input" class="format-input" placeholder="yes" autocomplete="off">
-            <button class="twrp-big-btn danger" id="btn-confirm-format-data">Форматировать Data</button>
+            <button class="rec-big-btn danger" id="btn-confirm-format-data">Форматировать Data</button>
           </div>
-          <button class="twrp-nav-back" data-back="main">Назад</button>
+          <button class="rec-nav-back" data-back="main">Назад</button>
         </div>
 
-        <!-- TWRP Page: Reboot -->
-        <div class="twrp-page" id="twrp-page-reboot" style="display:none;">
-          <div class="twrp-page-header">Reboot Menu</div>
+        <!-- Recovery Page: Reboot -->
+        <div class="rec-page" id="rec-page-reboot" style="display:none;">
+          <div class="rec-page-header">Reboot Menu</div>
           <div class="reboot-grid">
-            <button class="twrp-big-btn" id="rb-system">System</button>
-            <button class="twrp-big-btn" id="rb-recovery">Recovery</button>
-            <button class="twrp-big-btn" id="rb-bootloader">Bootloader (Fastboot)</button>
-            <button class="twrp-big-btn" id="rb-poweroff">Power Off</button>
+            <button class="rec-big-btn" id="rb-system">System</button>
+            <button class="rec-big-btn" id="rb-recovery">Recovery</button>
+            <button class="rec-big-btn" id="rb-bootloader">Bootloader (Fastboot)</button>
+            <button class="rec-big-btn" id="rb-poweroff">Power Off</button>
           </div>
-          <button class="twrp-nav-back" data-back="main">Назад</button>
+          <button class="rec-nav-back" data-back="main">Назад</button>
         </div>
 
       </div>
@@ -236,7 +236,9 @@
       <div class="os-statusbar">
         <span class="os-time" id="os-clock">14:30</span>
         <div class="os-icons">
-          <span class="root-badge" id="os-root-badge"># SU</span>
+          <span class="root-badge ksu-badge" id="os-ksu-badge">KernelSU</span>
+          <span class="root-badge magisk-badge" id="os-magisk-badge"># SU</span>
+          <span class="fps-badge" id="os-fps-badge">120 Hz</span>
           <span>📶 5G</span>
           <span>🔋 98%</span>
         </div>
@@ -249,19 +251,20 @@
           <div class="hero-time" id="hero-clock">14:30</div>
           <div class="hero-date" id="hero-date">Среда, 18 ноября</div>
           <div class="hero-os-title" id="hero-os-title">Xiaomi HyperOS</div>
+          <div class="hero-kernel-title" id="hero-kernel-title">Kernel: Linux 4.14 Stock</div>
         </div>
 
         <!-- Grid of Installed Apps -->
         <div class="os-app-grid" id="os-app-grid">
-          <!-- Populated dynamically based on installed ROM & Mods -->
+          <!-- Populated dynamically based on installed ROM, Kernel & Root mods -->
         </div>
 
         <!-- Android Bottom App Dock -->
         <div class="os-dock-bar">
-          <div class="dock-icon" data-open="phone-app">📞</div>
-          <div class="dock-icon" data-open="termux">💻</div>
-          <div class="dock-icon" data-open="bank">🏦</div>
-          <div class="dock-icon" data-open="settings">⚙️</div>
+          <div class="dock-icon" data-open="phone-app" title="Телефон">📞</div>
+          <div class="dock-icon" data-open="termux" title="Termux">💻</div>
+          <div class="dock-icon" data-open="bank" title="СберБанк">🏦</div>
+          <div class="dock-icon" data-open="settings" title="Настройки">⚙️</div>
         </div>
 
         <!-- Android 3-Button Navigation Bar -->
@@ -286,11 +289,11 @@
         </div>
       </div>
 
-      <!-- Magisk Superuser Prompt Dialog -->
+      <!-- Superuser Prompt Dialog (KernelSU / Magisk) -->
       <div class="magisk-su-prompt" id="magisk-su-prompt" style="display:none;">
-        <div class="su-shield">🛡️</div>
-        <div class="su-title">Superuser Request</div>
-        <div class="su-desc">Приложение <b>Termux (CLI)</b> запрашивает полный Root-доступ к разделам ядра!</div>
+        <div class="su-shield" id="su-prompt-icon">🛡️</div>
+        <div class="su-title" id="su-prompt-title">KernelSU Superuser Request</div>
+        <div class="su-desc" id="su-prompt-desc">Приложение <b>Termux (CLI)</b> запрашивает root доступ через системный вызов ядра!</div>
         <div class="su-countdown" id="su-countdown">Таймаут: 10с</div>
         <div class="su-actions">
           <button class="su-btn deny" id="su-btn-deny">Отказать</button>
@@ -309,8 +312,10 @@
           <span>💻 Рабочая станция мододела (ПК & 4PDA)</span>
         </div>
         <div class="pc-tabs">
-          <button class="pc-tab-btn active" data-tab="terminal">Fastboot & ADB Консоль</button>
-          <button class="pc-tab-btn" data-tab="forum">Форум 4PDA (Прошивки)</button>
+          <button class="pc-tab-btn active" data-tab="terminal">Консоль Fastboot/ADB</button>
+          <button class="pc-tab-btn" data-tab="forum">Форум 4PDA (Кастомы)</button>
+          <button class="pc-tab-btn" data-tab="kernels">Ядра & KernelSU</button>
+          <button class="pc-tab-btn" data-tab="modules">Модули</button>
           <button class="pc-tab-btn" data-tab="miflash">Mi Flash Tool</button>
           <button class="pc-tab-btn" data-tab="quests">Квесты</button>
         </div>
@@ -327,10 +332,12 @@
               <p class="t-line info">Готово к работе. Введите 'help' для списка команд.</p>
             </div>
             <div class="term-quick-bar">
-              <span class="q-label">Быстрые команды:</span>
+              <span class="q-label">Команды:</span>
               <button class="q-btn" data-cmd="fastboot devices">fastboot devices</button>
               <button class="q-btn" data-cmd="fastboot oem unlock">fastboot oem unlock</button>
-              <button class="q-btn" data-cmd="fastboot flash recovery twrp_3.7.0.img">flash recovery</button>
+              <button class="q-btn" data-cmd="fastboot flash recovery twrp_3.7.0.img">flash twrp</button>
+              <button class="q-btn" data-cmd="fastboot flash recovery orangefox_R11.1.img">flash orangefox</button>
+              <button class="q-btn" data-cmd="fastboot flash boot boot_ksu.img">flash KernelSU</button>
               <button class="q-btn" data-cmd="fastboot reboot recovery">reboot recovery</button>
               <button class="q-btn" data-cmd="adb push files">adb push files</button>
               <button class="q-btn" data-cmd="fastboot reboot">fastboot reboot</button>
@@ -343,12 +350,12 @@
           </div>
         </div>
 
-        <!-- TAB 2: 4PDA Forum -->
+        <!-- TAB 2: 4PDA Forum (ROMs) -->
         <div class="pc-tab-view" id="tab-forum">
           <div class="forum-scroller">
             <div class="forum-topic-head">
               <h2>🌐 4PDA > Android > Прошивки > Poco X3 Pro (vayu)</h2>
-              <p>Официальные и неофициальные кастомные прошивки Android 14, ядра и Root.</p>
+              <p>Официальные и кастомные прошивки Android 14, ядра и системный моддинг.</p>
             </div>
 
             <div class="forum-post-card">
@@ -358,13 +365,13 @@
                 <span class="fp-rank">Куратор темы</span>
               </div>
               <div class="fp-body">
-                <h3>📦 Кастомные прошивки (Скачать в память /sdcard/):</h3>
+                <h3>📦 Кастомные прошивки (Выбор сообщества):</h3>
                 <div class="dl-items-list">
                   <div class="dl-row">
                     <span class="dl-icon">📱</span>
                     <div class="dl-desc">
                       <b>PixelOS Android 14 (vayu)</b>
-                      <span>Оригинальный интерфейс Google Pixel, Monet UI, Google Фото безлимит</span>
+                      <span>Чистый Pixel Experience, Monet UI, Google Фото безлимит</span>
                     </div>
                     <button class="btn-download" data-file="PixelOS_vayu_A14.zip">Скачать</button>
                   </div>
@@ -373,7 +380,7 @@
                     <span class="dl-icon">⚡</span>
                     <div class="dl-desc">
                       <b>LineageOS 21 (AOSP 14)</b>
-                      <span>Легкая, сверхбыстрая AOSP-прошивка без сервисов Google и слежки</span>
+                      <span>Легковесный AOSP без сервисов Google и слежки, максимальная батарея</span>
                     </div>
                     <button class="btn-download" data-file="LineageOS_21_official.zip">Скачать</button>
                   </div>
@@ -382,48 +389,57 @@
                     <span class="dl-icon">🔥</span>
                     <div class="dl-desc">
                       <b>crDroid 10.5 (Gaming Edition)</b>
-                      <span>Игровой монстр: разгон частоты экрана 120Hz, оверклок CPU, кастомизация</span>
+                      <span>Игровой кастом: оверклок CPU, разгон 120Hz экрана, анти-троттлинг</span>
                     </div>
                     <button class="btn-download" data-file="crDroid_v10_gaming.zip">Скачать</button>
                   </div>
 
                   <div class="dl-row">
+                    <span class="dl-icon">🧬</span>
+                    <div class="dl-desc">
+                      <b>Evolution X 8.5 (The Customizer)</b>
+                      <span>Ультра-кастомизация: кастомные анимации, шторка, стили часов AOD</span>
+                    </div>
+                    <button class="btn-download" data-file="EvolutionX_8.5_vayu.zip">Скачать</button>
+                  </div>
+
+                  <div class="dl-row">
+                    <span class="dl-icon">🐉</span>
+                    <div class="dl-desc">
+                      <b>Kali NetHunter OS (Hacker Edition)</b>
+                      <span>Дистрибутив для этичного хакинга: мониторинг Wi-Fi, Nmap, Metasploit</span>
+                    </div>
+                    <button class="btn-download" data-file="Kali_NetHunter_vayu.zip">Скачать</button>
+                  </div>
+
+                  <div class="dl-row">
                     <span class="dl-icon">🏬</span>
                     <div class="dl-desc">
-                      <b>Stock HyperOS / MIUI 14 (Fastboot ROM)</b>
+                      <b>Stock HyperOS / MIUI 14 (Fastboot TGZ)</b>
                       <span>Официальная заводская прошивка для раскирпичивания через Mi Flash</span>
                     </div>
                     <button class="btn-download" data-file="HyperOS_Stock_Fastboot.tgz">Скачать</button>
                   </div>
                 </div>
 
-                <h3>🛡️ Утилиты для Root и Recovery:</h3>
+                <h3>🦊 Образы рекавери для Fastboot:</h3>
                 <div class="dl-items-list">
                   <div class="dl-row">
                     <span class="dl-icon">🦊</span>
                     <div class="dl-desc">
                       <b>TWRP Recovery 3.7.0.img</b>
-                      <span>Кастомное рекавери для прошивки через Fastboot</span>
+                      <span>Классическое рекавери TeamWin</span>
                     </div>
                     <button class="btn-download" data-file="twrp_3.7.0.img">Скачать</button>
                   </div>
 
                   <div class="dl-row">
-                    <span class="dl-icon">🪄</span>
+                    <span class="dl-icon">🍊</span>
                     <div class="dl-desc">
-                      <b>Magisk v27.0.zip</b>
-                      <span>Systemless Root + Zygisk + менеджер модулей</span>
+                      <b>OrangeFox Recovery R11.1.img</b>
+                      <span>Оранжевый интерфейс, поддержка паролей, встроенный Aroma-движок</span>
                     </div>
-                    <button class="btn-download" data-file="Magisk_v27.0.zip">Скачать</button>
-                  </div>
-
-                  <div class="dl-row">
-                    <span class="dl-icon">🛡️</span>
-                    <div class="dl-desc">
-                      <b>Play Integrity Fix v16.0.zip</b>
-                      <span>Модуль для обхода блокировок банковских приложений</span>
-                    </div>
-                    <button class="btn-download" data-file="PlayIntegrityFix_v16.zip">Скачать</button>
+                    <button class="btn-download" data-file="orangefox_R11.1.img">Скачать</button>
                   </div>
                 </div>
               </div>
@@ -431,7 +447,112 @@
           </div>
         </div>
 
-        <!-- TAB 3: Mi Flash Tool -->
+        <!-- TAB 3: Kernels & KernelSU -->
+        <div class="pc-tab-view" id="tab-kernels">
+          <div class="forum-scroller">
+            <div class="forum-topic-head">
+              <h2>⚡ Кастомные ядра и KernelSU (Встроенный Root в ядро Linux)</h2>
+              <p>KernelSU работает на уровне ядра и невидим для защит банков и SafetyNet!</p>
+            </div>
+
+            <div class="dl-items-list">
+              <div class="dl-row">
+                <span class="dl-icon">👑</span>
+                <div class="dl-desc">
+                  <b>NoGravityKernel v5.2 (KernelSU Native)</b>
+                  <span>Легендарное ядро с аппаратной поддержкой KernelSU v0.9.5 + разгон GPU</span>
+                </div>
+                <button class="btn-download" data-file="NGK_KernelSU_v5.2.zip">Скачать</button>
+              </div>
+
+              <div class="dl-row">
+                <span class="dl-icon">🌪️</span>
+                <div class="dl-desc">
+                  <b>StormBreaker Kernel v9 (Overclock 3.2GHz + KSU)</b>
+                  <span>Экстремальный разгон частот процессора и фиксация 120 FPS</span>
+                </div>
+                <button class="btn-download" data-file="StormBreaker_KernelSU_v9.zip">Скачать</button>
+              </div>
+
+              <div class="dl-row">
+                <span class="dl-icon">🛡️</span>
+                <div class="dl-desc">
+                  <b>KernelSU Manager APK (v0.9.5)</b>
+                  <span>Менеджер суперпользователя и модулей для ядер с KernelSU</span>
+                </div>
+                <button class="btn-download" data-file="KernelSU_Manager.apk">Скачать</button>
+              </div>
+
+              <div class="dl-row">
+                <span class="dl-icon">🪄</span>
+                <div class="dl-desc">
+                  <b>Magisk v27.0.zip</b>
+                  <span>Классический root через патч ramdisk (Legacy)</span>
+                </div>
+                <button class="btn-download" data-file="Magisk_v27.0.zip">Скачать</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: Modules (KernelSU / Magisk / LSPosed) -->
+        <div class="pc-tab-view" id="tab-modules">
+          <div class="forum-scroller">
+            <div class="forum-topic-head">
+              <h2>🧩 Каталог модулей для KernelSU & Magisk</h2>
+              <p>Прошивайте модули в TWRP / OrangeFox или устанавливайте через менеджер.</p>
+            </div>
+
+            <div class="dl-items-list">
+              <div class="dl-row">
+                <span class="dl-icon">🛡️</span>
+                <div class="dl-desc">
+                  <b>Play Integrity Fix v16.0 (Модуль)</b>
+                  <span>Спуфинг отпечатка Pixel 8 Pro для обхода проверок MEETS_DEVICE_INTEGRITY</span>
+                </div>
+                <button class="btn-download" data-file="PlayIntegrityFix_v16.zip">Скачать</button>
+              </div>
+
+              <div class="dl-row">
+                <span class="dl-icon">🥷</span>
+                <div class="dl-desc">
+                  <b>Shamiko v1.0.1 (Zygisk Hide)</b>
+                  <span>Полное скрытие root-прав от банков и античита</span>
+                </div>
+                <button class="btn-download" data-file="Shamiko_v1.0.1.zip">Скачать</button>
+              </div>
+
+              <div class="dl-row">
+                <span class="dl-icon">🎵</span>
+                <div class="dl-desc">
+                  <b>ViPER4Android FX Redesign</b>
+                  <span>Студийный эквалайзер, мощный бас и улучшение звука динамиков</span>
+                </div>
+                <button class="btn-download" data-file="ViPER4Android_FX.zip">Скачать</button>
+              </div>
+
+              <div class="dl-row">
+                <span class="dl-icon">💉</span>
+                <div class="dl-desc">
+                  <b>LSPosed Framework (Zygisk Release)</b>
+                  <span>Фреймворк для перехвата методов Java-приложений</span>
+                </div>
+                <button class="btn-download" data-file="LSPosed_v1.9.2.zip">Скачать</button>
+              </div>
+
+              <div class="dl-row">
+                <span class="dl-icon">🎮</span>
+                <div class="dl-desc">
+                  <b>PUBG 120 FPS Unlocker (Модуль)</b>
+                  <span>Спуфинг ROG Phone 8 для разблокировки режима 120 кадров/сек</span>
+                </div>
+                <button class="btn-download" data-file="Game_120FPS_Unlocker.zip">Скачать</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: Mi Flash Tool -->
         <div class="pc-tab-view" id="tab-miflash">
           <div class="mf-container">
             <div class="mf-bar-top">
@@ -462,11 +583,11 @@
           </div>
         </div>
 
-        <!-- TAB 4: Quests & Progression -->
+        <!-- TAB 6: Quests & Progression -->
         <div class="pc-tab-view" id="tab-quests">
           <div class="quests-container">
             <h3>🏆 Путь Мододела (Квесты 4PDA)</h3>
-            <p class="q-subtitle">Выполняйте задания, чтобы получить статус «Гуру кастомов»!</p>
+            <p class="q-subtitle">Выполняйте задания, чтобы прокачать статус от «Новичка» до «Легенды ветки vayu»!</p>
             <div class="quests-scroll" id="quests-scroll">
               <!-- Dynamically populated quest cards -->
             </div>
