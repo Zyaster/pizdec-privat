@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ROM Flasher & Root Simulator (4PDA Edition)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation & Global Controls -->
+  <header id="top-bar">
+    <div class="logo">
+      <span class="icon">⚡</span>
+      <span class="title">AndroFlash <b>4PDA</b></span>
+    </div>
+    <div class="tab-switcher">
+      <button class="tab-btn active" data-tab="phone">📱 Смартфон</button>
+      <button class="tab-btn" data-tab="pc">💻 Компьютер (Инструменты)</button>
+      <button class="tab-btn" data-tab="quests">🏆 Квесты</button>
+    </div>
+    <div class="usb-status" id="usb-toggle-btn" title="Нажмите, чтобы подключить/отключить кабель USB">
+      <span class="usb-dot connected"></span>
+      <span class="usb-text">USB: Подключен</span>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main id="workspace">
+
+    <!-- ================= VIEW 1: THE SMARTPHONE ================= -->
+    <section id="phone-view" class="view-panel active">
+      <div class="phone-outer-wrapper">
+        <!-- Physical Buttons on Phone Body -->
+        <div class="physical-controls-hint">
+          <div class="hint-item"><span class="key">Vol+</span> Вход в Recovery (TWRP)</div>
+          <div class="hint-item"><span class="key">Vol-</span> Вход в Fastboot</div>
+          <div class="hint-item"><span class="key">Power</span> Вкл / Перезагрузка</div>
+        </div>
+
+        <div class="phone-case">
+          <!-- Hardware Buttons -->
+          <div class="hardware-button btn-vol-up" id="btn-hw-volup" title="Зажать Громкость Вверх"><span>+</span></div>
+          <div class="hardware-button btn-vol-down" id="btn-hw-voldown" title="Зажать Громкость Вниз"><span>-</span></div>
+          <div class="hardware-button btn-power" id="btn-hw-power" title="Зажать Питание"><span>⚡</span></div>
+
+          <div class="phone-screen" id="phone-screen">
+            <!-- Screen Notch / Punch hole camera -->
+            <div class="punch-hole-camera"></div>
+
+            <!-- STATE 0: Screen Off -->
+            <div id="screen-off" class="screen-state active"></div>
+
+            <!-- STATE 1: Fastboot Mode -->
+            <div id="screen-fastboot" class="screen-state">
+              <div class="fastboot-content">
+                <div class="fastboot-logo">FASTBOOT</div>
+                <div class="fastboot-bunny">🤖⚡🔧</div>
+                <div class="fastboot-info">
+                  <p>PRODUCT NAME - vayu</p>
+                  <p>VARIANT - SM_ UFS</p>
+                  <p id="fb-info-bl">DEVICE STATE - locked</p>
+                  <p>BOOTLOADER VERSION - 0.2.1-custom</p>
+                  <p>BASEBAND - MPSS.HI.4.3</p>
+                  <p>SECURE BOOT - enabled</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- STATE 2: Bootloader Unlocking Warning (Iconic Xiaomi/Google unlocked warning) -->
+            <div id="screen-booting" class="screen-state">
+              <div class="unlocked-lock-icon" id="unlocked-indicator">🔓</div>
+              <div class="boot-animation-box" id="boot-animation-box">
+                <!-- Dynamically set boot animation -->
+              </div>
+              <div class="boot-powered-by">powered by <b>android</b></div>
+            </div>
+
+            <!-- STATE 3: Qualcomm CrashDump / Bootloop error -->
+            <div id="screen-crashdump" class="screen-state">
+              <div class="crashdump-box">
+                <h3>Qualcomm CrashDump Mode</h3>
+                <p>Subsystem: Modem/Boot</p>
+                <p id="crash-reason">Reason: Error mounting /data partition (Encryption mismatch)</p>
+                <div class="crash-hint">Зажмите Power + Vol- для перехода в Fastboot и раскирпичивания!</div>
+              </div>
+            </div>
+
+            <!-- STATE 4: TWRP Recovery -->
+            <div id="screen-twrp" class="screen-state">
+              <div class="twrp-header">
+                <span class="twrp-title">Team Win Recovery Project</span>
+                <span class="twrp-clock" id="twrp-clock">12:00</span>
+              </div>
+              <div class="twrp-body" id="twrp-body">
+                <!-- Main Grid -->
+                <div class="twrp-menu-grid" id="twrp-main-menu">
+                  <button class="twrp-btn" data-action="twrp-install">
+                    <span class="icon">📥</span>
+                    <span class="lbl">Install</span>
+                  </button>
+                  <button class="twrp-btn" data-action="twrp-wipe">
+                    <span class="icon">🧹</span>
+                    <span class="lbl">Wipe</span>
+                  </button>
+                  <button class="twrp-btn" data-action="twrp-backup">
+                    <span class="icon">💾</span>
+                    <span class="lbl">Backup</span>
+                  </button>
+                  <button class="twrp-btn" data-action="twrp-restore">
+                    <span class="icon">♻️</span>
+                    <span class="lbl">Restore</span>
+                  </button>
+                  <button class="twrp-btn" data-action="twrp-mount">
+                    <span class="icon">📁</span>
+                    <span class="lbl">Mount</span>
+                  </button>
+                  <button class="twrp-btn" data-action="twrp-settings">
+                    <span class="icon">⚙️</span>
+                    <span class="lbl">Settings</span>
+                  </button>
+                  <button class="twrp-btn" data-action="twrp-advanced">
+                    <span class="icon">🔧</span>
+                    <span class="lbl">Advanced</span>
+                  </button>
+                  <button class="twrp-btn" data-action="twrp-reboot">
+                    <span class="icon">🔄</span>
+                    <span class="lbl">Reboot</span>
+                  </button>
+                </div>
+
+                <!-- Subpage: Install -->
+                <div class="twrp-subpage" id="twrp-page-install">
+                  <div class="subpage-header">Select Zip to Install</div>
+                  <div class="file-list" id="twrp-file-list">
+                    <!-- populated dynamically -->
+                  </div>
+                  <button class="twrp-back-btn" data-back="twrp-main">Назад</button>
+                </div>
+
+                <!-- Subpage: Confirm Flash (Swipe to Flash) -->
+                <div class="twrp-subpage" id="twrp-page-flash-confirm">
+                  <div class="subpage-header" id="flash-target-title">Install Zip</div>
+                  <div class="flash-file-details" id="flash-file-details"></div>
+                  <div class="swipe-slider-container">
+                    <div class="swipe-track">
+                      <div class="swipe-handle" id="swipe-handle">➔</div>
+                      <span class="swipe-text">Свайп для подтверждения прошивки</span>
+                    </div>
+                  </div>
+                  <button class="twrp-back-btn" data-back="twrp-install">Отмена</button>
+                </div>
+
+                <!-- Subpage: Flashing Console Log -->
+                <div class="twrp-subpage" id="twrp-page-flash-log">
+                  <div class="twrp-console" id="twrp-console"></div>
+                  <button class="twrp-action-btn" id="twrp-reboot-after-flash" style="display:none;">Reboot System</button>
+                </div>
+
+                <!-- Subpage: Wipe -->
+                <div class="twrp-subpage" id="twrp-page-wipe">
+                  <div class="subpage-header">Очистка (Wipe)</div>
+                  <div class="wipe-options">
+                    <button class="twrp-action-btn danger" id="btn-format-data">Format Data (Сброс шифрования)</button>
+                    <button class="twrp-action-btn" id="btn-advanced-wipe">Advanced Wipe (Кэш / Далвик)</button>
+                  </div>
+                  <div id="format-data-box" style="display:none; margin-top:10px;">
+                    <p style="font-size:12px; color:#ff7777;">Внимание! Будут удалены все данные. Введите "yes" для подтверждения:</p>
+                    <input type="text" id="format-yes-input" class="twrp-input" placeholder="yes">
+                    <button class="twrp-action-btn danger" id="btn-confirm-format">Подтвердить</button>
+                  </div>
+                  <button class="twrp-back-btn" data-back="twrp-main">Назад</button>
+                </div>
+
+                <!-- Subpage: Reboot -->
+                <div class="twrp-subpage" id="twrp-page-reboot">
+                  <div class="subpage-header">Reboot Device</div>
+                  <button class="twrp-action-btn" id="btn-reboot-system">System</button>
+                  <button class="twrp-action-btn" id="btn-reboot-recovery">Recovery</button>
+                  <button class="twrp-action-btn" id="btn-reboot-bootloader">Bootloader (Fastboot)</button>
+                  <button class="twrp-action-btn" id="btn-reboot-poweroff">Power Off</button>
+                  <button class="twrp-back-btn" data-back="twrp-main">Назад</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- STATE 5: Active Operating System (Interactive OS!) -->
+            <div id="screen-os" class="screen-state">
+              <!-- Android Status Bar -->
+              <div class="os-statusbar">
+                <span class="os-clock" id="os-clock">14:30</span>
+                <div class="os-status-icons">
+                  <span id="os-root-indicator" class="icon-root" title="Root Access Active">#</span>
+                  <span class="icon-wifi">📶</span>
+                  <span class="icon-battery">🔋 98%</span>
+                </div>
+              </div>
+
+              <!-- OS Desktop Area -->
+              <div class="os-desktop" id="os-desktop">
+                <!-- OS Header Widget -->
+                <div class="os-widget" id="os-widget">
+                  <div class="os-widget-date" id="os-widget-date">Среда, 18 ноября</div>
+                  <div class="os-widget-temp">☀️ +22°C // 4PDA Edition</div>
+                </div>
+
+                <!-- Apps Grid -->
+                <div class="os-apps-grid" id="os-apps-grid">
+                  <!-- Populated depending on flashed OS & Root mods -->
+                </div>
+
+                <!-- Bottom Dock -->
+                <div class="os-dock">
+                  <div class="dock-app" data-app="phone-dialer">📞</div>
+                  <div class="dock-app" data-app="browser">🌐</div>
+                  <div class="dock-app" data-app="terminal">💻</div>
+                  <div class="dock-app" data-app="settings">⚙️</div>
+                </div>
+              </div>
+
+              <!-- Interactive In-OS Modal Windows -->
+              <div class="in-os-modal-overlay" id="in-os-modal">
+                <div class="in-os-modal-window">
+                  <div class="in-os-modal-header">
+                    <span id="in-os-modal-title">App Name</span>
+                    <button class="in-os-modal-close" id="btn-close-os-modal">✕</button>
+                  </div>
+                  <div class="in-os-modal-body" id="in-os-modal-body">
+                    <!-- Dynamic App Content -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Magisk Superuser Request Dialog -->
+              <div class="superuser-popup" id="su-dialog" style="display:none;">
+                <div class="su-icon">🛡️</div>
+                <h4>Запрос Суперпользователя</h4>
+                <p>Приложение <b>Termux (CLI)</b> запрашивает полный Root-доступ к системе!</p>
+                <div class="su-timer" id="su-timer">Таймаут: 10с</div>
+                <div class="su-buttons">
+                  <button class="su-btn deny" id="btn-su-deny">Отказать</button>
+                  <button class="su-btn grant" id="btn-su-grant">Предоставить</button>
+                </div>
+              </div>
+
+              <!-- Android Navigation Bar (Gestures or 3 buttons) -->
+              <div class="os-navbar">
+                <button class="nav-btn" id="nav-back">◀</button>
+                <button class="nav-btn" id="nav-home">●</button>
+                <button class="nav-btn" id="nav-recent">■</button>
+              </div>
+            </div>
+
+          </div> <!-- /phone-screen -->
+        </div> <!-- /phone-case -->
+
+        <!-- Quick Reboot / Hardware Combos Panel -->
+        <div class="hardware-combos-panel">
+          <span class="combos-title">🎮 Быстрые комбинации клавиш смартфона:</span>
+          <div class="combos-row">
+            <button class="combo-btn" id="combo-power">⚡ Зажать Power</button>
+            <button class="combo-btn" id="combo-fastboot">🤖 Power + Vol- (Fastboot)</button>
+            <button class="combo-btn" id="combo-recovery">🛡️ Power + Vol+ (Recovery)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 2: PC FLASHER STATION ================= -->
+    <section id="pc-view" class="view-panel">
+      <div class="pc-desktop">
+        <!-- PC Window 1: 4PDA / XDA Forum & Downloads -->
+        <div class="pc-window" id="win-4pda">
+          <div class="win-header">
+            <span class="win-title">🌐 4PDA.to — Тема: Прошивки и Root для Poco X3 Pro / Android 14</span>
+            <div class="win-buttons"><span>—</span><span>□</span><span>✕</span></div>
+          </div>
+          <div class="win-content forum-content">
+            <div class="forum-nav">
+              <b>Форум > Android > Прошивки > Poco X3 Pro (vayu)</b>
+            </div>
+
+            <div class="forum-post">
+              <div class="post-author">
+                <div class="avatar">👨‍💻</div>
+                <b>xXx_4PDA_Master_xXx</b>
+                <span class="badge">Куратор темы</span>
+              </div>
+              <div class="post-body">
+                <h3>📦 Официальные и кастомные прошивки (Шапка темы):</h3>
+                <p>Перед прошивкой <b>ОБЯЗАТЕЛЬНО</b> разблокируйте загрузчик через Fastboot (`fastboot oem unlock`) и прошейте кастомное Recovery TWRP!</p>
+                <div class="download-grid">
+                  <div class="dl-card">
+                    <span class="dl-icon">📱</span>
+                    <div class="dl-info">
+                      <b>PixelOS Android 14</b>
+                      <span>Чистый Pixel Experience, Monet UI, Google камера</span>
+                    </div>
+                    <button class="btn-dl" data-file="PixelOS_vayu_A14.zip">Скачать</button>
+                  </div>
+
+                  <div class="dl-card">
+                    <span class="dl-icon">⚡</span>
+                    <div class="dl-info">
+                      <b>LineageOS 21 (AOSP)</b>
+                      <span>Легендарный легковесный кастом, максимум автономности</span>
+                    </div>
+                    <button class="btn-dl" data-file="LineageOS_21_official.zip">Скачать</button>
+                  </div>
+
+                  <div class="dl-card">
+                    <span class="dl-icon">🔥</span>
+                    <div class="dl-info">
+                      <b>crDroid 10.5 (Gaming)</b>
+                      <span>Кастомизация всего, разгон экрана 120Hz, оверклок</span>
+                    </div>
+                    <button class="btn-dl" data-file="crDroid_v10_gaming.zip">Скачать</button>
+                  </div>
+
+                  <div class="dl-card">
+                    <span class="dl-icon">🏬</span>
+                    <div class="dl-info">
+                      <b>Stock HyperOS / MIUI 14</b>
+                      <span>Официальная стоковая прошивка для раскирпичивания</span>
+                    </div>
+                    <button class="btn-dl" data-file="HyperOS_Stock_Fastboot.tgz">Скачать</button>
+                  </div>
+                </div>
+
+                <h3>🛡️ Утилиты для Root и Recovery:</h3>
+                <div class="download-grid">
+                  <div class="dl-card">
+                    <span class="dl-icon">🦊</span>
+                    <div class="dl-info">
+                      <b>TWRP Recovery 3.7.0.img</b>
+                      <span>Образ для прошивки через Fastboot</span>
+                    </div>
+                    <button class="btn-dl" data-file="twrp_3.7.0.img">Скачать</button>
+                  </div>
+
+                  <div class="dl-card">
+                    <span class="dl-icon">🪄</span>
+                    <div class="dl-info">
+                      <b>Magisk v27.0.zip</b>
+                      <span>Systemless Root + Zygisk + Модули</span>
+                    </div>
+                    <button class="btn-dl" data-file="Magisk_v27.0.zip">Скачать</button>
+                  </div>
+
+                  <div class="dl-card">
+                    <span class="dl-icon">🛡️</span>
+                    <div class="dl-info">
+                      <b>Play Integrity Fix (Модуль)</b>
+                      <span>Обход блокировок банковских приложений и SafetyNet</span>
+                    </div>
+                    <button class="btn-dl" data-file="PlayIntegrityFix_v16.zip">Скачать</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PC Window 2: Fastboot / ADB Terminal -->
+        <div class="pc-window" id="win-terminal">
+          <div class="win-header">
+            <span class="win-title">💻 Командная строка: Fastboot & ADB Console</span>
+            <div class="win-buttons"><span>—</span><span>□</span><span>✕</span></div>
+          </div>
+          <div class="win-content terminal-content">
+            <div class="terminal-log" id="pc-terminal-log">
+              <p class="term-line info">Android Fastboot & ADB Flashing Toolkit [Version 34.0.5]</p>
+              <p class="term-line info">Введите 'help' для списка доступных команд прошивки.</p>
+            </div>
+            <div class="quick-commands-bar">
+              <span class="qc-label">Быстрые команды:</span>
+              <button class="qc-btn" data-cmd="fastboot devices">fastboot devices</button>
+              <button class="qc-btn" data-cmd="fastboot oem unlock">fastboot oem unlock</button>
+              <button class="qc-btn" data-cmd="fastboot flash recovery twrp_3.7.0.img">flash recovery</button>
+              <button class="qc-btn" data-cmd="fastboot reboot recovery">reboot recovery</button>
+              <button class="qc-btn" data-cmd="adb push files">adb push files</button>
+              <button class="qc-btn" data-cmd="fastboot reboot">fastboot reboot</button>
+            </div>
+            <div class="terminal-input-row">
+              <span class="term-prompt">C:\platform-tools&gt;</span>
+              <input type="text" id="pc-terminal-input" class="term-input" placeholder="например: fastboot oem unlock" autocomplete="off" spellcheck="false">
+              <button id="pc-terminal-send-btn" class="term-send-btn">Ввод ↵</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PC Window 3: Mi Flash Tool (GUI Unbrick) -->
+        <div class="pc-window" id="win-miflash">
+          <div class="win-header">
+            <span class="win-title">⚙️ Mi Flash Tool 2024.08.15</span>
+            <div class="win-buttons"><span>—</span><span>□</span><span>✕</span></div>
+          </div>
+          <div class="win-content miflash-content">
+            <div class="miflash-top">
+              <input type="text" id="miflash-path" readonly value="C:\Firmware\HyperOS_Stock_Fastboot">
+              <button class="mf-btn" id="btn-miflash-refresh">Refresh</button>
+              <button class="mf-btn primary" id="btn-miflash-flash">Flash (Прошить)</button>
+            </div>
+            <div class="miflash-table-wrap">
+              <table class="miflash-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Device</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody id="miflash-tbody">
+                  <tr>
+                    <td>1</td>
+                    <td id="mf-device-id">Не подключен</td>
+                    <td>
+                      <div class="mf-prog-track"><div class="mf-prog-bar" id="mf-bar"></div></div>
+                    </td>
+                    <td id="mf-status">Idle</td>
+                    <td id="mf-result">-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="miflash-bottom">
+              <label><input type="radio" name="mf-type" value="clean" checked> Clean all (Чистая прошивка)</label>
+              <label><input type="radio" name="mf-type" value="lock"> Clean all and lock</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= VIEW 3: QUESTS & PROGRESSION ================= -->
+    <section id="quests-view" class="view-panel">
+      <div class="quests-container">
+        <h2>🏆 Путь Мастера Прошивки (Квесты 4PDA)</h2>
+        <p class="quests-subtitle">Выполняйте задания, чтобы прокачать статус от «Новичка с кирпичом» до «Бога кастомов»!</p>
+
+        <div class="quests-list" id="quests-list">
+          <!-- Dynamically populated quest cards -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
