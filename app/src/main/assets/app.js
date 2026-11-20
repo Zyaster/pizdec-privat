@@ -1024,18 +1024,25 @@ function runRecoveryConsoleLog(lines, callback) {
 }
 
 // --- DRAMATICALLY DISTINCT OS VISUAL ENGINE ---
+const OS_THEME = {
+  stock: 'hyperos',
+  pixel: 'pixel',
+  lineage: 'lineage',
+  crdroid: 'crdroid',
+  evolution: 'evolution',
+  kali: 'kali'
+};
+
 function updateOsUI() {
   const os = GameState.rom || 'stock';
   const osEl = UI.screens.OS;
+  const theme = OS_THEME[os] || 'hyperos';
 
-  // Apply root CSS classes for each OS
+  // Apply root CSS classes + data attribute for each OS
   osEl.className = 'screen-view active';
-  if (os === 'pixel') osEl.classList.add('theme-pixel');
-  else if (os === 'lineage') osEl.classList.add('theme-lineage');
-  else if (os === 'crdroid') osEl.classList.add('theme-crdroid');
-  else if (os === 'evolution') osEl.classList.add('theme-evolution');
-  else if (os === 'kali') osEl.classList.add('theme-kali');
-  else osEl.classList.add('theme-hyperos');
+  osEl.dataset.os = theme;
+  UI.osAppWindow.dataset.os = theme;
+  if (theme !== 'hyperos') osEl.classList.add('theme-' + theme);
 
   // Badges in statusbar
   UI.osKsuBadge.classList.toggle('visible', GameState.ksuWorking);
@@ -1055,101 +1062,97 @@ function renderOsWidgets(os) {
   const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
   const hours = String(now.getHours()).padStart(2, '0');
   const mins = String(now.getMinutes()).padStart(2, '0');
+  const dateStr = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
 
-  // 1. GOOGLE PIXELOS: At a Glance + Huge Pastel 2-line Material You Clock + Google Search Pill
+  // 1. GOOGLE PIXEL: At a Glance + two-line Material You clock + search pill
   if (os === 'pixel') {
     UI.pixelSearchBar.style.display = 'flex';
     widget.innerHTML = `
-      <div style="text-align:left; padding:0 8px; margin-bottom:12px;">
-        <div style="font-size:14px; font-weight:600; color:#d1e4ff; display:flex; align-items:center; gap:6px;">
-          <span>Среда, 18 ноя • 21°C</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        </div>
-        <div style="font-size:11px; color:#8e919e; margin-top:2px;">Google Pixel Experience • Чистый Android 14</div>
+      <div class="px-glance">
+        <span>${dateStr}</span>
+        <span style="opacity:.5">•</span>
+        <span>−3°C</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
       </div>
-      <div style="display:flex; justify-content:center; align-items:center; line-height:0.85; font-size:74px; font-weight:900; color:#a8c7fa; font-family:'Google Sans', sans-serif;">
-        <span id="dyn-clock-h">${hours}</span><br><span id="dyn-clock-m">${mins}</span>
-      </div>
-      <div class="hero-kernel-title" style="color:#8e919e; margin-top:8px;">${GameState.kernelVersion}</div>
+      <div class="px-clock"><span>${hours}</span><span>${mins}</span></div>
+      <div class="px-date-line">${dateStr}</div>
+      <div class="hero-kernel-title" style="color:#8e919e;">${GameState.kernelVersion}</div>
     `;
     return;
   }
 
-  // Search pill hidden for other OSes
   UI.pixelSearchBar.style.display = 'none';
 
-  // 2. CRDROID: Cyberpunk Gaming HUD with 120 FPS & Overclock status
+  // 2. CRDROID: gaming HUD, red terminal readouts
   if (os === 'crdroid') {
     widget.innerHTML = `
-      <div class="crdroid-hud-box">
-        <span>FPS: ${GameState.displayRefreshRate} LOCKED</span>
-        <span>GPU: ADRENO 640</span>
-        <span>CPU: ${GameState.kernel === 'stormbreaker' ? '3.2 GHz OC' : '2.96 GHz'}</span>
-        <span>TEMP: 38°C</span>
+      <div class="cr-hero-hud">
+        <div><b>${GameState.displayRefreshRate}</b><span>FPS</span></div>
+        <div><b>${GameState.kernel === 'stormbreaker' ? '3.2' : '2.96'}</b><span>GHz</span></div>
+        <div><b>${GameState.kernel === 'stormbreaker' ? '825' : '675'}</b><span>MHz GPU</span></div>
+        <div><b>38°</b><span>TEMP</span></div>
       </div>
-      <div style="font-family:var(--font-mono); font-size:38px; font-weight:900; color:#ff3366; text-shadow:0 0 15px rgba(255,51,102,0.6);" id="dyn-clock-time">
-        ${timeStr}
-      </div>
-      <div style="font-family:var(--font-mono); font-size:11px; color:#ff99bb; margin-top:4px;">// CRDROID V10.5 GAMING EDITION</div>
-      <div class="hero-kernel-title" style="color:#ff6699;">${GameState.kernelVersion}</div>
+      <div class="cr-clock">${timeStr}</div>
+      <div class="cr-tag">// CRDROID 10.5 GAMING EDITION</div>
+      <div class="hero-kernel-title" style="color:#8a5b66;">${GameState.kernelVersion}</div>
     `;
     return;
   }
 
-  // 3. KALI NETHUNTER: Interactive Retro Hacker CRT Terminal Widget
+  // 3. KALI NETHUNTER: chroot terminal
   if (os === 'kali') {
     widget.innerHTML = `
       <div class="kali-terminal-widget">
-        <span style="color:#00f2fe;">root@kali-vayu:~#</span> ./nethunter_init.sh<br>
-        <span style="color:#22c55e;">[+] Chroot ARM64: /data/local/nhsystem mounted</span><br>
-        <span style="color:#22c55e;">[+] Monitor Mode: wlan0mon active</span><br>
-        <span style="color:#e2e8f0;">[SYS] TIME: <b id="dyn-clock-time">${timeStr}</b> | KERNEL: ${GameState.kernelVersion}</span>
+        <span class="k-prompt">root@kali-vayu:~#</span> ./nethunter_init.sh<br>
+        <span class="k-ok">[+]</span> chroot arm64: /data/local/nhsystem mounted<br>
+        <span class="k-ok">[+]</span> wlan0mon: monitor mode active<br>
+        <span class="k-dim">[sys] time ${timeStr} · kernel ${GameState.kernelVersion}</span>
       </div>
-      <div style="font-family:var(--font-mono); font-size:10px; color:#00f2fe; text-align:center;">
-        [ OFFENSIVE SECURITY PEN-TEST PLATFORM ]
-      </div>
+      <div class="kali-banner">[ OFFENSIVE SECURITY PLATFORM ]</div>
     `;
     return;
   }
 
-  // 4. EVOLUTION X: Artistic Neon Violet Typographic Themer Clock
+  // 4. EVOLUTION X: Evolver gradient clock
   if (os === 'evolution') {
     widget.innerHTML = `
-      <div style="font-size:36px; font-weight:900; background:linear-gradient(135deg, #c084fc, #38bdf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 20px rgba(192,132,252,0.4);" id="dyn-clock-time">
-        ${timeStr}
-      </div>
-      <div style="font-size:11px; font-weight:700; color:#c084fc; letter-spacing:2px; margin-top:2px;">KEEP EVOLVING • ANDROID 14</div>
-      <div style="display:inline-block; background:rgba(192,132,252,0.15); border:1px solid #c084fc; border-radius:12px; padding:2px 10px; font-size:10px; color:#e0e7ff; margin-top:6px;">
-        Evolution Themer: Nebula Violet
-      </div>
-      <div class="hero-kernel-title" style="color:#cbd5e1;">${GameState.kernelVersion}</div>
+      <div class="ev-clock">${timeStr}</div>
+      <div class="ln-weekday" style="color:#b9a8ce;">${dateStr} • 21°C</div>
+      <span class="ev-tag">EVOLVER · NEBULA THEME</span>
+      <div class="hero-kernel-title" style="color:#8a7fa0;">${GameState.kernelVersion}</div>
     `;
     return;
   }
 
-  // 5. LINEAGEOS: Minimalist Clean AOSP + Lineage Trust Badge
+  // 5. LINEAGEOS: Trebuchet clock + Trust chip
   if (os === 'lineage') {
     widget.innerHTML = `
-      <div style="font-size:42px; font-weight:700; color:#e6edf3;" id="dyn-clock-time">${timeStr}</div>
-      <div style="font-size:12px; color:#94a3b8; margin-top:2px;">Среда, 18 ноября • 21°C Ясно</div>
-      <div style="display:inline-flex; align-items:center; gap:6px; background:#064e43; border-radius:14px; padding:3px 10px; font-size:10.5px; color:#6ee7b7; margin-top:8px;">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>Trust:</span> <b>SELinux Enforcing</b>
+      <div class="ln-widget-line">${timeStr}</div>
+      <div class="ln-weekday">${dateStr} • Ясно, 21°C</div>
+      <div class="ln-trust-chip">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Trust: SELinux ${GameState.selinuxMode === 'enforcing' ? 'Enforcing' : 'Permissive'}
       </div>
-      <div class="hero-kernel-title" style="color:#6ee7b7;">${GameState.kernelVersion}</div>
+      <div class="hero-kernel-title" style="color:#5f807c;">${GameState.kernelVersion}</div>
     `;
     return;
   }
 
-  // 6. XIAOMI HYPEROS (Default): Big Thin Split Magazine Clock + Mi Health Pill
+  // 6. XIAOMI HYPEROS (default): big thin clock, weather + step chips
   widget.innerHTML = `
-    <div style="font-size:52px; font-weight:300; letter-spacing:-1px; color:#ffffff;" id="dyn-clock-time">${timeStr}</div>
-    <div style="font-size:12px; color:#cbd5e1; margin-top:2px;">Среда, 18 ноября • Xiaomi HyperOS 1.0</div>
-    <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.15); border-radius:14px; padding:3px 12px; font-size:10.5px; color:#fff; margin-top:8px;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-      <span>6 420 шагов</span> <span>•</span> <span>8.4 км</span>
+    <div class="hx-clock-line">${hours}<b>:</b>${mins}</div>
+    <div class="hx-date-line">${dateStr} • HyperOS</div>
+    <div class="hx-chip-row">
+      <span class="hx-chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+        6 420 шагов
+      </span>
+      <span class="hx-chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
+        21°C
+      </span>
     </div>
-    <div class="hero-kernel-title" style="color:#93c5fd;">${GameState.kernelVersion}</div>
+    <div class="hero-kernel-title" style="color:#6f86b8;">${GameState.kernelVersion}</div>
   `;
 }
 
@@ -1214,10 +1217,11 @@ function renderOsAppsGrid(os) {
     tile.className = 'app-tile';
 
     let bg = app.bg;
-    if (os === 'pixel') bg = '#252936';
-    if (os === 'kali') bg = '#030a0a';
+    if (os === 'pixel') bg = '#2f3033';
+    if (os === 'lineage') bg = '#243230';
+    if (os === 'kali') bg = '#04100a';
     if (os === 'crdroid') bg = '#1a040d';
-    if (os === 'evolution') bg = '#240a3d';
+    if (os === 'evolution') bg = '#241a33';
 
     const vector = appVectors[app.id] || `<span style="font-weight:900; font-size:16px; color:#fff;">${app.name.substring(0, 2)}</span>`;
 
@@ -1267,13 +1271,19 @@ function closeFullscreenApp(force = false) {
   }
   currentAppBackHandler = null;
   UI.osAppWindow.classList.remove('active');
+  UI.osAppWindow.classList.remove('settings-open');
+  document.getElementById('phone-container').classList.remove('app-open');
 }
 
 function openFullscreenApp(appId) {
   currentAppBackHandler = null;
   UI.osAppWindow.classList.add('active');
+  document.getElementById('phone-container').classList.add('app-open');
   const body = UI.appWindowContent;
   body.innerHTML = '';
+  body.onclick = null;
+  body.oninput = null;
+  UI.osAppWindow.classList.toggle('settings-open', appId === 'settings');
 
   if (appId === 'kernelsu') {
     UI.appWindowTitle.textContent = 'KernelSU Manager v0.9.5';
@@ -2502,55 +2512,601 @@ function renderMtManagerApp(container) {
 
 // --- APP: SETTINGS (Full-Fledged Android 14 System Settings) ---
 function renderSettingsApp(container) {
-  let currentView = 'main'; // 'main', 'about', 'display', 'battery', 'network', 'security', 'developer', 'system', 'easter_egg'
+  let currentView = 'main';
   let searchQuery = '';
   let easterEggTapCount = 0;
+  let eggTapCount = 0;
 
-  const osDetails = {
+  const win = container.closest('.os-app-window');
+  const romKey = GameState.rom || 'stock';
+  const rom = {
     stock: {
-      name: 'Xiaomi HyperOS 1.0.4.0 (Global)',
-      codename: 'HyperOS 1.0 (Android 14)',
-      security: '1 ноября 2026',
-      badge: 'Официальная Global',
-      desc: 'Фирменная система Xiaomi с плавным интерфейсом и экосистемой Mi.'
+      name: 'Xiaomi HyperOS', ver: '1.0.4.0 (Global)', build: 'UQ1A.240205.002.A1',
+      security: '1 ноября 2026', badge: 'Global',
+      desc: 'Фирменная система Xiaomi: плавный интерфейс, экосистема Mi и HyperOS.'
     },
     pixel: {
-      name: 'PixelOS 14 (Pixel Experience)',
-      codename: 'Android 14 (UpsideDownCake)',
-      security: '5 ноября 2026',
-      badge: 'Pixel Edition',
-      desc: 'Чистый интерфейс Google Pixel с Material You и Google сервисами.'
+      name: 'PixelOS 14', ver: 'Android 14 QPR3', build: 'AP2A.240605.024',
+      security: '5 ноября 2026', badge: 'Pixel Edition',
+      desc: 'Чистый Android с Material You, монетизацией Google и Pixel-фишками.'
     },
     lineage: {
-      name: 'LineageOS 21.0 Official',
-      codename: 'Android 14 (Pure AOSP)',
-      security: '1 ноября 2026',
-      badge: 'Lineage Trust Enforced',
-      desc: 'Эталонный открытый Android без мусора с контролем безопасности Trust.'
+      name: 'LineageOS 21', ver: '21.0 (AOSP 14)', build: 'lineage_vayu-userdebug 14',
+      security: '1 ноября 2026', badge: 'Official',
+      desc: 'Открытый Android без лишнего: Trust, Privacy Guard и максимум автономности.'
     },
     crdroid: {
-      name: 'crDroid 10.5 (Gaming Edition)',
-      codename: 'crDroid vayu (Android 14)',
-      security: '10 ноября 2026',
-      badge: '120 FPS Gaming OC',
-      desc: 'Кастомная прошивка для геймеров с разгоном Adreno и игровым дашбордом.'
+      name: 'crDroid 10.5', ver: 'Android 14', build: 'crDroid-vayu-10.5',
+      security: '10 ноября 2026', badge: 'Gaming',
+      desc: 'Кастом для геймеров: разгон CPU/GPU, фиксация 120 Гц и анти-троттлинг.'
     },
     evolution: {
-      name: 'Evolution X 8.5 (The Customizer)',
-      codename: 'Evolver Build (Android 14)',
-      security: '5 ноября 2026',
-      badge: 'Themer Engine Active',
-      desc: 'Максимальная кастомизация каждого пикселя интерфейса.'
+      name: 'Evolution X 8.5', ver: 'Android 14', build: 'evolution_vayu-8.5',
+      security: '5 ноября 2026', badge: 'Evolver',
+      desc: 'Кастомизация каждого элемента: темы, анимации, часы и панель быстрых настроек.'
     },
     kali: {
-      name: 'Kali NetHunter Android 14',
-      codename: 'Offensive Security Chroot',
-      security: '1 ноября 2026',
-      badge: 'Root Kernel Injected',
-      desc: 'Дистрибутив для этичного хакинга, аудита сетей и тестирования на проникновение.'
+      name: 'Kali NetHunter', ver: '2024.2 (Android 14)', build: 'nethunter-vayu-2024.2',
+      security: '1 ноября 2026', badge: 'Root',
+      desc: 'Пентест-платформа: chroot, мониторинг Wi-Fi, Nmap и Metasploit.'
     }
+  }[romKey] || null;
+  const info = rom || {
+    name: 'Android', ver: '14', build: 'UQ1A.240205.002.A1',
+    security: '1 ноября 2026', badge: 'AOSP',
+    desc: 'Система на базе Android 14.'
   };
 
+  const theme = OS_THEME[romKey] || 'hyperos';
+  if (win) {
+    win.classList.add('settings-open');
+    win.dataset.os = theme;
+  }
+
+  if (GameState.netWifi === undefined) GameState.netWifi = true;
+  if (GameState.netSim === undefined) GameState.netSim = true;
+  if (GameState.netHotspot === undefined) GameState.netHotspot = false;
+  if (GameState.fpsOverlay === undefined) GameState.fpsOverlay = true;
+
+  // ---------- inline icon set ----------
+  const svg = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const I = {
+    search: svg('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>'),
+    display: svg('<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>'),
+    battery: svg('<rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/><rect x="5" y="10" width="8" height="4" fill="currentColor" stroke="none"/>'),
+    wifi: svg('<path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M2 9a16 16 0 0 1 20 0"/><path d="M8.5 16a6 6 0 0 1 7 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/>'),
+    shield: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+    code: svg('<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13 5l-2 14"/>'),
+    power: svg('<path d="M18.4 6.6a9 9 0 1 1-12.8 0"/><path d="M12 2v10"/>'),
+    info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>'),
+    bluetooth: svg('<path d="M7 7l10 10-5 4V3l5 4L7 17"/>'),
+    hotspot: svg('<circle cx="12" cy="12" r="2"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4M3.5 3.5a12 12 0 0 0 0 17M20.5 3.5a12 12 0 0 1 0 17"/>'),
+    sound: svg('<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>'),
+    storage: svg('<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>'),
+    apps: svg('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+    bell: svg('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>'),
+    sim: svg('<path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect x="8" y="12" width="8" height="7" rx="1"/>'),
+    moon: svg('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),
+    palette: svg('<circle cx="12" cy="12" r="9"/><circle cx="8" cy="9" r="1.2" fill="currentColor"/><circle cx="15" cy="7" r="1.2" fill="currentColor"/><circle cx="17" cy="13" r="1.2" fill="currentColor"/><circle cx="10" cy="16" r="1.2" fill="currentColor"/>'),
+    dpi: svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><rect x="9" y="9" width="6" height="6" rx="1"/>'),
+    speed: svg('<path d="M4 18a9 9 0 1 1 16 0"/><path d="M12 14l4-4"/><circle cx="12" cy="14" r="1.5"/>'),
+    globe: svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>'),
+    lock: svg('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
+    usb: svg('<path d="M12 20V8"/><path d="M12 8l-3-3M12 8l3-3"/><rect x="9" y="20" width="6" height="2" rx="1"/><circle cx="12" cy="5" r="2"/>'),
+    refresh: svg('<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>'),
+    trash: svg('<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>'),
+    key: svg('<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/>'),
+    badge: svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>'),
+    finger: svg('<path d="M12 11a3 3 0 0 1 3 3c0 3-1 5-1 6"/><path d="M8.5 21c.5-1.5 1-3.5 1-7a2.5 2.5 0 0 1 5 0"/><path d="M6 18c.5-2 1-4 1-7a5 5 0 0 1 10 0"/><path d="M4.5 12a7.5 7.5 0 0 1 15 0"/>'),
+    update: svg('<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/>'),
+    gestures: svg('<path d="M8 13V6a1.5 1.5 0 0 1 3 0v6"/><path d="M11 12V5a1.5 1.5 0 0 1 3 0v7"/><path d="M14 12V7a1.5 1.5 0 0 1 3 0v8a6 6 0 0 1-6 6h-1a6 6 0 0 1-5.2-3L4 15a1.6 1.6 0 0 1 2.7-1.7L8 15"/>'),
+    buttons: svg('<rect x="2" y="6" width="20" height="12" rx="6"/><circle cx="8" cy="12" r="1.5" fill="currentColor"/><circle cx="16" cy="12" r="1.5" fill="currentColor"/>'),
+    clock: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    terminal: svg('<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/>'),
+    gamepad: svg('<rect x="2" y="7" width="20" height="10" rx="5"/><path d="M7 12h4M9 10v4"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="18" cy="13" r="1" fill="currentColor"/>'),
+    pin: svg('<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'),
+    eye: svg('<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+    crosshair: svg('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>'),
+    download: svg('<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/>'),
+    plane: svg('<path d="M2 12l20-9-7 20-4-7-9-4z"/>'),
+    heart: svg('<path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21l8.8-8.3a5 5 0 0 0 0-7.1z"/>'),
+    chevron: svg('<path d="M9 6l6 6-6 6"/>')
+  };
+
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  // ---------- markup helpers ----------
+  function row(o) {
+    const r = o || {};
+    const right = (r.toggle !== undefined)
+      ? `<span class="st-switch ${r.toggle ? 'on' : ''}"><i></i></span>`
+      : `${r.value ? `<span class="st-value">${r.value}</span>` : ''}${r.chev === false ? '' : '<span class="st-chev">›</span>'}`;
+    const attrs = [
+      r.nav ? `data-nav="${r.nav}"` : '',
+      r.action ? `data-action="${r.action}"` : '',
+      r.ico ? `style="--ic:${r.ico}"` : ''
+    ].filter(Boolean).join(' ');
+    return `<div class="st-row${r.danger ? ' danger' : ''}" ${attrs}>
+      <span class="st-ic">${I[r.icon] || I.info}</span>
+      <span class="st-txt">
+        <span class="st-title">${r.title || ''}</span>
+        ${r.sub ? `<span class="st-sub">${r.sub}</span>` : ''}
+      </span>
+      <span class="st-right">${right}</span>
+    </div>`;
+  }
+
+  function section(title, body, cls) {
+    return `<div class="st-section ${cls || ''}">${title ? `<div class="st-section-title">${title}</div>` : ''}<div class="st-card">${body}</div></div>`;
+  }
+
+  function tiles(list) {
+    return `<div class="st-tiles">${list.map(t =>
+      `<div class="st-tile ${t.active ? 'active' : ''}" ${t.attr || ''}>
+        <div class="st-tile-title">${t.title}</div>
+        <div class="st-tile-sub">${t.sub || ''}</div>
+      </div>`).join('')}</div>`;
+  }
+
+  function hero(icon, title, desc, extra) {
+    return `<div class="st-hero">
+      <div class="st-hero-ic">${I[icon] || I.info}</div>
+      <div class="st-hero-title">${title}</div>
+      <div class="st-hero-desc">${desc}</div>
+      ${extra || ''}
+    </div>`;
+  }
+
+  function searchBox(placeholder) {
+    return `<div class="st-search">
+      <span class="st-search-ic">${I.search}</span>
+      <input id="st-search" type="text" placeholder="${placeholder}" value="${esc(searchQuery)}" autocomplete="off" spellcheck="false">
+    </div>`;
+  }
+
+  function wrap(inner) {
+    container.innerHTML = `<div class="st" data-os="${theme}"><div class="st-shell">${inner}</div></div>`;
+  }
+
+  function setTitle(t) {
+    UI.appWindowTitle.textContent = t;
+  }
+
+  // ---------- dynamic values ----------
+  function hzNow() { return GameState.displayRefreshRate; }
+  function perfName() {
+    if (GameState.perfProfile === 'performance') return 'Game Turbo';
+    if (GameState.perfProfile === 'powersave') return 'Экономия';
+    return 'Сбалансированный';
+  }
+  function rootName() {
+    if (GameState.ksuWorking) return 'KernelSU активен';
+    if (GameState.magiskInstalled) return 'Magisk установлен';
+    return 'Root не установлен';
+  }
+  function integrityName() {
+    return GameState.ksuUnmountRoot.has('bank') ? 'STRONG' : 'BASIC';
+  }
+
+  const MAIN_TITLE = {
+    hyperos: 'Настройки',
+    pixel: 'Настройки',
+    lineage: 'Настройки',
+    crdroid: 'crDroid Settings',
+    evolution: 'Настройки',
+    kali: 'settings --list'
+  }[theme] || 'Настройки';
+
+  // ---------- searchable index ----------
+  const SEARCH_ITEMS = [
+    { title: 'О телефоне', sub: 'Модель, процессор, память, ядро, сборка', view: 'about', icon: 'info' },
+    { title: 'Частота обновления экрана', sub: '60 / 90 / 120 Гц, Peak Refresh Rate', view: 'display', icon: 'display' },
+    { title: 'Тёмная тема (Dark Mode)', sub: 'AMOLED Black и оформление системы', view: 'display', icon: 'moon' },
+    { title: 'Плотность экрана (DPI)', sub: 'Масштаб элементов интерфейса, 392 / 440 dpi', view: 'display', icon: 'dpi' },
+    { title: 'Батарея и производительность', sub: 'Game Turbo, энергосбережение, температура', view: 'battery', icon: 'battery' },
+    { title: 'Быстрая зарядка 33W', sub: 'Контроллер Mi Turbo Charge', view: 'battery', icon: 'heart' },
+    { title: 'Wi-Fi и интернет', sub: 'Подключение 5 ГГц, мобильная сеть', view: 'network', icon: 'wifi' },
+    { title: 'Частный DNS (AdGuard)', sub: 'Блокировка рекламы через DNS', view: 'network', icon: 'globe' },
+    { title: 'Безопасность и Play Integrity', sub: 'SafetyNet, MEETS_STRONG, аттестация', view: 'security', icon: 'shield' },
+    { title: 'KernelSU и Magisk', sub: 'Root на уровне ядра, скрытие от банков', view: 'security', icon: 'key' },
+    { title: 'Отладка по USB', sub: 'ADB, связь с ПК, демон adbd', view: 'developer', icon: 'usb' },
+    { title: 'Разблокировка загрузчика', sub: 'OEM Unlock и Fastboot', view: 'developer', icon: 'lock' },
+    { title: 'Перезагрузка в Recovery', sub: 'TWRP / OrangeFox, очистка Dalvik', view: 'system', icon: 'refresh' },
+    { title: 'Перезагрузка в Fastboot', sub: 'Bootloader Poco X3 Pro', view: 'system', icon: 'power' },
+    { title: 'Сброс до заводских', sub: 'Format Data и очистка разделов', view: 'system', icon: 'trash' }
+  ];
+
+  // ---------- main rows ----------
+  const rNetwork = row({ icon: 'wifi', title: 'Сеть и интернет', sub: `Wi-Fi 4PDA_Modder_5GHz • Private DNS`, nav: 'network', ico: '#3b82f6' });
+  const rDisplay = row({ icon: 'display', title: 'Экран и яркость', sub: `${hzNow()} Гц • ${GameState.darkMode ? 'тёмная тема' : 'светлая тема'} • DPI ${GameState.dpiScale}`, nav: 'display', ico: '#6366f1' });
+  const rBattery = row({ icon: 'battery', title: 'Батарея и питание', sub: `${GameState.battery}% • ${perfName()} • 31.8°C`, nav: 'battery', ico: '#22c55e' });
+  const rSecurity = row({ icon: 'shield', title: 'Безопасность и Root', sub: `Play Integrity ${integrityName()} • ${rootName()}`, nav: 'security', ico: '#a855f7' });
+  const rDeveloper = row({ icon: 'code', title: 'Для разработчиков', sub: GameState.developerUnlocked ? (GameState.usbDebugging ? 'Отладка по USB включена' : 'Отладка по USB выключена') : 'Заблокировано — 7 тапов по сборке', nav: 'developer', ico: '#f59e0b', value: GameState.developerUnlocked ? '' : 'LOCK' });
+  const rSystem = row({ icon: 'power', title: 'Перезагрузка и сброс', sub: 'Recovery • Fastboot • Format Data', nav: 'system', ico: '#ef4444' });
+  const rAbout = row({ icon: 'info', title: 'О телефоне', sub: `Poco X3 Pro • ${info.name}`, nav: 'about', ico: '#64748b' });
+  const rApps = row({ icon: 'apps', title: 'Приложения', sub: 'Установленные приложения и разрешения', nav: 'security', ico: '#0ea5e9' });
+  const rNotifications = row({ icon: 'bell', title: 'Уведомления', sub: 'Каналы, история и беззвучный режим', nav: 'display', ico: '#f97316' });
+  const rStorage = row({ icon: 'storage', title: 'Хранилище', sub: '54,2 ГБ из 256 ГБ занято', nav: 'about', ico: '#14b8a6' });
+  const rSound = row({ icon: 'sound', title: 'Звук и вибрация', sub: 'Медиа, звонок, будильник', nav: 'display', ico: '#ec4899' });
+  const rBluetooth = row({ icon: 'bluetooth', title: 'Bluetooth', sub: 'Наушники Xiaomi Buds 4 Pro', nav: 'network', ico: '#3b82f6' });
+  const rHotspot = row({ icon: 'hotspot', title: 'Точка доступа', sub: 'Poco_Hotspot • выключена', nav: 'network', ico: '#0ea5e9' });
+  const rSim = row({ icon: 'sim', title: 'Мобильная сеть', sub: 'Tele2 4G+ • VoLTE активен', nav: 'network', ico: '#22c55e' });
+  const rDark = row({ icon: 'moon', title: 'Тёмная тема', sub: 'AMOLED Black', action: 'toggle-dark', toggle: GameState.darkMode, ico: '#8b5cf6' });
+  const rLocation = row({ icon: 'pin', title: 'Местоположение', sub: 'Доступ к геоданным приложений', nav: 'security', ico: '#10b981' });
+  const rPrivacy = row({ icon: 'eye', title: 'Конфиденциальность', sub: 'Privacy Guard, разрешения, реклама', nav: 'security', ico: '#8b5cf6' });
+  const rTrust = row({ icon: 'badge', title: 'Lineage Trust', sub: `SELinux ${GameState.selinuxMode} • подпись сборки`, nav: 'security', ico: '#4dd0c4' });
+  const rUpdates = row({ icon: 'download', title: 'Обновления системы', sub: 'LineageOS 21 • проверено сегодня', nav: 'about', ico: '#4dd0c4' });
+  const rButtons = row({ icon: 'buttons', title: 'Кнопки и жесты', sub: 'Навигация, быстрые действия, подсветка', nav: 'display', ico: '#4dd0c4' });
+  const rStatusBar = row({ icon: 'clock', title: 'Строка состояния', sub: 'Часы, значки, батарея, сеть', nav: 'display', ico: '#ff2d55' });
+  const rQuick = row({ icon: 'apps', title: 'Панель быстрых настроек', sub: 'Плитки, яркость, ряды', nav: 'display', ico: '#ff2d55' });
+  const rLockScreen = row({ icon: 'lock', title: 'Экран блокировки', sub: 'Часы, уведомления, разблокировка', nav: 'display', ico: '#ff2d55' });
+  const rGestures = row({ icon: 'gestures', title: 'Жесты', sub: 'Навигация, свайпы, двойной тап', nav: 'display', ico: '#ff2d55' });
+  const rThemes = row({ icon: 'palette', title: 'Темы и оформление', sub: 'Material You, акцент, иконки', nav: 'display', ico: '#c9a7ff' });
+  const rAnim = row({ icon: 'speed', title: 'Анимации', sub: 'Скорость окон и переходов', nav: 'display', ico: '#c9a7ff' });
+  const rEvolver = row({ icon: 'spark', title: 'The Evolver', sub: 'Кастомизация статус-бара и интерфейса', nav: 'display', ico: '#c9a7ff' });
+  const rKaliNet = row({ icon: 'crosshair', title: 'wlan0 / wlan0mon', sub: 'Monitor mode, injection, MAC spoof', nav: 'network', ico: '#39ff88', value: 'UP' });
+  const rKaliTools = row({ icon: 'terminal', title: 'Nmap · Metasploit · Aircrack', sub: '/usr/bin · chroot arm64', nav: 'security', ico: '#39ff88', value: 'READY' });
+  const rKaliChroot = row({ icon: 'key', title: 'Kali chroot', sub: '/data/local/nhsystem · arm64', nav: 'security', ico: '#39ff88', value: 'MOUNTED' });
+
+  function mainHyperOS() {
+    return {
+      top: `<div class="hx-account">
+        <div class="hx-avatar">Z</div>
+        <div>
+          <div class="hx-account-name">Zyaster</div>
+          <div class="hx-account-sub">Mi Account • 4PDA Modder</div>
+        </div>
+        <span class="hx-account-badge">Синхр.</span>
+      </div>`,
+      body: `<div class="hx-device" data-nav="about">
+        <div class="hx-device-icon">POCO</div>
+        <div style="flex:1; min-width:0;">
+          <div class="hx-device-title">Poco X3 Pro</div>
+          <div class="hx-device-sub">256 ГБ • Занято 54,2 ГБ • ${info.name}</div>
+          <div class="hx-device-bar"><i style="width:21%"></i></div>
+        </div>
+        <span class="hx-device-arrow">›</span>
+      </div>
+      ${section('Сеть и подключения', rNetwork + rBluetooth + rHotspot)}
+      ${section('Экран и звук', rDisplay + rSound + rDark)}
+      ${section('Моддинг и безопасность', rSecurity + rDeveloper)}
+      ${section('Система', rBattery + rSystem + rAbout)}`
+    };
+  }
+
+  function mainPixel() {
+    return {
+      top: `<div class="px-head">
+        <div class="px-title">Настройки</div>
+        <div class="px-sub">Poco X3 Pro • ${info.name}</div>
+      </div>`,
+      body: `${section('Сеть и интернет', rNetwork + rSim)}
+      ${section('Подключённые устройства', rBluetooth + rHotspot)}
+      ${section('Приложения', rApps + rNotifications)}
+      ${section('Батарея', rBattery)}
+      ${section('Хранилище', rStorage)}
+      ${section('Звук и вибрация', rSound)}
+      ${section('Экран', rDisplay)}
+      ${section('Безопасность и конфиденциальность', rSecurity + rLocation + rPrivacy)}
+      ${section('Система', rDeveloper + rSystem + rAbout)}`
+    };
+  }
+
+  function mainLineage() {
+    return {
+      top: `<div class="px-head">
+        <div class="px-title" style="font-size:24px;">Настройки</div>
+        <div class="px-sub">LineageOS 21 • ${GameState.model}</div>
+      </div>
+      <div class="ln-trust">
+        <span class="ln-trust-ic">${I.badge}</span>
+        <div>
+          <div class="ln-trust-title">Trust: система в порядке</div>
+          <div class="ln-trust-sub">SELinux ${GameState.selinuxMode} • загрузчик ${GameState.bootloaderUnlocked ? 'разблокирован' : 'заблокирован'} • Privacy Guard активен</div>
+        </div>
+      </div>`,
+      body: `${section('Сеть и интернет', rNetwork + rSim + rBluetooth)}
+      ${section('Приложения', rApps + rNotifications)}
+      ${section('Батарея и хранилище', rBattery + rStorage)}
+      ${section('Звук и экран', rSound + rDisplay)}
+      ${section('LineageOS', rTrust + rUpdates + rButtons)}
+      ${section('Безопасность', rSecurity + rPrivacy)}
+      ${section('Система', rDeveloper + rSystem + rAbout)}`
+    };
+  }
+
+  function mainCrDroid() {
+    return {
+      top: `<div class="cr-hero">
+        <div class="cr-hero-top">
+          <div class="cr-hero-name">crDroid Settings</div>
+          <div class="cr-hero-ver">v10.5</div>
+        </div>
+        <div class="cr-hero-stats">
+          <div><b>${hzNow()}</b><span>FPS LOCK</span></div>
+          <div><b>${GameState.kernel === 'stormbreaker' ? '3.20' : '2.96'}</b><span>GHz CPU</span></div>
+          <div><b>${GameState.kernel === 'stormbreaker' ? '825' : '675'}</b><span>MHz GPU</span></div>
+          <div><b>38°</b><span>TEMP</span></div>
+        </div>
+      </div>`,
+      body: `${section('crDroid Settings', rStatusBar + rQuick + rLockScreen + rButtons + rGestures)}
+      ${section('Сеть', rNetwork + rSim)}
+      ${section('Экран', rDisplay + rSound)}
+      ${section('Батарея', rBattery)}
+      ${section('Безопасность', rSecurity + rDeveloper)}
+      ${section('Система', rSystem + rAbout)}`
+    };
+  }
+
+  function mainEvolution() {
+    return {
+      top: `<div class="ev-hero">
+        <div class="ev-hero-name">The Evolver</div>
+        <div class="ev-hero-sub">Evolution X 8.5 • ${GameState.model}</div>
+        <div class="ev-hero-row">
+          <span class="ev-pill">Nebula</span>
+          <span class="ev-pill">Material You</span>
+          <span class="ev-pill">${hzNow()} Hz</span>
+        </div>
+      </div>`,
+      body: `${section('Evolver', rThemes + rStatusBar + rQuick + rLockScreen + rGestures + rAnim)}
+      ${section('Сеть и устройства', rNetwork + rSim + rBluetooth)}
+      ${section('Экран и звук', rDisplay + rSound)}
+      ${section('Батарея и хранилище', rBattery + rStorage)}
+      ${section('Безопасность', rSecurity + rDeveloper)}
+      ${section('Система', rSystem + rAbout)}`
+    };
+  }
+
+  function mainKali() {
+    return {
+      top: `<div class="kali-hero">
+        <span class="k-prompt">root@kali-vayu:~#</span> settings --system<br>
+        <span class="k-ok">[+]</span> chroot /data/local/nhsystem : mounted<br>
+        <span class="k-ok">[+]</span> wlan0mon : monitor mode active<br>
+        <span class="k-warn">[!]</span> kernel ${GameState.kernelVersion}
+      </div>`,
+      body: `${section('СЕТЬ', rKaliNet + rNetwork + rSim)}
+      ${section('ЭКРАН', rDisplay + rSound)}
+      ${section('БЕЗОПАСНОСТЬ', rKaliChroot + rSecurity + rKaliTools)}
+      ${section('СИСТЕМА', rBattery + rSystem + rAbout)}
+      ${section('РАЗРАБОТКА', rDeveloper)}`
+    };
+  }
+
+  function renderMainView() {
+    let main;
+    if (theme === 'hyperos') main = mainHyperOS();
+    else if (theme === 'pixel') main = mainPixel();
+    else if (theme === 'lineage') main = mainLineage();
+    else if (theme === 'crdroid') main = mainCrDroid();
+    else if (theme === 'evolution') main = mainEvolution();
+    else if (theme === 'kali') main = mainKali();
+    else main = mainHyperOS();
+
+    const placeholder = theme === 'kali' ? 'grep -i "..."' : 'Поиск настроек';
+    setTitle(MAIN_TITLE);
+    container.innerHTML = `<div class="st" data-os="${theme}"><div class="st-shell">
+      <div id="st-search-zone">${main.top}${searchBox(placeholder)}</div>
+      <div id="st-results" style="display:none;"></div>
+      <div id="st-main">${main.body}</div>
+    </div></div>`;
+    applySearch();
+  }
+
+  function applySearch() {
+    const box = container.querySelector('#st-results');
+    const main = container.querySelector('#st-main');
+    if (!box || !main) return;
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      box.style.display = 'none';
+      main.style.display = 'block';
+      return;
+    }
+    const matches = SEARCH_ITEMS.filter(it =>
+      it.title.toLowerCase().includes(q) || it.sub.toLowerCase().includes(q));
+    box.style.display = 'block';
+    main.style.display = 'none';
+    if (!matches.length) {
+      box.innerHTML = `<div class="st-empty"><div class="st-empty-ic">${I.search}</div>По запросу «${esc(searchQuery)}» ничего не найдено</div>`;
+      return;
+    }
+    box.innerHTML = section(`Результаты поиска (${matches.length})`, matches.map(it =>
+      row({ icon: it.icon, title: it.title, sub: it.sub, nav: it.view, ico: theme === 'hyperos' ? '#3482ff' : '' })
+    ).join(''));
+  }
+
+  // ---------- subpage: about ----------
+  function renderAboutView() {
+    setTitle('О телефоне');
+    const devHint = GameState.developerUnlocked
+      ? '<span id="st-build-hint" style="display:block;margin-top:2px;color:var(--st-accent)">Режим разработчика активирован</span>'
+      : '<span id="st-build-hint" style="display:block;margin-top:2px;color:var(--st-accent)">Нажмите 7 раз, чтобы включить режим разработчика</span>';
+
+    wrap(`
+      ${hero('info', info.name, info.desc)}
+      ${section('Устройство',
+        row({ icon: 'info', title: 'Модель устройства', sub: 'POCO X3 Pro (vayu / bhima)', value: 'Xiaomi', chev: false })
+        + row({ icon: 'display', title: 'Версия Android', sub: '14 (UpsideDownCake) • 3 тапа для пасхалки', action: 'android-egg', value: '14' })
+        + row({ icon: 'speed', title: 'Процессор', sub: GameState.kernel === 'stormbreaker' ? 'Snapdragon 860 @ 3.20 GHz (OC)' : 'Snapdragon 860 @ 2.96 GHz', chev: false })
+        + row({ icon: 'gamepad', title: 'Графика', sub: GameState.kernel === 'stormbreaker' ? 'Adreno 640 @ 825 MHz (Vulkan 1.3)' : 'Adreno 640 @ 675 MHz', chev: false })
+        + row({ icon: 'storage', title: 'Память', sub: '8 ГБ LPDDR4X + 3 ГБ RAM+ • 256 ГБ UFS 3.1', chev: false })
+      )}
+      ${section('Сборка и безопасность',
+        row({ icon: 'code', title: 'Номер сборки', sub: `${info.build}${devHint}`, action: 'build-tap', chev: false })
+        + row({ icon: 'terminal', title: 'Ядро Linux', sub: GameState.kernelVersion, value: GameState.ksuWorking ? 'KSU' : '', chev: false })
+        + row({ icon: 'lock', title: 'Загрузчик', sub: GameState.bootloaderUnlocked ? 'Разблокирован • кастомы разрешены' : 'Заблокирован', action: 'boot-state', value: GameState.bootloaderUnlocked ? 'UNLOCKED' : 'LOCKED' })
+        + row({ icon: 'shield', title: 'SELinux', sub: GameState.selinuxMode === 'enforcing' ? 'Enforcing (строгий)' : 'Permissive (мягкий)', action: 'toggle-selinux', value: GameState.selinuxMode.toUpperCase() })
+      )}
+      ${section('Версия системы',
+        row({ icon: 'badge', title: info.name, sub: `${info.ver} • патч ${info.security}`, value: info.badge, chev: false })
+      )}
+    `);
+  }
+
+  // ---------- subpage: display ----------
+  function renderDisplayView() {
+    setTitle('Экран и графика');
+    wrap(`
+      ${hero('display', 'Экран и графика', 'Частота, тема, цветовой охват и масштаб интерфейса.')}
+      ${section('Частота обновления', tiles([
+        { title: '60 Hz', sub: 'Экономия', active: hzNow() === 60, attr: 'data-hz="60"' },
+        { title: '90 Hz', sub: 'Баланс', active: hzNow() === 90, attr: 'data-hz="90"' },
+        { title: '120 Hz', sub: 'Плавность', active: hzNow() === 120, attr: 'data-hz="120"' }
+      ]))}
+      ${section('Оформление',
+        rDark
+        + row({ icon: 'speed', title: 'Принудительные 120 Гц', sub: 'Peak refresh rate для игр и видео', action: 'toggle-peak', toggle: GameState.forcePeakRefreshRate, ico: '#f59e0b' })
+        + row({ icon: 'palette', title: 'Цветовой охват', sub: GameState.displayColorMode === 'dci_p3' ? 'DCI-P3 (насыщенный)' : 'sRGB (натуральный)', action: 'toggle-color', value: GameState.displayColorMode.toUpperCase(), ico: '#ec4899' })
+        + row({ icon: 'dpi', title: 'Плотность экрана', sub: `Масштаб интерфейса: ${GameState.dpiScale} dp`, action: 'toggle-dpi', value: `${GameState.dpiScale} dp`, ico: '#14b8a6' })
+      )}
+      ${section('Отрисовка',
+        row({ icon: 'gamepad', title: '4x MSAA', sub: 'Сглаживание в 3D-играх (OpenGL ES 3.2)', action: 'toggle-msaa', toggle: GameState.forceMsaa, ico: '#8b5cf6' })
+      )}
+    `);
+  }
+
+  // ---------- subpage: battery ----------
+  function renderBatteryView() {
+    setTitle('Батарея и питание');
+    const gauge = `<div class="st-gauge">
+      <div class="st-gauge-num">${GameState.battery}%</div>
+      <div class="st-gauge-label">${GameState.usbConnected ? '⚡ Mi Turbo Charge 33W • зарядка идёт' : '≈ 19 ч 45 мин работы'}</div>
+      <div class="st-gauge-meta">
+        <span>Здоровье: <b style="color:#21c46a">98%</b></span>
+        <span>Ёмкость: <b>5 160 мАч</b></span>
+        <span>Температура: <b style="color:#35d0ff">31.8°C</b></span>
+      </div>
+    </div>`;
+    wrap(`
+      ${hero('battery', 'Батарея и питание', 'Профиль производительности и расход заряда.')}
+      ${section('', gauge)}
+      ${section('Режим производительности', tiles([
+        { title: 'Эко', sub: '60 Гц', active: GameState.perfProfile === 'powersave', attr: 'data-perf="powersave"' },
+        { title: 'Баланс', sub: 'Адаптивный', active: GameState.perfProfile === 'balanced', attr: 'data-perf="balanced"' },
+        { title: 'Turbo', sub: 'Макс. FPS', active: GameState.perfProfile === 'performance', attr: 'data-perf="performance"' }
+      ]))}
+      ${section('Расход заряда',
+        row({ icon: 'display', title: 'Экран (5 ч 42 мин)', sub: 'Яркость 80%, 120 Гц', value: '42%', chev: false })
+        + row({ icon: 'gamepad', title: 'Игры и тесты', sub: 'PUBG Mobile, AnTuTu', value: '34%', chev: false })
+        + row({ icon: 'terminal', title: 'Система и ядро', sub: 'Фоновые процессы Linux', value: '16%', chev: false })
+      )}
+    `);
+  }
+
+  // ---------- subpage: network ----------
+  function renderNetworkView() {
+    setTitle('Сеть и интернет');
+    wrap(`
+      ${hero('wifi', 'Сеть и интернет', 'Wi-Fi, мобильная сеть, DNS и точка доступа.')}
+      ${section('Беспроводные сети',
+        row({ icon: 'wifi', title: 'Wi-Fi', sub: '4PDA_Modder_5GHz • 866 Мбит/с • WPA3', action: 'net-wifi', toggle: GameState.netWifi, ico: '#3b82f6' })
+        + row({ icon: 'sim', title: 'Мобильная сеть (SIM 1)', sub: 'Tele2 4G+ • VoLTE • передача данных', action: 'net-sim', toggle: GameState.netSim, ico: '#22c55e' })
+        + row({ icon: 'hotspot', title: 'Точка доступа', sub: 'Poco_Hotspot • 2,4 / 5 ГГц', action: 'net-hotspot', toggle: GameState.netHotspot, ico: '#0ea5e9' })
+      )}
+      ${section('DNS и подключения',
+        row({ icon: 'globe', title: 'Частный DNS', sub: `Сервер: ${GameState.privateDns}`, action: 'toggle-dns', value: 'АКТИВЕН', ico: '#8b5cf6' })
+        + row({ icon: 'bluetooth', title: 'Bluetooth', sub: 'Xiaomi Buds 4 Pro • подключены', nav: 'network', chev: false, value: 'ON', ico: '#6366f1' })
+      )}
+      ${section('Диагностика',
+        row({ icon: 'speed', title: 'Тест скорости', sub: 'Загрузка 480 Мбит/с • отдача 96 Мбит/с', action: 'speedtest', ico: '#f59e0b' })
+      )}
+    `);
+  }
+
+  // ---------- subpage: security ----------
+  function renderSecurityView() {
+    setTitle('Безопасность и Root');
+    const strong = GameState.ksuUnmountRoot.has('bank');
+    const trustBlock = theme === 'lineage'
+      ? `<div class="ln-trust"><span class="ln-trust-ic">${I.badge}</span><div><div class="ln-trust-title">Trust: SELinux ${GameState.selinuxMode}</div><div class="ln-trust-sub">Privacy Guard активен • подпись сборки проверена</div></div></div>`
+      : '';
+    const kaliBlock = theme === 'kali'
+      ? `<div class="kali-hero"><span class="k-prompt">root@kali-vayu:~#</span> su -c "id"<br><span class="k-ok">[+]</span> uid=0(root) gid=0(root) groups=0(root)<br><span class="k-ok">[+]</span> nethunter chroot: MOUNTED<br><span class="k-warn">[!]</span> SELinux: ${GameState.selinuxMode}</div>`
+      : '';
+    wrap(`
+      ${hero('shield', 'Безопасность и Root', 'Аттестация Play Integrity, root-подсистема и шифрование.')}
+      ${trustBlock}${kaliBlock}
+      ${section('Аттестация устройства',
+        row({ icon: 'badge', title: 'Google Play Protect', sub: 'Устройство сертифицировано Google', value: 'CERTIFIED', chev: false, ico: '#22c55e' })
+        + row({ icon: 'shield', title: 'Play Integrity API', sub: `BASIC ✅ • DEVICE ✅ • STRONG ${strong ? '✅' : '⚠️'}`, value: strong ? 'STRONG' : 'BASIC', chev: false, ico: '#a855f7' })
+      )}
+      ${section('Root-подсистема',
+        row({ icon: 'key', title: 'KernelSU', sub: GameState.ksuWorking ? 'v0.9.5 • перехват в ядре Linux' : 'Не обнаружен в ядре', value: GameState.ksuWorking ? 'WORKING' : 'OFF', chev: false, ico: '#22c55e' })
+        + row({ icon: 'lock', title: 'Magisk', sub: GameState.magiskInstalled ? 'v27.0 • Zygisk активен' : 'Не установлен', value: GameState.magiskInstalled ? 'INSTALLED' : 'ABSENT', chev: false, ico: '#0ea5e9' })
+        + row({ icon: 'finger', title: 'Шифрование данных', sub: 'File-Based Encryption (FBE v2)', value: 'ENCRYPTED', chev: false, ico: '#14b8a6' })
+        + row({ icon: 'shield', title: 'SELinux', sub: GameState.selinuxMode === 'enforcing' ? 'Enforcing (строгий)' : 'Permissive (мягкий)', action: 'toggle-selinux', value: GameState.selinuxMode.toUpperCase(), ico: '#f59e0b' })
+      )}
+      ${section('Приватность',
+        row({ icon: 'eye', title: 'Privacy Guard', sub: 'Контроль разрешений приложений', value: 'ON', chev: false, ico: '#8b5cf6' })
+        + row({ icon: 'pin', title: 'Доступ к геоданным', sub: 'Только для карт и погоды', value: '3 прил.', chev: false, ico: '#10b981' })
+      )}
+    `);
+  }
+
+  // ---------- subpage: developer ----------
+  function renderDeveloperView() {
+    setTitle('Для разработчиков');
+    if (!GameState.developerUnlocked) {
+      wrap(`
+        ${hero('lock', 'Меню разработчика заблокировано', 'Откройте «О телефоне» и нажмите 7 раз на строку «Номер сборки».', `<div style="margin-top:16px"><div class="st-row" data-nav="about" style="justify-content:center;border:none;background:transparent;"><span class="st-title" style="color:var(--st-accent)">Перейти в «О телефоне» →</span></div></div>`)}
+      `);
+      return;
+    }
+    wrap(`
+      ${hero('code', 'Для разработчиков', 'Отладка, аппаратное ускорение и системные параметры.')}
+      ${section('Отладка и связь с ПК',
+        row({ icon: 'usb', title: 'Отладка по USB', sub: 'Разрешить команды ADB с ПК', action: 'toggle-usb', toggle: GameState.usbDebugging, ico: '#3b82f6' })
+        + row({ icon: 'lock', title: 'OEM Unlock', sub: 'Разблокировка загрузчика в Fastboot', value: 'ON', chev: false, ico: '#22c55e' })
+        + row({ icon: 'refresh', title: 'Перезапустить adbd', sub: 'Сбросить сессию на порту 5555', action: 'adbd', ico: '#f59e0b' })
+      )}
+      ${section('Аппаратное ускорение',
+        row({ icon: 'speed', title: 'Счётчик FPS', sub: 'Показывать частоту кадров поверх окон', action: 'toggle-fps', toggle: GameState.fpsOverlay, ico: '#ef4444' })
+        + row({ icon: 'gamepad', title: '4x MSAA', sub: 'Принудительное сглаживание', action: 'toggle-msaa', toggle: GameState.forceMsaa, ico: '#8b5cf6' })
+        + row({ icon: 'clock', title: 'Скорость анимаций', sub: 'Окна и переходы системы', action: 'cycle-anim', value: GameState.animationScale, ico: '#ec4899' })
+      )}
+    `);
+  }
+
+  // ---------- subpage: system ----------
+  function renderSystemView() {
+    setTitle('Перезагрузка и сброс');
+    wrap(`
+      ${hero('power', 'Перезагрузка и сброс', 'Power menu, Recovery, Fastboot и очистка данных.')}
+      ${section('Меню перезагрузки',
+        row({ icon: 'refresh', title: 'Перезагрузка системы', sub: 'Обычный reboot', action: 'reboot-system', ico: '#0ea5e9' })
+        + row({ icon: 'terminal', title: 'Recovery', sub: GameState.recoveryType === 'orangefox' ? 'OrangeFox R11.1' : 'TWRP 3.7.0', action: 'reboot-recovery', ico: '#f97316' })
+        + row({ icon: 'power', title: 'Fastboot / Bootloader', sub: 'Режим прошивки через ПК', action: 'reboot-bootloader', ico: '#6366f1' })
+        + row({ icon: 'crosshair', title: 'EDL 9008', sub: 'Аварийное раскирпичивание', action: 'reboot-edl', value: 'EDL', ico: '#ef4444' })
+      )}
+      ${section('Очистка',
+        row({ icon: 'refresh', title: 'Dalvik / ART кэш', sub: 'Устранить сбои после обновления', action: 'wipe-dalvik', ico: '#14b8a6' })
+        + row({ icon: 'trash', title: 'Format Data', sub: 'Полное стирание /data и настроек', action: 'factory-reset', danger: true, value: 'RESET', ico: '#ef4444' })
+      )}
+    `);
+  }
+
+  // ---------- subpage: easter egg ----------
+  function renderEasterEggView() {
+    setTitle('Easter Egg');
+    const egg = {
+      hyperos: ['🐰', 'Mitu нашёл пасхалку', 'HyperOS прячет кролика Mitu — он уже починил этот Android.'],
+      pixel: ['🚀', 'Android 14', 'UpsideDownCake • Space Rocket Mission. Пасхалка Pixel найдена.'],
+      lineage: ['🛡️', 'LineageOS Trust', 'Никакой слежки: пасхалка осталась в открытом коде.'],
+      crdroid: ['🎮', 'crDroid 120 FPS', 'Gaming-пасхалка: 120 кадров и ни одного троттлинга.'],
+      evolution: ['🌌', 'Evolver Nebula', 'Тема Nebula активна. Кастомизация дошла до космоса.'],
+      kali: ['🐉', 'Kali NetHunter', 'root@kali-vayu:~# flag{egg_found} — доступ получен.']
+    }[theme] || ['🤖', 'Android 14', 'Пасхалка найдена.'];
+
+    wrap(`
+      ${hero('heart', egg[1], egg[2])}
+      <div style="text-align:center;font-size:64px;margin:4px 0 18px;">${egg[0]}</div>
+      ${section('', row({ icon: 'info', title: 'Секрет разблокирован', sub: 'Продолжайте моддить — но делайте бэкапы.', nav: 'about', chev: false, ico: '#f59e0b' }))}
+    `);
+  }
+
+  // ---------- navigation / search ----------
   function updateBackHandler() {
     if (currentView !== 'main') {
       currentAppBackHandler = () => {
@@ -2565,1112 +3121,195 @@ function renderSettingsApp(container) {
 
   function render() {
     updateBackHandler();
-    const curRom = osDetails[GameState.rom || 'stock'] || osDetails.stock;
-
-    if (currentView === 'about') {
-      UI.appWindowTitle.textContent = 'О телефоне';
-      renderAboutView(curRom);
-    } else if (currentView === 'display') {
-      UI.appWindowTitle.textContent = 'Экран и графика';
-      renderDisplayView();
-    } else if (currentView === 'battery') {
-      UI.appWindowTitle.textContent = 'Батарея и питание';
-      renderBatteryView();
-    } else if (currentView === 'network') {
-      UI.appWindowTitle.textContent = 'Сеть и интернет';
-      renderNetworkView();
-    } else if (currentView === 'security') {
-      UI.appWindowTitle.textContent = 'Безопасность и Root';
-      renderSecurityView();
-    } else if (currentView === 'developer') {
-      UI.appWindowTitle.textContent = 'Для разработчиков';
-      renderDeveloperView();
-    } else if (currentView === 'system') {
-      UI.appWindowTitle.textContent = 'Система и сброс';
-      renderSystemView();
-    } else if (currentView === 'easter_egg') {
-      UI.appWindowTitle.textContent = 'Android 14 Easter Egg';
-      renderEasterEggView();
-    } else {
-      UI.appWindowTitle.textContent = 'Настройки';
-      renderMainView(curRom);
-    }
+    if (currentView === 'about') renderAboutView();
+    else if (currentView === 'display') renderDisplayView();
+    else if (currentView === 'battery') renderBatteryView();
+    else if (currentView === 'network') renderNetworkView();
+    else if (currentView === 'security') renderSecurityView();
+    else if (currentView === 'developer') renderDeveloperView();
+    else if (currentView === 'system') renderSystemView();
+    else if (currentView === 'easter_egg') renderEasterEggView();
+    else renderMainView();
   }
 
-  // === 1. MAIN SETTINGS VIEW ===
-  function renderMainView(curRom) {
-    container.innerHTML = `
-      <div class="settings-container">
-        <!-- Search Bar -->
-        <div class="settings-search-wrapper">
-          <span class="settings-search-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </span>
-          <input type="text" id="settings-search-input" class="settings-search-input" placeholder="Поиск настроек (экран, root, usb, герц...)" value="${searchQuery}" autocomplete="off">
-        </div>
-
-        <!-- Search Results (if searching) -->
-        <div id="settings-search-results" style="display: ${searchQuery.trim() ? 'block' : 'none'};"></div>
-
-        <div id="settings-default-content" style="display: ${searchQuery.trim() ? 'none' : 'flex'}; flex-direction:column; gap:14px;">
-          <!-- Modder Profile Card -->
-          <div class="settings-profile-card">
-            <div class="fp-avatar" style="width:38px; height:38px; font-size:14px;">4P</div>
-            <div style="flex:1;">
-              <div class="settings-profile-name">Zyaster (Senior 4PDA Modder)</div>
-              <div class="settings-profile-sub">Аккаунт 4PDA синхронизирован • Репутация: +${GameState.modderReputation}</div>
-            </div>
-            <div style="font-size:16px; color:var(--accent-cyan);">✓</div>
-          </div>
-
-          <!-- Hero OS / About Phone Banner -->
-          <div class="settings-hero-banner" id="btn-goto-about">
-            <div class="settings-hero-header">
-              <div class="settings-hero-title">${curRom.name}</div>
-              <span class="settings-hero-badge">${curRom.badge}</span>
-            </div>
-            <div style="font-size:12px; color:#cbd5e1;">Poco X3 Pro (vayu) • Snapdragon 860</div>
-            <div class="settings-hero-storage">
-              <div class="storage-text">
-                <span>Память UFS 3.1</span>
-                <b>54.2 ГБ / 256 ГБ занято</b>
-              </div>
-              <div class="storage-bar-bg">
-                <div class="storage-bar-fill" style="width: 21%;"></div>
-              </div>
-              <div style="display:flex; justify-content:space-between; font-size:10px; color:#64748b; margin-top:2px;">
-                <span>Безопасность: ${curRom.security}</span>
-                <span style="color:var(--accent-cyan); font-weight:700;">Подробнее ›</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Group 1: Hardware & Interface -->
-          <div class="settings-group">
-            <div class="settings-group-header">Устройство и экран</div>
-            
-            <div class="settings-item" id="btn-goto-display">
-              <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#0284c7;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                </div>
-                <div class="settings-item-text">
-                  <div class="settings-item-title">Экран и графика</div>
-                  <div class="settings-item-sub">Частота: ${GameState.displayRefreshRate} Гц • Тёмная тема • DPI: ${GameState.dpiScale}</div>
-                </div>
-              </div>
-              <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-            </div>
-
-            <div class="settings-item" id="btn-goto-battery">
-              <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#16a34a;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2"/><line x1="20" y1="11" x2="20" y2="13"/><rect x="5" y="10" width="8" height="4" fill="#fff"/></svg>
-                </div>
-                <div class="settings-item-text">
-                  <div class="settings-item-title">Батарея и питание</div>
-                  <div class="settings-item-sub">${GameState.battery}% • ${GameState.perfProfile === 'performance' ? 'Game Turbo' : 'Сбалансированный'} • 31.8°C</div>
-                </div>
-              </div>
-              <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-            </div>
-
-            <div class="settings-item" id="btn-goto-network">
-              <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#4f46e5;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                </div>
-                <div class="settings-item-text">
-                  <div class="settings-item-title">Сеть и интернет</div>
-                  <div class="settings-item-sub">Wi-Fi: 4PDA_Modder_5GHz • Частный DNS: AdGuard</div>
-                </div>
-              </div>
-              <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-            </div>
-          </div>
-
-          <!-- Group 2: Modding & Security -->
-          <div class="settings-group">
-            <div class="settings-group-header">Моддинг и безопасность</div>
-
-            <div class="settings-item" id="btn-goto-security">
-              <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#9333ea;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-                <div class="settings-item-text">
-                  <div class="settings-item-title">Безопасность и Root</div>
-                  <div class="settings-item-sub">Play Integrity: Strong • KernelSU: ${GameState.ksuWorking ? 'Активен' : 'Выкл'}</div>
-                </div>
-              </div>
-              <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-            </div>
-
-            <div class="settings-item" id="btn-goto-developer">
-              <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#d97706;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                </div>
-                <div class="settings-item-text">
-                  <div class="settings-item-title">Для разработчиков</div>
-                  <div class="settings-item-sub">
-                    ${GameState.developerUnlocked ? (GameState.usbDebugging ? 'Отладка по USB: Вкл' : 'Отладка по USB: Выкл') : 'Заблокировано (7 тапов по сборке)'}
-                  </div>
-                </div>
-              </div>
-              <div class="settings-item-right">
-                ${GameState.developerUnlocked ? '<span style="color:#00e676; font-size:11px;">АКТИВНО</span>' : '<span style="color:#64748b; font-size:11px;">[LOCKED]</span>'}
-                <span class="settings-item-arrow">›</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Group 3: System & Power -->
-          <div class="settings-group">
-            <div class="settings-group-header">Система</div>
-
-            <div class="settings-item" id="btn-goto-about-item">
-              <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#475569;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                </div>
-                <div class="settings-item-text">
-                  <div class="settings-item-title">О телефоне</div>
-                  <div class="settings-item-sub">POCO X3 Pro • Android 14 • ${curRom.name}</div>
-                </div>
-              </div>
-              <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-            </div>
-
-            <div class="settings-item" id="btn-goto-system">
-              <div class="settings-item-left">
-                <div class="settings-item-icon" style="background:#dc2626;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
-                </div>
-                <div class="settings-item-text">
-                  <div class="settings-item-title">Перезагрузка и сброс</div>
-                  <div class="settings-item-sub">Reboot в Recovery/Fastboot • Очистка Dalvik • Format Data</div>
-                </div>
-              </div>
-              <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Bind Search Input
-    const searchInput = document.getElementById('settings-search-input');
-    searchInput.addEventListener('input', (e) => {
-      searchQuery = e.target.value.toLowerCase();
-      handleSearch(searchQuery, curRom);
-    });
-
-    // Navigation clicks
-    document.getElementById('btn-goto-about').onclick = () => { sounds.click(); currentView = 'about'; render(); };
-    document.getElementById('btn-goto-about-item').onclick = () => { sounds.click(); currentView = 'about'; render(); };
-    document.getElementById('btn-goto-display').onclick = () => { sounds.click(); currentView = 'display'; render(); };
-    document.getElementById('btn-goto-battery').onclick = () => { sounds.click(); currentView = 'battery'; render(); };
-    document.getElementById('btn-goto-network').onclick = () => { sounds.click(); currentView = 'network'; render(); };
-    document.getElementById('btn-goto-security').onclick = () => { sounds.click(); currentView = 'security'; render(); };
-    document.getElementById('btn-goto-developer').onclick = () => { sounds.click(); currentView = 'developer'; render(); };
-    document.getElementById('btn-goto-system').onclick = () => { sounds.click(); currentView = 'system'; render(); };
-  }
-
-  // --- SEARCH HANDLER ---
-  function handleSearch(q, curRom) {
-    const resBox = document.getElementById('settings-search-results');
-    const defBox = document.getElementById('settings-default-content');
-    if (!q.trim()) {
-      resBox.style.display = 'none';
-      defBox.style.display = 'flex';
-      return;
+  container.oninput = (e) => {
+    if (e.target && e.target.id === 'st-search') {
+      searchQuery = e.target.value;
+      applySearch();
     }
-    resBox.style.display = 'block';
-    defBox.style.display = 'none';
+  };
 
-    const searchableItems = [
-      { title: 'О телефоне', sub: 'Спецификации, процессор, память, ядро, сборка', view: 'about', icon: '📱' },
-      { title: 'Частота экрана (Hz)', sub: '60 Гц, 90 Гц, 120 Гц, Peak Refresh Rate', view: 'display', icon: '📺' },
-      { title: 'Тёмный режим (Dark Mode)', sub: 'Оформление AMOLED Black', view: 'display', icon: '🌙' },
-      { title: 'Плотность экрана (DPI)', sub: 'Масштаб элементов интерфейса (392/440 DPI)', view: 'display', icon: '🔍' },
-      { title: 'Батарея и производительность', sub: 'Game Turbo, энергосбережение, температура, заряд', view: 'battery', icon: '🔋' },
-      { title: 'Быстрая зарядка 33W', sub: 'Параметры контроллера зарядки Xiaomi', view: 'battery', icon: '⚡' },
-      { title: 'Wi-Fi и интернет', sub: 'Подключение 5 GHz, настройки сети', view: 'network', icon: '📶' },
-      { title: 'Частный DNS (AdGuard)', sub: 'Блокировка баннеров и рекламы через DNS', view: 'network', icon: '🌐' },
-      { title: 'Безопасность и Play Integrity', sub: 'Сертификация SafetyNet, Root Isolate', view: 'security', icon: '🛡️' },
-      { title: 'KernelSU & Magisk', sub: 'Статус рутирования на уровне ядра Linux', view: 'security', icon: '👑' },
-      { title: 'Отладка по USB (USB Debugging)', sub: 'Связь с консолью ADB на ПК', view: 'developer', icon: '🛠️' },
-      { title: 'Заводская разблокировка (OEM)', sub: 'Разрешение разблокировки загрузчика', view: 'developer', icon: '🔓' },
-      { title: 'Перезагрузка в Recovery (TWRP/OrangeFox)', sub: 'Запуск рекавери для прошивки архивов', view: 'system', icon: '🦊' },
-      { title: 'Перезагрузка в Fastboot', sub: 'Режим загрузчика Poco X3 Pro', view: 'system', icon: '⚡' },
-      { title: 'Сброс до заводских (Format Data)', sub: 'Очистка разделов, предотвращение бутлупа', view: 'system', icon: '⚠️' }
-    ];
+  container.onclick = (e) => {
+    const el = e.target.closest('[data-nav],[data-action],[data-hz],[data-perf]');
+    if (!el) return;
 
-    const matches = searchableItems.filter(item => 
-      item.title.toLowerCase().includes(q) || item.sub.toLowerCase().includes(q)
-    );
-
-    if (matches.length === 0) {
-      resBox.innerHTML = `
-        <div style="text-align:center; padding:30px 10px; color:#64748b;">
-          <div style="font-size:32px; margin-bottom:8px;">🔍</div>
-          <div>По запросу "<b>${q}</b>" ничего не найдено</div>
-        </div>
-      `;
-      return;
-    }
-
-    resBox.innerHTML = `
-      <div class="settings-group">
-        <div class="settings-group-header">Результаты поиска (${matches.length})</div>
-        ${matches.map((item, idx) => `
-          <div class="settings-item search-match-item" data-view="${item.view}" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-icon" style="background:#1e293b;">${item.icon}</div>
-              <div class="settings-item-text">
-                <div class="settings-item-title">${item.title}</div>
-                <div class="settings-item-sub">${item.sub}</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-          </div>
-        `).join('')}
-      </div>
-    `;
-
-    resBox.querySelectorAll('.search-match-item').forEach(el => {
-      el.onclick = () => {
-        sounds.click();
-        currentView = el.dataset.view;
-        render();
-      };
-    });
-  }
-
-  // === 2. ABOUT VIEW ===
-  function renderAboutView(curRom) {
-    container.innerHTML = `
-      <div class="settings-container">
-        <div class="settings-subpage-hero">
-          <div class="settings-subpage-hero-icon">${curRom.icon}</div>
-          <div class="settings-subpage-hero-title">${curRom.name}</div>
-          <div class="settings-subpage-hero-desc">${curRom.desc}</div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-header">Характеристики устройства</div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Модель устройства</div>
-                <div class="settings-item-sub">POCO X3 Pro (vayu / bhima)</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span>Xiaomi Inc.</span></div>
-          </div>
-
-          <div class="settings-item" id="btn-tap-android" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Версия Android</div>
-                <div class="settings-item-sub">14 (UpsideDownCake) • Тапните 3 раза для пасхалки!</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#00f2fe; font-weight:800;">14 ›</span></div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Процессор (SoC)</div>
-                <div class="settings-item-sub">
-                  ${GameState.kernel.includes('stormbreaker') ? 'Qualcomm Snapdragon 860 @ 3.20 GHz OC (StormBreaker)' : 'Qualcomm Snapdragon 860 Octa-Core @ 2.96 GHz'}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Видеоускоритель</div>
-                <div class="settings-item-sub">
-                  ${GameState.kernel.includes('stormbreaker') ? 'Adreno 640 @ 825 MHz OC (Vulkan 1.3)' : 'Adreno 640 @ 675 MHz'}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Оперативная память (RAM)</div>
-                <div class="settings-item-sub">8.00 ГБ LPDDR4X (+3.0 ГБ виртуальной памяти RAM+)</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Внутренний накопитель</div>
-                <div class="settings-item-sub">256 ГБ UFS 3.1 (Свободно: 201.8 ГБ)</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Ядро Linux (Kernel)</div>
-                <div class="settings-item-sub" style="color:#00f2fe; font-family:monospace;">${GameState.kernelVersion}</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              ${GameState.ksuWorking ? '<span style="color:#00e676; font-size:10px; font-weight:bold;">KSU HOOKED</span>' : ''}
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Статус загрузчика (Bootloader)</div>
-                <div class="settings-item-sub">
-                  ${GameState.bootloaderUnlocked ? 'Разблокирован (Unlocked) • Прошивка кастомов разрешена' : 'Заблокирован (Locked)'}
-                </div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <span style="color:${GameState.bootloaderUnlocked ? '#00e676' : '#ff3366'}; font-weight:bold;">
-                ${GameState.bootloaderUnlocked ? 'UNLOCKED' : 'LOCKED'}
-              </span>
-            </div>
-          </div>
-
-          <div class="settings-item" id="btn-toggle-selinux" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Режим SELinux</div>
-                <div class="settings-item-sub">Текущий статус: ${GameState.selinuxMode === 'enforcing' ? 'Enforcing (Строгий)' : 'Permissive (Мягкий)'}</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <span style="color:${GameState.selinuxMode === 'enforcing' ? '#00e676' : '#f59e0b'}; font-weight:bold; font-size:11px;">
-                ${GameState.selinuxMode.toUpperCase()}
-              </span>
-            </div>
-          </div>
-
-          <div class="settings-item" id="btn-build-number" style="cursor:pointer; background:rgba(0, 242, 254, 0.05);">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Номер сборки</div>
-                <div class="settings-item-sub" style="font-family:monospace;">UQ1A.240205.002.A1 (4PDA-Mod)</div>
-                <div id="build-tap-hint" style="font-size:10px; color:#00f2fe; margin-top:2px;">
-                  ${GameState.developerUnlocked ? '✓ Режим разработчика разблокирован!' : 'Тапните 7 раз для включения режима разработчика'}
-                </div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#00f2fe;">🛠️</span></div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Android 14 Easter Egg Tap
-    document.getElementById('btn-tap-android').onclick = () => {
+    if (el.dataset.nav) {
       sounds.click();
-      sounds.vibrate(30);
-      easterEggTapCount++;
-      if (easterEggTapCount >= 3) {
-        easterEggTapCount = 0;
-        currentView = 'easter_egg';
-        render();
-      }
-    };
-
-    // SELinux toggle
-    document.getElementById('btn-toggle-selinux').onclick = () => {
-      sounds.click();
-      sounds.vibrate(25);
-      GameState.selinuxMode = GameState.selinuxMode === 'enforcing' ? 'permissive' : 'enforcing';
+      searchQuery = '';
+      currentView = el.dataset.nav;
       render();
-    };
+      return;
+    }
 
-    // 7 Taps on Build Number
-    document.getElementById('btn-build-number').onclick = () => {
-      sounds.click();
-      if (GameState.developerUnlocked) {
-        alert('Вы уже являетесь разработчиком!');
-        return;
-      }
-      GameState.buildTapCount++;
-      sounds.vibrate(35);
-      const left = 7 - GameState.buildTapCount;
-      const hint = document.getElementById('build-tap-hint');
-      if (left > 0) {
-        hint.textContent = `Осталось шагов: ${left}`;
-      } else {
-        GameState.developerUnlocked = true;
-        sounds.bootChime();
-        sounds.vibrate(150);
-        hint.textContent = '🎉 Режим разработчика активирован!';
-        alert('🎉 Поздравляем! Меню «Для разработчиков» разблокировано.');
-      }
-    };
-  }
-
-  // === 3. DISPLAY VIEW ===
-  function renderDisplayView() {
-    container.innerHTML = `
-      <div class="settings-container">
-        <div class="settings-group">
-          <div class="settings-group-header">Частота обновления экрана</div>
-          <div style="padding:14px 16px;">
-            <div style="font-size:12px; color:#94a3b8; margin-bottom:10px;">
-              Выберите частоту для плавности отображения элементов и игр.
-            </div>
-            <div class="settings-tile-grid">
-              <div class="settings-tile ${GameState.displayRefreshRate === 60 ? 'active' : ''}" data-hz="60">
-                <div class="settings-tile-title">60 Hz</div>
-                <div class="settings-tile-sub">Энергия</div>
-              </div>
-              <div class="settings-tile ${GameState.displayRefreshRate === 90 ? 'active' : ''}" data-hz="90">
-                <div class="settings-tile-title">90 Hz</div>
-                <div class="settings-tile-sub">Баланс</div>
-              </div>
-              <div class="settings-tile ${GameState.displayRefreshRate === 120 ? 'active' : ''}" data-hz="120">
-                <div class="settings-tile-title">120 Hz</div>
-                <div class="settings-tile-sub">Плавность</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-item" id="btn-toggle-peak-hz">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Принудительные 120 Гц (Peak Rate)</div>
-                <div class="settings-item-sub">Блокирует сброс частоты кадров до 60 FPS в видео и играх</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <div class="settings-switch ${GameState.forcePeakRefreshRate ? 'active' : ''}">
-                <div class="settings-switch-thumb"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-header">Цвет и оформление</div>
-
-          <div class="settings-item" id="btn-toggle-dark-mode">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Тёмная тема (AMOLED Black)</div>
-                <div class="settings-item-sub">Глубокий чёрный цвет для экономии заряда батареи</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <div class="settings-switch ${GameState.darkMode ? 'active' : ''}">
-                <div class="settings-switch-thumb"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-item" id="btn-toggle-color-mode">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Цветовой охват</div>
-                <div class="settings-item-sub">Текущий профиль: ${GameState.displayColorMode === 'dci_p3' ? 'DCI-P3 (Насыщенный)' : 'sRGB (Натуральный)'}</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#00f2fe; font-size:11px; font-weight:bold;">${GameState.displayColorMode.toUpperCase()}</span></div>
-          </div>
-
-          <div class="settings-item" id="btn-toggle-dpi">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Минимальная ширина (DPI)</div>
-                <div class="settings-item-sub">Масштаб интерфейса: ${GameState.dpiScale} dp (${GameState.dpiScale === 392 ? 'Стандартный' : 'Компактный'})</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#00e676; font-weight:bold;">${GameState.dpiScale} dp</span></div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Bind Hz tiles
-    container.querySelectorAll('.settings-tile').forEach(tile => {
-      tile.onclick = () => {
-        sounds.click();
-        sounds.vibrate(20);
-        const hz = parseInt(tile.dataset.hz);
-        GameState.displayRefreshRate = hz;
-        UI.osFpsBadge.textContent = `${hz} Hz`;
-        render();
-      };
-    });
-
-    // Peak rate toggle
-    document.getElementById('btn-toggle-peak-hz').onclick = () => {
-      sounds.click();
-      sounds.vibrate(20);
-      GameState.forcePeakRefreshRate = !GameState.forcePeakRefreshRate;
-      if (GameState.forcePeakRefreshRate) GameState.displayRefreshRate = 120;
+    if (el.dataset.hz) {
+      sounds.click(); sounds.vibrate(20);
+      GameState.displayRefreshRate = parseInt(el.dataset.hz, 10);
       UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
       render();
-    };
-
-    // Dark mode toggle
-    document.getElementById('btn-toggle-dark-mode').onclick = () => {
-      sounds.click();
-      sounds.vibrate(20);
-      GameState.darkMode = !GameState.darkMode;
-      render();
-    };
-
-    // Color mode toggle
-    document.getElementById('btn-toggle-color-mode').onclick = () => {
-      sounds.click();
-      sounds.vibrate(20);
-      GameState.displayColorMode = GameState.displayColorMode === 'dci_p3' ? 'srgb' : 'dci_p3';
-      render();
-    };
-
-    // DPI toggle
-    document.getElementById('btn-toggle-dpi').onclick = () => {
-      sounds.click();
-      sounds.vibrate(20);
-      GameState.dpiScale = GameState.dpiScale === 392 ? 440 : 392;
-      render();
-    };
-  }
-
-  // === 4. BATTERY VIEW ===
-  function renderBatteryView() {
-    container.innerHTML = `
-      <div class="settings-container">
-        <!-- Battery Meter -->
-        <div class="battery-gauge-box">
-          <div class="battery-gauge-num">${GameState.battery}%</div>
-          <div class="battery-gauge-label">
-            ${GameState.usbConnected ? '⚡ Идет быстрая зарядка (Mi Turbo Charge 33W)' : 'Осталось ~19 ч 45 мин работы'}
-          </div>
-          <div style="display:flex; justify-content:center; gap:16px; margin-top:14px; font-size:11px; color:#94a3b8;">
-            <span>Здоровье: <b style="color:#00e676;">98% (5 160 мАч)</b></span>
-            <span>•</span>
-            <span>Температура: <b style="color:#00f2fe;">31.8°C</b></span>
-          </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-header">Режим производительности</div>
-          <div style="padding:14px 16px;">
-            <div class="settings-tile-grid">
-              <div class="settings-tile ${GameState.perfProfile === 'powersave' ? 'active' : ''}" data-perf="powersave">
-                <div class="settings-tile-title">🍃 Эко</div>
-                <div class="settings-tile-sub">60 Гц / Сбережение</div>
-              </div>
-              <div class="settings-tile ${GameState.perfProfile === 'balanced' ? 'active' : ''}" data-perf="balanced">
-                <div class="settings-tile-title">⚖️ Баланс</div>
-                <div class="settings-tile-sub">Адаптивный режим</div>
-              </div>
-              <div class="settings-tile ${GameState.perfProfile === 'performance' ? 'active' : ''}" data-perf="performance">
-                <div class="settings-tile-title">🚀 Turbo</div>
-                <div class="settings-tile-sub">Макс. FPS</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-header">Расход заряда приложениями</div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Экран (Screen on time: 5 ч 42 мин)</div>
-                <div class="settings-item-sub">Яркость 80%, частота 120 Гц</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><b style="color:#f1f5f9;">42%</b></div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Игры и тесты (PUBG Mobile, AnTuTu)</div>
-                <div class="settings-item-sub">Рендеринг Adreno 640 @ 825MHz</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><b style="color:#f1f5f9;">34%</b></div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Система Android & Kernel</div>
-                <div class="settings-item-sub">Фоновые процессы ядра Linux</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><b style="color:#f1f5f9;">16%</b></div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    container.querySelectorAll('.settings-tile').forEach(tile => {
-      tile.onclick = () => {
-        sounds.click();
-        sounds.vibrate(25);
-        GameState.perfProfile = tile.dataset.perf;
-        if (GameState.perfProfile === 'performance') {
-          GameState.displayRefreshRate = 120;
-          UI.osFpsBadge.textContent = '120 Hz';
-        } else if (GameState.perfProfile === 'powersave') {
-          GameState.displayRefreshRate = 60;
-          UI.osFpsBadge.textContent = '60 Hz';
-        }
-        render();
-      };
-    });
-  }
-
-  // === 5. NETWORK VIEW ===
-  function renderNetworkView() {
-    container.innerHTML = `
-      <div class="settings-container">
-        <div class="settings-group">
-          <div class="settings-group-header">Беспроводные сети</div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Wi-Fi (Подключено)</div>
-                <div class="settings-item-sub">4PDA_Modder_5GHz • 866 Мбит/с • WPA3</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <div class="settings-switch active"><div class="settings-switch-thumb"></div></div>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Мобильная сеть (SIM 1)</div>
-                <div class="settings-item-sub">Tele2 4G+ VoLTE • Передача данных активна</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <div class="settings-switch active"><div class="settings-switch-thumb"></div></div>
-            </div>
-          </div>
-
-          <div class="settings-item" id="btn-toggle-dns" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Частный DNS (Private DNS)</div>
-                <div class="settings-item-sub">Сервер: ${GameState.privateDns} (Блокировка рекламы)</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#00e676; font-weight:bold; font-size:11px;">АКТИВЕН</span></div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Точка доступа Wi-Fi</div>
-                <div class="settings-item-sub">Poco_Hotspot (Выключено)</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <div class="settings-switch"><div class="settings-switch-thumb"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('btn-toggle-dns').onclick = () => {
-      sounds.click();
-      sounds.vibrate(20);
-      GameState.privateDns = GameState.privateDns === 'dns.adguard.com' ? '1dot1dot1dot1.cloudflare-dns.com' : 'dns.adguard.com';
-      render();
-    };
-  }
-
-  // === 6. SECURITY VIEW ===
-  function renderSecurityView() {
-    const isStrong = GameState.ksuUnmountRoot.has('bank');
-    container.innerHTML = `
-      <div class="settings-container">
-        <div class="settings-group">
-          <div class="settings-group-header">Аттестация и целостность устройства</div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Google Play Protect</div>
-                <div class="settings-item-sub">Устройство сертифицировано Google</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#00e676; font-weight:bold;">CERTIFIED ✓</span></div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Play Integrity API</div>
-                <div class="settings-item-sub">MEETS_BASIC: ✅ | MEETS_DEVICE: ✅ | MEETS_STRONG: ${isStrong ? '✅' : '⚠️'}</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <span style="color:${isStrong ? '#00e676' : '#f59e0b'}; font-weight:bold; font-size:11px;">
-                ${isStrong ? 'STRONG PASS' : 'NEEDS UNMOUNT'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-header">Подсистема Root-доступа</div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">KernelSU (Ядерный перехват)</div>
-                <div class="settings-item-sub">
-                  ${GameState.ksuWorking ? 'Версия v0.9.5 активна в /boot (ядро Linux)' : 'Не обнаружен в ядре (установите NGK Kernel)'}
-                </div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <span style="color:${GameState.ksuWorking ? '#00e676' : '#64748b'}; font-weight:bold; font-size:11px;">
-                ${GameState.ksuWorking ? 'WORKING' : 'DISABLED'}
-              </span>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Magisk Root (Ramdisk)</div>
-                <div class="settings-item-sub">
-                  ${GameState.magiskInstalled ? 'Magisk v27.0 установлен (Zygisk активен)' : 'Не установлен'}
-                </div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <span style="color:${GameState.magiskInstalled ? '#00e676' : '#64748b'}; font-weight:bold; font-size:11px;">
-                ${GameState.magiskInstalled ? 'INSTALLED' : 'ABSENT'}
-              </span>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Шифрование данных пользователя</div>
-                <div class="settings-item-sub">File-Based Encryption (FBE v2)</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#00e676; font-size:11px;">ENCRYPTED</span></div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // === 7. DEVELOPER VIEW ===
-  function renderDeveloperView() {
-    if (!GameState.developerUnlocked) {
-      container.innerHTML = `
-        <div class="settings-container">
-          <div class="settings-subpage-hero" style="padding:40px 16px;">
-            <div class="settings-subpage-hero-icon">🔒</div>
-            <div class="settings-subpage-hero-title">Меню разработчика заблокировано</div>
-            <div class="settings-subpage-hero-desc" style="max-width:280px; margin:8px auto;">
-              Для разблокировки перейдите в <b>«О телефоне»</b> и быстро нажмите 7 раз на строку <b>«Номер сборки»</b>.
-            </div>
-            <button id="btn-goto-about-dev" class="rec-big-btn" style="margin-top:20px; display:inline-block; width:auto; padding:10px 24px;">
-              Перейти в «О телефоне»
-            </button>
-          </div>
-        </div>
-      `;
-      document.getElementById('btn-goto-about-dev').onclick = () => {
-        sounds.click();
-        currentView = 'about';
-        render();
-      };
       return;
     }
 
-    container.innerHTML = `
-      <div class="settings-container">
-        <div class="settings-group">
-          <div class="settings-group-header">Отладка и связь с ПК</div>
-
-          <div class="settings-item" id="btn-toggle-usb-debug" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Отладка по USB (USB Debugging)</div>
-                <div class="settings-item-sub">Разрешить команды ADB с подключенного ПК</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <div class="settings-switch ${GameState.usbDebugging ? 'active' : ''}">
-                <div class="settings-switch-thumb"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-item">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Заводская разблокировка (OEM Unlock)</div>
-                <div class="settings-item-sub">Разрешить разблокировку загрузчика в Fastboot</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <div class="settings-switch active"><div class="settings-switch-thumb"></div></div>
-            </div>
-          </div>
-
-          <div class="settings-item" id="btn-restart-adbd" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Перезапустить ADB демон (kill-server)</div>
-                <div class="settings-item-sub">Сбросить сессию adbd на порту 5555</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:var(--accent-cyan);">🔄</span></div>
-          </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-header">Аппаратное ускорение и отрисовка</div>
-
-          <div class="settings-item" id="btn-toggle-fps-overlay" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Отображать частоту обновления (Hz / FPS)</div>
-                <div class="settings-item-sub">Показывать счетчик кадров поверх всех окон</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <div class="settings-switch active"><div class="settings-switch-thumb"></div></div>
-            </div>
-          </div>
-
-          <div class="settings-item" id="btn-toggle-msaa" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Принудительный 4x MSAA</div>
-                <div class="settings-item-sub">Сглаживание текстур в 3D играх (OpenGL ES 3.2)</div>
-              </div>
-            </div>
-            <div class="settings-item-right">
-              <div class="settings-switch ${GameState.forceMsaa ? 'active' : ''}">
-                <div class="settings-switch-thumb"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="settings-item" id="btn-toggle-anim-scale" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-text">
-                <div class="settings-item-title">Скорость анимаций</div>
-                <div class="settings-item-sub">Анимация окон и переходов: ${GameState.animationScale}</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#00f2fe; font-weight:bold;">${GameState.animationScale}</span></div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('btn-toggle-usb-debug').onclick = () => {
-      sounds.click();
-      sounds.vibrate(20);
-      GameState.usbDebugging = !GameState.usbDebugging;
+    if (el.dataset.perf) {
+      sounds.click(); sounds.vibrate(25);
+      GameState.perfProfile = el.dataset.perf;
+      if (GameState.perfProfile === 'performance') GameState.displayRefreshRate = 120;
+      if (GameState.perfProfile === 'powersave') GameState.displayRefreshRate = 60;
+      UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
       render();
-    };
+      return;
+    }
 
-    document.getElementById('btn-restart-adbd').onclick = () => {
-      sounds.click();
-      sounds.vibrate(40);
-      alert('adbd: демон успешно перезапущен. Порт 5555 слушает подключения.');
-    };
+    const a = el.dataset.action;
+    if (!a) return;
+    sounds.click();
 
-    document.getElementById('btn-toggle-msaa').onclick = () => {
-      sounds.click();
-      sounds.vibrate(20);
-      GameState.forceMsaa = !GameState.forceMsaa;
-      render();
-    };
-
-    document.getElementById('btn-toggle-anim-scale').onclick = () => {
-      sounds.click();
-      sounds.vibrate(20);
-      const scales = ['0.5x', '1.0x', 'Без анимаций'];
-      const nextIdx = (scales.indexOf(GameState.animationScale) + 1) % scales.length;
-      GameState.animationScale = scales[nextIdx];
-      render();
-    };
-  }
-
-  // === 8. SYSTEM VIEW ===
-  function renderSystemView() {
-    container.innerHTML = `
-      <div class="settings-container">
-        <div class="settings-group">
-          <div class="settings-group-header">Меню перезагрузки (Power Menu)</div>
-
-          <div class="settings-item" id="btn-rb-sys" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-icon" style="background:#0284c7;">🔄</div>
-              <div class="settings-item-text">
-                <div class="settings-item-title">Обычная перезагрузка (Reboot System)</div>
-                <div class="settings-item-sub">Перезапуск текущей операционной системы</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-          </div>
-
-          <div class="settings-item" id="btn-rb-rec" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-icon" style="background:#ea580c;">🦊</div>
-              <div class="settings-item-text">
-                <div class="settings-item-title">Перезагрузка в Recovery</div>
-                <div class="settings-item-sub">Запуск ${GameState.recoveryType === 'orangefox' ? 'OrangeFox R11.1' : 'TWRP 3.7.0'}</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-          </div>
-
-          <div class="settings-item" id="btn-rb-bootloader" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-icon" style="background:#4f46e5;">⚡</div>
-              <div class="settings-item-text">
-                <div class="settings-item-title">Перезагрузка в Fastboot (Bootloader)</div>
-                <div class="settings-item-sub">Режим прошивки через ПК консоль</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-          </div>
-
-          <div class="settings-item" id="btn-rb-edl" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-icon" style="background:#b91c1c;">💀</div>
-              <div class="settings-item-text">
-                <div class="settings-item-title">Аварийный режим EDL (Qualcomm 9008)</div>
-                <div class="settings-item-sub">Экстренное раскирпичивание через тест-поинты</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#ff3366; font-size:11px;">EDL 9008</span></div>
-          </div>
-        </div>
-
-        <div class="settings-group">
-          <div class="settings-group-header">Очистка и сброс</div>
-
-          <div class="settings-item" id="btn-wipe-dalvik" style="cursor:pointer;">
-            <div class="settings-item-left">
-              <div class="settings-item-icon" style="background:#059669;">🧹</div>
-              <div class="settings-item-text">
-                <div class="settings-item-title">Очистить Dalvik / ART кэш</div>
-                <div class="settings-item-sub">Очистка байткода приложений для устранения сбоев</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span class="settings-item-arrow">›</span></div>
-          </div>
-
-          <div class="settings-item" id="btn-factory-reset" style="cursor:pointer; background:rgba(239, 68, 68, 0.08);">
-            <div class="settings-item-left">
-              <div class="settings-item-icon" style="background:#dc2626;">⚠️</div>
-              <div class="settings-item-text">
-                <div class="settings-item-title" style="color:#ff5252;">Сброс до заводских (Format Data)</div>
-                <div class="settings-item-sub">Полное стирание данных пользователя (/data) и сброс настроек</div>
-              </div>
-            </div>
-            <div class="settings-item-right"><span style="color:#ff5252; font-weight:bold;">RESET</span></div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('btn-rb-sys').onclick = () => {
-      closeFullscreenApp(true);
-      bootDevice();
-    };
-    document.getElementById('btn-rb-rec').onclick = () => {
-      closeFullscreenApp(true);
-      bootToRecovery();
-    };
-    document.getElementById('btn-rb-bootloader').onclick = () => {
-      closeFullscreenApp(true);
-      bootToFastboot();
-    };
-    document.getElementById('btn-rb-edl').onclick = () => {
-      closeFullscreenApp(true);
-      setScreenState('CRASHDUMP');
-    };
-    document.getElementById('btn-wipe-dalvik').onclick = () => {
-      sounds.click();
-      sounds.vibrate(30);
-      alert('🧹 Dalvik / ART Cache успешно очищен! Кэш приложений сброшен.');
-    };
-    document.getElementById('btn-factory-reset').onclick = () => {
-      sounds.errorTone();
-      sounds.vibrate(60);
-      if (confirm('⚠️ ВНИМАНИЕ! Это действие сотрет все данные пользователя (/data), настройки и вызовет перезагрузку. Продолжить?')) {
-        GameState.phoneStorage.clear();
-        GameState.modules.clear();
+    switch (a) {
+      case 'toggle-dark':
+        sounds.vibrate(20);
+        GameState.darkMode = !GameState.darkMode;
+        render();
+        break;
+      case 'toggle-peak':
+        sounds.vibrate(20);
+        GameState.forcePeakRefreshRate = !GameState.forcePeakRefreshRate;
+        if (GameState.forcePeakRefreshRate) GameState.displayRefreshRate = 120;
+        UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
+        render();
+        break;
+      case 'toggle-color':
+        sounds.vibrate(20);
+        GameState.displayColorMode = GameState.displayColorMode === 'dci_p3' ? 'srgb' : 'dci_p3';
+        render();
+        break;
+      case 'toggle-dpi':
+        sounds.vibrate(20);
+        GameState.dpiScale = GameState.dpiScale === 392 ? 440 : 392;
+        render();
+        break;
+      case 'toggle-msaa':
+        sounds.vibrate(20);
+        GameState.forceMsaa = !GameState.forceMsaa;
+        render();
+        break;
+      case 'toggle-usb':
+        sounds.vibrate(20);
+        GameState.usbDebugging = !GameState.usbDebugging;
+        render();
+        break;
+      case 'toggle-fps':
+        sounds.vibrate(20);
+        GameState.fpsOverlay = !GameState.fpsOverlay;
+        UI.osFpsBadge.style.display = GameState.fpsOverlay ? '' : 'none';
+        render();
+        break;
+      case 'cycle-anim': {
+        const scales = ['0.5x', '1.0x', 'Без анимаций'];
+        GameState.animationScale = scales[(scales.indexOf(GameState.animationScale) + 1) % scales.length];
+        render();
+        break;
+      }
+      case 'toggle-dns':
+        sounds.vibrate(20);
+        GameState.privateDns = GameState.privateDns === 'dns.adguard.com' ? '1dot1dot1dot1.cloudflare-dns.com' : 'dns.adguard.com';
+        render();
+        break;
+      case 'toggle-selinux':
+        sounds.vibrate(25);
+        GameState.selinuxMode = GameState.selinuxMode === 'enforcing' ? 'permissive' : 'enforcing';
+        render();
+        break;
+      case 'net-wifi':
+        GameState.netWifi = !GameState.netWifi; render(); break;
+      case 'net-sim':
+        GameState.netSim = !GameState.netSim; render(); break;
+      case 'net-hotspot':
+        GameState.netHotspot = !GameState.netHotspot; render(); break;
+      case 'speedtest':
+        sounds.vibrate(30);
+        alert('Speedtest: загрузка 480 Мбит/с, отдача 96 Мбит/с, ping 6 мс.');
+        break;
+      case 'adbd':
+        sounds.vibrate(40);
+        alert('adbd: демон перезапущен, порт 5555 слушает подключения.');
+        break;
+      case 'boot-state':
+        alert(GameState.bootloaderUnlocked ? 'Загрузчик разблокирован. OEM Unlock активен.' : 'Загрузчик заблокирован. Разблокировка — только через Fastboot.');
+        break;
+      case 'android-egg':
+        sounds.vibrate(30);
+        eggTapCount++;
+        if (eggTapCount >= 3) {
+          eggTapCount = 0;
+          currentView = 'easter_egg';
+          render();
+        }
+        break;
+      case 'build-tap': {
+        if (GameState.developerUnlocked) {
+          alert('Режим разработчика уже активирован.');
+          break;
+        }
+        GameState.buildTapCount++;
+        sounds.vibrate(35);
+        const hint = document.getElementById('st-build-hint');
+        const left = 7 - GameState.buildTapCount;
+        if (left > 0) {
+          if (hint) hint.textContent = `Осталось шагов: ${left}`;
+        } else {
+          GameState.developerUnlocked = true;
+          sounds.bootChime();
+          sounds.vibrate(150);
+          if (hint) hint.textContent = '🎉 Режим разработчика активирован!';
+          alert('🎉 Меню «Для разработчиков» разблокировано.');
+        }
+        break;
+      }
+      case 'reboot-system':
         closeFullscreenApp(true);
         bootDevice();
-      }
-    };
-  }
+        break;
+      case 'reboot-recovery':
+        closeFullscreenApp(true);
+        bootToRecovery();
+        break;
+      case 'reboot-bootloader':
+        closeFullscreenApp(true);
+        bootToFastboot();
+        break;
+      case 'reboot-edl':
+        closeFullscreenApp(true);
+        setScreenState('CRASHDUMP');
+        break;
+      case 'wipe-dalvik':
+        sounds.vibrate(30);
+        alert('🧹 Dalvik / ART Cache очищен. Кэш приложений сброшен.');
+        break;
+      case 'factory-reset':
+        sounds.errorTone();
+        sounds.vibrate(60);
+        if (confirm('⚠️ ВНИМАНИЕ! Это сотрёт все данные пользователя (/data) и настройки. Продолжить?')) {
+          GameState.phoneStorage.clear();
+          GameState.modules.clear();
+          closeFullscreenApp(true);
+          bootDevice();
+        }
+        break;
+    }
+  };
 
-  // === 9. EASTER EGG VIEW ===
-  function renderEasterEggView() {
-    container.innerHTML = `
-      <div class="settings-container" style="text-align:center; padding:30px 10px;">
-        <div style="font-size:72px; animation:boot-pulse 1.5s infinite;">🚀</div>
-        <div style="font-size:24px; font-weight:900; color:#00f2fe; margin-top:12px;">Android 14</div>
-        <div style="font-size:14px; color:#94a3b8; margin-top:4px;">UpsideDownCake • Space Rocket Mission</div>
-        
-        <div style="background:#161d2b; border:1px solid #28354c; border-radius:18px; padding:18px; margin:24px 0; text-align:left;">
-          <div style="color:#00e676; font-weight:700; font-size:13px; margin-bottom:6px;">🛰️ Полет нормальный!</div>
-          <div style="font-size:12px; color:#cbd5e1; line-height:1.5;">
-            Вы открыли секретную пасхалку Android 14. Смартфон POCO X3 Pro (vayu) успешно синхронизирован со станцией моддинга 4PDA.
-          </div>
-        </div>
-
-        <button id="btn-exit-easter-egg" class="rec-big-btn" style="display:inline-block; width:auto; padding:12px 30px;">
-          ← Назад в настройки
-        </button>
-      </div>
-    `;
-
-    document.getElementById('btn-exit-easter-egg').onclick = () => {
-      sounds.click();
-      currentView = 'about';
-      render();
-    };
-  }
-
-  // Initial render
   render();
 }
 
-// --- APP: RICH LINUX BASH TERMUX ---
 function renderTermuxApp(container) {
   let isSuSession = false;
   container.innerHTML = `

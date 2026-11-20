@@ -710,215 +710,288 @@ html, body {
   margin: 10px 0;
 }
 
-/* ================= STATE 5: DRAMATICALLY DISTINCT OS VISUALS ================= */
+/* ================= STATE 5: AUTHENTIC OS SHELLS =================
+   Each ROM renders its own launcher language: HyperOS, Pixel, LineageOS,
+   crDroid, Evolution X and Kali NetHunter. No shared "glass dashboard" look.
+*/
 #screen-os {
   background: #000;
-  transition: background 0.4s ease;
+  transition: background 0.45s ease;
+  --os-fg: #ffffff;
+  --os-muted: rgba(255, 255, 255, 0.62);
+  --os-accent: #ffffff;
 }
 
-/* 1. XIAOMI HYPEROS: Crystal Blue glass & Mi style */
-#screen-os.theme-hyperos {
-  background: linear-gradient(160deg, #102a5c 0%, #081226 60%, #030611 100%);
+/* ---------- 1. XIAOMI HYPEROS ---------- */
+#screen-os[data-os="hyperos"] {
+  background:
+    radial-gradient(95% 65% at 12% 0%, #24407a 0%, rgba(36, 64, 122, 0) 55%),
+    radial-gradient(75% 55% at 92% 12%, #472a63 0%, rgba(71, 42, 99, 0) 52%),
+    linear-gradient(168deg, #0b1529 0%, #070c17 55%, #02040a 100%);
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --os-accent: #7ea6ff;
 }
-#screen-os.theme-hyperos .os-statusbar {
-  font-family: -apple-system, sans-serif;
-  color: #ffffff;
+#screen-os[data-os="hyperos"] .os-statusbar { color: #fff; font-weight: 600; }
+#screen-os[data-os="hyperos"] .os-dock-bar {
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 32px;
+  margin: 0 14px 10px;
+  padding: 10px 10px;
+  backdrop-filter: blur(26px) saturate(140%);
 }
-#screen-os.theme-hyperos .os-dock-bar {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-}
-#screen-os.theme-hyperos .dock-icon {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-}
-#screen-os.theme-hyperos .app-icon-squircle {
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
+#screen-os[data-os="hyperos"] .dock-squircle { border-radius: 16px; }
+#screen-os[data-os="hyperos"] .app-icon-squircle { border-radius: 24px; }
+#screen-os[data-os="hyperos"] .app-label { color: #eef2ff; font-weight: 500; }
 
-/* 2. GOOGLE PIXELOS: Pastel Material You & Google Search Bar */
-#screen-os.theme-pixel {
-  background: linear-gradient(165deg, #2a2c3a 0%, #1c1d28 40%, #12131b 100%);
+/* ---------- 2. GOOGLE PIXEL / PIXELOS ---------- */
+#screen-os[data-os="pixel"] {
+  background:
+    radial-gradient(80% 55% at 50% 0%, #23303d 0%, rgba(35, 48, 61, 0) 60%),
+    linear-gradient(180deg, #17191d 0%, #101114 60%, #0a0a0c 100%);
+  font-family: "Google Sans", "Product Sans", -apple-system, Roboto, sans-serif;
+  --os-accent: #a8c7fa;
 }
-#screen-os.theme-pixel .os-statusbar {
-  font-family: "Google Sans", -apple-system, sans-serif;
-  color: #d1e4ff;
-}
-#screen-os.theme-pixel .os-dock-bar {
+#screen-os[data-os="pixel"] .os-statusbar { color: #e7e9ee; font-weight: 600; }
+#screen-os[data-os="pixel"] .os-dock-bar {
   background: transparent;
-  backdrop-filter: none;
   border: none;
   box-shadow: none;
+  padding: 6px 14px 2px;
 }
-#screen-os.theme-pixel .dock-icon {
-  background: #323544;
+#screen-os[data-os="pixel"] .dock-icon { width: 58px; height: 58px; }
+#screen-os[data-os="pixel"] .dock-squircle {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  color: #d1e4ff;
+  box-shadow: none;
 }
-#screen-os.theme-pixel .app-icon-squircle {
+#screen-os[data-os="pixel"] .app-icon-squircle {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: #2b2e3b !important;
-  color: #a8c7fa !important;
-  border: 1px solid rgba(168, 199, 250, 0.2);
+  box-shadow: none;
 }
-#screen-os.theme-pixel .app-label {
-  color: #d1e4ff;
-}
-.pixel-search-bar {
+#screen-os[data-os="pixel"] .app-label { color: #e3e5ea; font-weight: 400; }
+#screen-os[data-os="pixel"] .pixel-search-bar {
   display: flex;
   align-items: center;
-  background: #272a36;
-  border-radius: 28px;
-  padding: 10px 16px;
-  margin: 0 10px 10px;
   gap: 10px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  background: #2a2b2f;
+  border-radius: 30px;
+  padding: 13px 18px;
+  margin: 0 10px 12px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 .pixel-search-bar .search-g {
-  font-weight: 900;
-  font-size: 18px;
-  background: linear-gradient(135deg, #4285F4, #EA4335, #FBBC05, #34A853);
+  font-weight: 700;
+  font-size: 17px;
+  background: linear-gradient(135deg, #4285f4, #ea4335, #fbbc05, #34a853);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.pixel-search-bar .search-text {
-  flex: 1;
-  font-size: 11.5px;
-  color: #8e919e;
-}
-.pixel-search-bar .search-icons {
-  display: flex;
-  gap: 8px;
-  font-size: 15px;
-}
+.pixel-search-bar .search-text { flex: 1; font-size: 12.5px; color: #a6a9b1; }
+.pixel-search-bar .search-icons { display: flex; gap: 10px; color: #cfd2da; }
 
-/* 3. LINEAGEOS: Clean Minimalist AOSP Teal */
-#screen-os.theme-lineage {
-  background: linear-gradient(155deg, #063c32 0%, #071f1a 50%, #030d0a 100%);
+/* ---------- 3. LINEAGEOS (Trebuchet / AOSP) ---------- */
+#screen-os[data-os="lineage"] {
+  background:
+    radial-gradient(70% 45% at 50% 0%, #0f3b38 0%, rgba(15, 59, 56, 0) 62%),
+    linear-gradient(180deg, #0d1414 0%, #0a0f10 55%, #050708 100%);
+  font-family: -apple-system, Roboto, sans-serif;
+  --os-accent: #4dd0c4;
 }
-#screen-os.theme-lineage .os-dock-bar {
-  background: rgba(6, 60, 50, 0.4);
-  border-radius: 18px;
-  border: 1px solid #167c80;
+#screen-os[data-os="lineage"] .os-statusbar { color: #e8f1f0; font-weight: 500; }
+#screen-os[data-os="lineage"] .os-time { letter-spacing: -0.2px; }
+#screen-os[data-os="lineage"] .os-dock-bar {
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(77, 208, 196, 0.12);
+  border-radius: 22px;
+  margin: 0 16px 8px;
+  padding: 9px 12px;
 }
-#screen-os.theme-lineage .app-icon-squircle {
-  border-radius: 50%;
-  border: 2px solid #167c80;
-}
-#screen-os.theme-lineage .dock-icon {
-  background: #064e43;
-  border-radius: 50%;
-}
+#screen-os[data-os="lineage"] .dock-squircle { border-radius: 50%; }
+#screen-os[data-os="lineage"] .app-icon-squircle { border-radius: 50%; }
+#screen-os[data-os="lineage"] .app-label { color: #dbe7e5; }
 
-/* 4. CRDROID: Cyberpunk Gaming 120 FPS HUD */
-#screen-os.theme-crdroid {
-  background: radial-gradient(circle at 50% 30%, #580c27 0%, #1e030e 55%, #080004 100%);
-}
-#screen-os.theme-crdroid .os-statusbar {
-  color: #ff3366;
+/* ---------- 4. CRDROID (gaming, red) ---------- */
+#screen-os[data-os="crdroid"] {
+  background:
+    radial-gradient(80% 50% at 50% 18%, #45091a 0%, rgba(69, 9, 26, 0) 62%),
+    linear-gradient(180deg, #12040a 0%, #0a0205 60%, #050103 100%);
   font-family: var(--font-mono);
+  --os-accent: #ff2d55;
 }
-#screen-os.theme-crdroid .os-dock-bar {
-  background: #14050b;
-  border-radius: 14px;
-  border: 1.5px solid #ff3366;
-  box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
-}
-#screen-os.theme-crdroid .dock-icon {
-  background: #250714;
-  border: 1px solid #ff3366;
-  border-radius: 10px;
-}
-#screen-os.theme-crdroid .app-icon-squircle {
-  border-radius: 10px;
-  border: 1.5px solid #ff3366;
-  box-shadow: 0 0 12px rgba(255, 51, 102, 0.4);
-}
-.crdroid-hud-box {
-  background: rgba(20, 5, 11, 0.85);
-  border: 1px solid #ff3366;
-  border-radius: 10px;
-  padding: 8px 12px;
-  display: flex;
-  justify-content: space-around;
+#screen-os[data-os="crdroid"] .os-statusbar {
+  color: #ff5c7c;
   font-family: var(--font-mono);
-  font-size: 10px;
-  color: #ff99bb;
-  margin-bottom: 12px;
-  box-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+  font-size: 11px;
+  letter-spacing: 0.2px;
 }
-
-/* 5. EVOLUTION X: Neon Violet Gradient Themer */
-#screen-os.theme-evolution {
-  background: linear-gradient(150deg, #4c1d95 0%, #2e1065 45%, #0f0426 100%);
-}
-#screen-os.theme-evolution .os-dock-bar {
-  background: rgba(76, 29, 149, 0.35);
-  border: 1.5px solid #c084fc;
-  border-radius: 24px;
-  box-shadow: 0 0 25px rgba(192, 132, 252, 0.35);
-}
-#screen-os.theme-evolution .dock-icon {
-  background: #3b0764;
+#screen-os[data-os="crdroid"] .os-dock-bar {
+  background: #0e0508;
+  border: 1px solid #ff2d55;
   border-radius: 14px;
-  border: 1px solid #a855f7;
+  margin: 0 14px 8px;
+  box-shadow: 0 0 18px rgba(255, 45, 85, 0.22);
 }
-#screen-os.theme-evolution .app-icon-squircle {
-  border-radius: 18px;
-  border: 2px solid #c084fc;
-  box-shadow: 0 0 12px rgba(192, 132, 252, 0.4);
+#screen-os[data-os="crdroid"] .dock-squircle { border-radius: 11px; border: 1px solid rgba(255, 45, 85, 0.5); }
+#screen-os[data-os="crdroid"] .app-icon-squircle {
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255, 45, 85, 0.45);
 }
+#screen-os[data-os="crdroid"] .app-label { color: #ff9db1; font-family: var(--font-mono); font-size: 9.5px; }
 
-/* 6. KALI NETHUNTER: Hacker Cyber Terminal UI */
-#screen-os.theme-kali {
-  background: #040909;
+/* ---------- 5. EVOLUTION X ---------- */
+#screen-os[data-os="evolution"] {
+  background:
+    radial-gradient(85% 60% at 50% 0%, #3c1e66 0%, rgba(60, 30, 102, 0) 62%),
+    linear-gradient(180deg, #120c1d 0%, #0b0713 60%, #050308 100%);
+  font-family: "Google Sans", Roboto, sans-serif;
+  --os-accent: #c9a7ff;
+}
+#screen-os[data-os="evolution"] .os-statusbar { color: #ece5ff; }
+#screen-os[data-os="evolution"] .os-dock-bar {
+  background: rgba(201, 167, 255, 0.09);
+  border: 1px solid rgba(201, 167, 255, 0.22);
+  border-radius: 30px;
+  margin: 0 16px 8px;
+  padding: 9px 12px;
+  backdrop-filter: blur(20px);
+}
+#screen-os[data-os="evolution"] .dock-squircle { border-radius: 17px; }
+#screen-os[data-os="evolution"] .app-icon-squircle { border-radius: 20px; }
+#screen-os[data-os="evolution"] .app-label { color: #e9ddff; }
+
+/* ---------- 6. KALI NETHUNTER ---------- */
+#screen-os[data-os="kali"] {
+  background: #040806;
   background-image:
-    linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-#screen-os.theme-kali .os-statusbar {
+    linear-gradient(rgba(57, 255, 136, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57, 255, 136, 0.035) 1px, transparent 1px);
+  background-size: 26px 26px;
   font-family: var(--font-mono);
-  color: #00f2fe;
+  --os-accent: #39ff88;
 }
-#screen-os.theme-kali .os-dock-bar {
-  background: #081414;
-  border: 1px solid #00f2fe;
-  border-radius: 4px;
-  box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
-}
-#screen-os.theme-kali .dock-icon {
-  background: #030a0a;
-  border-radius: 4px;
-  border: 1px solid #00f2fe;
-}
-#screen-os.theme-kali .app-icon-squircle {
-  border-radius: 4px;
-  background: #030909 !important;
-  border: 1px solid #00f2fe;
-  color: #00f2fe !important;
-  box-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
-}
-#screen-os.theme-kali .app-label {
-  font-family: var(--font-mono);
-  color: #00f2fe;
-  font-size: 9.5px;
-}
-.kali-terminal-widget {
-  background: #040a0a;
-  border: 1px solid #00f2fe;
-  border-radius: 6px;
-  padding: 10px 12px;
+#screen-os[data-os="kali"] .os-statusbar {
+  color: #35d0ff;
   font-family: var(--font-mono);
   font-size: 10.5px;
-  color: #39ff14;
-  line-height: 1.5;
-  box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+}
+#screen-os[data-os="kali"] .os-dock-bar {
+  background: #05100a;
+  border: 1px solid #1d5c38;
+  border-radius: 4px;
+  margin: 0 14px 8px;
+}
+#screen-os[data-os="kali"] .dock-squircle { border-radius: 5px; border: 1px solid rgba(57, 255, 136, 0.35); }
+#screen-os[data-os="kali"] .app-icon-squircle {
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px rgba(57, 255, 136, 0.35);
+}
+#screen-os[data-os="kali"] .app-label { color: #39ff88; font-family: var(--font-mono); font-size: 9px; }
+
+/* ---------- Per-OS widget language ---------- */
+.hx-clock-line { font-size: 60px; font-weight: 200; letter-spacing: -2.5px; line-height: 1; color: #fff; }
+.hx-clock-line b { font-weight: 300; }
+.hx-date-line { font-size: 13px; color: rgba(255, 255, 255, 0.78); margin-top: 8px; }
+.hx-chip-row { display: flex; justify-content: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.hx-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 40px;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: #fff;
+}
+
+.px-glance {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13.5px; font-weight: 500; color: #c9ccd4;
+  padding: 0 6px; margin-bottom: 14px;
+}
+.px-clock { font-size: 76px; font-weight: 300; line-height: 0.88; letter-spacing: -4px; color: #eef0f4; }
+.px-clock span { display: block; }
+.px-date-line { font-size: 13px; color: #a9acb5; margin-top: 10px; }
+
+.ln-widget-line { font-size: 44px; font-weight: 600; letter-spacing: -1px; color: #eef6f5; }
+.ln-weekday { font-size: 12.5px; color: #9db6b3; margin-top: 3px; }
+.ln-trust-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 12px;
+  background: rgba(77, 208, 196, 0.10);
+  border: 1px solid rgba(77, 208, 196, 0.28);
+  border-radius: 40px;
+  padding: 5px 12px;
+  font-size: 10.5px;
+  color: #7fe3d8;
+}
+
+.cr-hero-hud {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  border: 1px solid rgba(255, 45, 85, 0.5);
+  background: rgba(14, 5, 8, 0.9);
+  border-radius: 12px;
+  padding: 10px;
   margin-bottom: 14px;
 }
+.cr-hero-hud div { text-align: center; }
+.cr-hero-hud b { display: block; font-size: 14px; color: #ff2d55; }
+.cr-hero-hud span { font-size: 8.5px; color: #b07d89; letter-spacing: 0.5px; }
+.cr-clock { font-size: 40px; font-weight: 700; color: #ff2d55; letter-spacing: 2px; text-shadow: 0 0 18px rgba(255, 45, 85, 0.45); }
+.cr-tag { font-size: 10px; color: #b07d89; letter-spacing: 1.5px; margin-top: 4px; }
+
+.ev-clock {
+  font-size: 44px; font-weight: 800; letter-spacing: -1.5px;
+  background: linear-gradient(120deg, #e2c8ff, #8b5cf6 55%, #6ee7f9);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ev-tag {
+  display: inline-block; margin-top: 10px;
+  font-size: 10px; letter-spacing: 1.5px; color: #c9a7ff;
+  border: 1px solid rgba(201, 167, 255, 0.35);
+  border-radius: 30px; padding: 4px 12px;
+}
+
+.kali-terminal-widget {
+  background: #040a06;
+  border: 1px solid #1d5c38;
+  border-radius: 3px;
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: #9dd7b2;
+  line-height: 1.55;
+  box-shadow: 0 0 16px rgba(57, 255, 136, 0.08);
+  text-align: left;
+}
+.kali-terminal-widget .k-prompt { color: #39ff88; }
+.kali-terminal-widget .k-ok { color: #35d0ff; }
+.kali-terminal-widget .k-dim { color: #578066; }
+.kali-banner { font-size: 9px; letter-spacing: 2px; color: #39ff88; text-align: center; margin-top: 10px; opacity: 0.8; }
+
+/* Per-OS navigation mode */
+.os-gesture-bar {
+  display: none;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+}
+.os-gesture-bar i {
+  width: 112px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.72);
+}
+#screen-os[data-os="hyperos"] .os-gesture-bar,
+#screen-os[data-os="pixel"] .os-gesture-bar,
+#screen-os[data-os="evolution"] .os-gesture-bar { display: flex; }
+#screen-os[data-os="hyperos"] .os-nav-bar,
+#screen-os[data-os="pixel"] .os-nav-bar,
+#screen-os[data-os="evolution"] .os-nav-bar { display: none; }
+#screen-os[data-os="kali"] .os-nav-bar { color: #39ff88; }
 
 /* Universal OS Status Bar */
 .os-statusbar {
@@ -2302,4 +2375,519 @@ html, body {
   resize: none;
   outline: none;
   box-sizing: border-box;
+}
+
+/* ========================================================
+   AUTHENTIC PER-OS SETTINGS
+   The settings app changes its whole layout language with the ROM:
+   HyperOS (light MIUI cards), Pixel (Material You text rows),
+   LineageOS (AOSP list), crDroid (red gaming), Evolution (Evolver),
+   Kali NetHunter (terminal).
+   ======================================================== */
+.os-app-window.settings-open .app-window-content { padding: 0; }
+.os-app-window.settings-open .app-window-header {
+  background: var(--st-appbar, #16181d);
+  color: var(--st-appbar-fg, #fff);
+  border-bottom: 1px solid var(--st-appbar-line, rgba(255, 255, 255, 0.06));
+  min-height: 50px;
+  padding: 10px 14px;
+}
+.os-app-window.settings-open .app-window-title { font-size: 15px; font-weight: 600; }
+.os-app-window.settings-open .app-back-btn,
+.os-app-window.settings-open .app-close-btn { color: var(--st-appbar-fg, #fff); }
+
+.os-app-window[data-os="hyperos"] {
+  --st-bg: #f4f5f7;
+  --st-card: #ffffff;
+  --st-text: #111214;
+  --st-sub: #8a8f98;
+  --st-line: #eef0f3;
+  --st-accent: #3482ff;
+  --st-search: #eceef2;
+  --st-radius: 16px;
+  --st-appbar: #ffffff;
+  --st-appbar-fg: #111214;
+  --st-appbar-line: #eceef1;
+  --st-font: -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.os-app-window[data-os="pixel"] {
+  --st-bg: #131314;
+  --st-card: #1e1f20;
+  --st-text: #e8eaed;
+  --st-sub: #9aa0a6;
+  --st-line: #2c2d2f;
+  --st-accent: #a8c7fa;
+  --st-search: #2b2c2f;
+  --st-radius: 28px;
+  --st-appbar: #131314;
+  --st-appbar-fg: #e8eaed;
+  --st-appbar-line: #26272a;
+  --st-font: "Google Sans", Roboto, -apple-system, sans-serif;
+}
+.os-app-window[data-os="lineage"] {
+  --st-bg: #141514;
+  --st-card: #1f201f;
+  --st-text: #e9eeec;
+  --st-sub: #9aa5a2;
+  --st-line: #2b2d2c;
+  --st-accent: #4dd0c4;
+  --st-search: #232524;
+  --st-radius: 10px;
+  --st-appbar: #141514;
+  --st-appbar-fg: #e9eeec;
+  --st-appbar-line: #262827;
+  --st-font: Roboto, -apple-system, sans-serif;
+}
+.os-app-window[data-os="crdroid"] {
+  --st-bg: #0b0709;
+  --st-card: #161014;
+  --st-text: #f2e6e9;
+  --st-sub: #a07b84;
+  --st-line: #2b171d;
+  --st-accent: #ff2d55;
+  --st-search: #160d11;
+  --st-radius: 14px;
+  --st-appbar: #0e0508;
+  --st-appbar-fg: #ff9db1;
+  --st-appbar-line: #3a111c;
+  --st-font: var(--font-mono);
+}
+.os-app-window[data-os="evolution"] {
+  --st-bg: #0f0b15;
+  --st-card: #1a1424;
+  --st-text: #f0eaff;
+  --st-sub: #a79ab8;
+  --st-line: #2b2138;
+  --st-accent: #c9a7ff;
+  --st-search: #1d1629;
+  --st-radius: 24px;
+  --st-appbar: #120d1a;
+  --st-appbar-fg: #efe6ff;
+  --st-appbar-line: #2b2138;
+  --st-font: "Google Sans", Roboto, sans-serif;
+}
+.os-app-window[data-os="kali"] {
+  --st-bg: #050a07;
+  --st-card: rgba(6, 16, 10, 0.86);
+  --st-text: #b9e8c8;
+  --st-sub: #5d8a6d;
+  --st-line: #173624;
+  --st-accent: #39ff88;
+  --st-search: #07110b;
+  --st-radius: 3px;
+  --st-appbar: #04100a;
+  --st-appbar-fg: #39ff88;
+  --st-appbar-line: #1d4a30;
+  --st-font: var(--font-mono);
+}
+
+.st {
+  min-height: 100%;
+  background: var(--st-bg);
+  color: var(--st-text);
+  font-family: var(--st-font);
+  padding: 10px 16px 34px;
+  box-sizing: border-box;
+}
+.os-app-window[data-os="kali"] .st {
+  background-image:
+    linear-gradient(rgba(57, 255, 136, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57, 255, 136, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.st-shell { max-width: 620px; margin: 0 auto; }
+
+/* Search */
+.st-search { position: relative; margin: 2px 0 16px; }
+.st-search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: var(--st-search);
+  color: var(--st-text);
+  border-radius: var(--st-radius);
+  padding: 13px 16px 13px 44px;
+  font: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.st-search input::placeholder { color: var(--st-sub); }
+.st-search .st-search-ic {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  color: var(--st-sub);
+  pointer-events: none;
+}
+.st-search .st-search-ic svg { width: 17px; height: 17px; }
+
+/* Sections and rows */
+.st-section { margin: 0 0 18px; }
+.st-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--st-sub);
+  margin: 0 6px 8px;
+}
+.st-card {
+  background: var(--st-card);
+  border-radius: var(--st-radius);
+  overflow: hidden;
+}
+.st-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--st-line);
+  cursor: pointer;
+  transition: background 0.14s;
+  -webkit-tap-highlight-color: transparent;
+}
+.st-row:last-child { border-bottom: none; }
+.st-row:active { background: rgba(127, 127, 127, 0.09); }
+.st-ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(127, 127, 127, 0.10);
+  color: var(--st-accent);
+}
+.st-ic svg { width: 19px; height: 19px; }
+.st-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.st-title { font-size: 14.5px; font-weight: 500; line-height: 1.25; }
+.st-sub { font-size: 11.8px; color: var(--st-sub); margin-top: 2px; line-height: 1.3; }
+.st-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 6px; }
+.st-value { font-size: 12px; color: var(--st-sub); white-space: nowrap; }
+.st-chev { font-size: 19px; color: var(--st-sub); opacity: 0.7; line-height: 1; }
+.st-row.danger .st-title { color: #ff4d5e; }
+.st-row.danger .st-ic { background: rgba(255, 77, 94, 0.14); color: #ff4d5e; }
+
+/* Toggle */
+.st-switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border-radius: 12px;
+  background: #cbd0d8;
+  flex-shrink: 0;
+  transition: background 0.18s;
+}
+.st-switch i {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
+  transition: transform 0.18s;
+}
+.st-switch.on { background: var(--st-accent); }
+.st-switch.on i { transform: translateX(18px); }
+
+/* Subpage hero */
+.st-hero {
+  padding: 20px 16px;
+  text-align: center;
+  background: var(--st-card);
+  border-radius: var(--st-radius);
+  margin-bottom: 18px;
+}
+.st-hero-ic {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(127, 127, 127, 0.10);
+  color: var(--st-accent);
+}
+.st-hero-ic svg { width: 30px; height: 30px; }
+.st-hero-title { font-size: 19px; font-weight: 700; }
+.st-hero-desc { font-size: 12.5px; color: var(--st-sub); margin-top: 5px; line-height: 1.45; }
+
+/* Option tiles */
+.st-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 16px; }
+.st-tile {
+  border: 1.5px solid var(--st-line);
+  border-radius: 12px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  background: transparent;
+  color: var(--st-text);
+  transition: all 0.15s;
+}
+.st-tile.active { border-color: var(--st-accent); background: rgba(127, 127, 127, 0.10); }
+.st-tile-title { font-size: 14px; font-weight: 700; }
+.st-tile-sub { font-size: 10px; color: var(--st-sub); margin-top: 2px; }
+
+/* Battery gauge */
+.st-gauge { text-align: center; padding: 24px 16px 20px; }
+.st-gauge-num { font-size: 46px; font-weight: 800; color: #21c46a; line-height: 1; }
+.st-gauge-label { font-size: 12px; color: var(--st-sub); margin-top: 6px; }
+.st-gauge-meta { display: flex; justify-content: center; gap: 16px; margin-top: 14px; font-size: 11px; color: var(--st-sub); flex-wrap: wrap; }
+
+/* ========== HYPEROS ========== */
+.os-app-window[data-os="hyperos"] .st { background: #f4f5f7; }
+.os-app-window[data-os="hyperos"] .st-card {
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(17, 18, 20, 0.04);
+}
+.os-app-window[data-os="hyperos"] .st-section-title { font-size: 12px; color: #9a9fa8; margin-left: 4px; }
+.os-app-window[data-os="hyperos"] .st-row { padding: 13px 16px; gap: 13px; }
+.os-app-window[data-os="hyperos"] .st-ic {
+  width: 37px; height: 37px; border-radius: 11px;
+  background: var(--ic, #3482ff);
+  color: #fff;
+}
+.os-app-window[data-os="hyperos"] .st-title { font-size: 15px; font-weight: 500; }
+.os-app-window[data-os="hyperos"] .st-sub { font-size: 12px; color: #8a8f98; }
+.os-app-window[data-os="hyperos"] .st-chev { color: #c4c8cf; }
+.os-app-window[data-os="hyperos"] .st-search input { border-radius: 22px; }
+.os-app-window[data-os="hyperos"] .st-hero { background: #fff; box-shadow: 0 1px 2px rgba(17,18,20,.04); }
+.os-app-window[data-os="hyperos"] .st-hero-ic { background: #e8f0ff; color: #3482ff; border-radius: 20px; }
+.os-app-window[data-os="hyperos"] .st-switch { background: #d6dae1; }
+.os-app-window[data-os="hyperos"] .st-switch.on { background: #3482ff; }
+
+/* HyperOS header blocks */
+.hx-account {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 4px 14px;
+}
+.hx-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, #ff8a3d, #ff5a3d);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 17px;
+}
+.hx-account-name { font-size: 15px; font-weight: 600; color: #111214; }
+.hx-account-sub { font-size: 11.5px; color: #8a8f98; margin-top: 1px; }
+.hx-account-badge {
+  margin-left: auto; font-size: 10px; color: #3482ff;
+  background: #e8f0ff; border-radius: 20px; padding: 3px 9px; font-weight: 600;
+}
+.hx-device {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border-radius: 18px; padding: 16px;
+  box-shadow: 0 1px 2px rgba(17, 18, 20, 0.04);
+  margin-bottom: 18px; cursor: pointer;
+}
+.hx-device-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: linear-gradient(135deg, #ff9f43, #ff6b35);
+  color: #fff; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  letter-spacing: -0.3px;
+}
+.hx-device-title { font-size: 15px; font-weight: 600; color: #111214; }
+.hx-device-sub { font-size: 11.5px; color: #8a8f98; margin-top: 2px; }
+.hx-device-arrow { margin-left: auto; color: #c4c8cf; font-size: 20px; }
+.hx-device-bar { height: 5px; border-radius: 3px; background: #eef0f3; margin-top: 8px; overflow: hidden; }
+.hx-device-bar i { display: block; height: 100%; background: #3482ff; border-radius: 3px; }
+
+/* ========== PIXEL ========== */
+.os-app-window[data-os="pixel"] .st { padding-top: 4px; }
+.os-app-window[data-os="pixel"] .st-section-title {
+  color: var(--st-accent);
+  font-size: 12.5px;
+  font-weight: 500;
+  margin: 0 8px 8px;
+}
+.os-app-window[data-os="pixel"] .st-row { padding: 17px 20px; gap: 12px; }
+.os-app-window[data-os="pixel"] .st-ic { display: none; }
+.os-app-window[data-os="pixel"] .st-title { font-size: 16px; font-weight: 400; }
+.os-app-window[data-os="pixel"] .st-sub { font-size: 13px; color: #9aa0a6; margin-top: 3px; }
+.os-app-window[data-os="pixel"] .st-value { font-size: 13px; }
+.os-app-window[data-os="pixel"] .st-chev { font-size: 20px; color: #8f939a; }
+.os-app-window[data-os="pixel"] .st-card { border-radius: 28px; }
+.os-app-window[data-os="pixel"] .st-switch { background: #3c4043; }
+.os-app-window[data-os="pixel"] .st-switch.on { background: #a8c7fa; }
+.os-app-window[data-os="pixel"] .st-switch.on i { background: #0b1b34; }
+.os-app-window[data-os="pixel"] .st-hero { background: transparent; padding: 10px 8px 18px; text-align: left; }
+.os-app-window[data-os="pixel"] .st-hero-ic { margin: 0 0 12px; background: rgba(168, 199, 250, 0.14); color: #a8c7fa; border-radius: 50%; }
+.os-app-window[data-os="pixel"] .st-tile { border-radius: 20px; }
+.px-head { padding: 4px 6px 12px; }
+.px-title { font-size: 26px; font-weight: 400; letter-spacing: -0.5px; color: #e8eaed; }
+.px-sub { font-size: 12.5px; color: #9aa0a6; margin-top: 4px; }
+
+/* ========== LINEAGEOS ========== */
+.os-app-window[data-os="lineage"] .st-section-title {
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.9px;
+  color: #9aa5a2;
+}
+.os-app-window[data-os="lineage"] .st-ic {
+  border-radius: 50%;
+  background: rgba(77, 208, 196, 0.11);
+  color: #4dd0c4;
+  width: 34px; height: 34px;
+}
+.os-app-window[data-os="lineage"] .st-ic svg { width: 17px; height: 17px; }
+.os-app-window[data-os="lineage"] .st-title { font-size: 15px; font-weight: 400; }
+.os-app-window[data-os="lineage"] .st-sub { font-size: 12px; }
+.os-app-window[data-os="lineage"] .st-hero-ic { border-radius: 50%; }
+.os-app-window[data-os="lineage"] .st-switch.on { background: #4dd0c4; }
+.os-app-window[data-os="lineage"] .st-switch.on i { background: #05211f; }
+.ln-trust {
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid rgba(77, 208, 196, 0.26);
+  background: rgba(77, 208, 196, 0.07);
+  border-radius: 12px;
+  padding: 13px 15px;
+  margin-bottom: 18px;
+}
+.ln-trust-ic { color: #4dd0c4; display: flex; }
+.ln-trust-title { font-size: 13px; font-weight: 600; color: #d8f3ef; }
+.ln-trust-sub { font-size: 11px; color: #8aa8a4; margin-top: 2px; }
+
+/* ========== CRDROID ========== */
+.os-app-window[data-os="crdroid"] .st-section-title {
+  color: #ff2d55;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 1.1px;
+}
+.os-app-window[data-os="crdroid"] .st-card {
+  border: 1px solid rgba(255, 45, 85, 0.13);
+  border-radius: 14px;
+}
+.os-app-window[data-os="crdroid"] .st-ic {
+  border-radius: 9px;
+  background: rgba(255, 45, 85, 0.11);
+  color: #ff5c7c;
+  width: 34px; height: 34px;
+}
+.os-app-window[data-os="crdroid"] .st-ic svg { width: 17px; height: 17px; }
+.os-app-window[data-os="crdroid"] .st-title { font-size: 13.5px; font-family: -apple-system, Roboto, sans-serif; font-weight: 600; }
+.os-app-window[data-os="crdroid"] .st-sub { font-size: 11px; }
+.os-app-window[data-os="crdroid"] .st-search input { border: 1px solid #3a111c; font-family: var(--font-mono); font-size: 12.5px; }
+.os-app-window[data-os="crdroid"] .st-switch.on { background: #ff2d55; }
+.os-app-window[data-os="crdroid"] .st-hero { border: 1px solid rgba(255, 45, 85, 0.18); }
+.os-app-window[data-os="crdroid"] .st-tile { border-radius: 8px; }
+.cr-hero {
+  border: 1px solid rgba(255, 45, 85, 0.45);
+  background: linear-gradient(150deg, rgba(255, 45, 85, 0.09), rgba(14, 5, 8, 0.4));
+  border-radius: 14px;
+  padding: 15px 16px;
+  margin-bottom: 18px;
+  font-family: var(--font-mono);
+}
+.cr-hero-top { display: flex; align-items: center; justify-content: space-between; }
+.cr-hero-name { font-size: 15px; font-weight: 700; color: #ff2d55; letter-spacing: 0.5px; }
+.cr-hero-ver { font-size: 9.5px; color: #b07d89; border: 1px solid #4a1622; border-radius: 3px; padding: 2px 6px; }
+.cr-hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; }
+.cr-hero-stats div { text-align: center; background: rgba(255, 45, 85, 0.06); border-radius: 6px; padding: 6px 2px; }
+.cr-hero-stats b { display: block; font-size: 12.5px; color: #ff5c7c; }
+.cr-hero-stats span { font-size: 8px; color: #a07b84; letter-spacing: 0.5px; }
+
+/* ========== EVOLUTION X ========== */
+.os-app-window[data-os="evolution"] .st-section-title {
+  color: #c9a7ff;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.os-app-window[data-os="evolution"] .st-ic {
+  width: 40px; height: 40px;
+  border-radius: 14px;
+  background: rgba(201, 167, 255, 0.12);
+  color: #c9a7ff;
+}
+.os-app-window[data-os="evolution"] .st-title { font-size: 15px; font-weight: 500; }
+.os-app-window[data-os="evolution"] .st-switch.on { background: #c9a7ff; }
+.os-app-window[data-os="evolution"] .st-switch.on i { background: #1b1030; }
+.os-app-window[data-os="evolution"] .st-tile { border-radius: 18px; }
+.ev-hero {
+  border-radius: 24px;
+  padding: 20px;
+  margin-bottom: 18px;
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(201, 167, 255, 0.28), transparent 60%),
+    linear-gradient(150deg, #241735, #150e20);
+  border: 1px solid rgba(201, 167, 255, 0.22);
+}
+.ev-hero-name {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.4px;
+  background: linear-gradient(110deg, #efe2ff, #b98bff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ev-hero-sub { font-size: 11.5px; color: #b9a8ce; margin-top: 4px; }
+.ev-hero-row { display: flex; gap: 8px; margin-top: 14px; }
+.ev-pill { font-size: 10px; color: #e2d3ff; background: rgba(201, 167, 255, 0.13); border-radius: 20px; padding: 4px 10px; }
+
+/* ========== KALI NETHUNTER ========== */
+.os-app-window[data-os="kali"] .st-section-title {
+  color: #39ff88;
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.os-app-window[data-os="kali"] .st-section-title::before { content: "// "; color: #1d6b41; }
+.os-app-window[data-os="kali"] .st-card {
+  border: 1px solid #1d4a30;
+  border-radius: 3px;
+  background: rgba(6, 16, 10, 0.86);
+}
+.os-app-window[data-os="kali"] .st-row { padding: 11px 12px; gap: 8px; }
+.os-app-window[data-os="kali"] .st-ic { display: none; }
+.os-app-window[data-os="kali"] .st-title { font-size: 12.5px; font-family: var(--font-mono); font-weight: 400; }
+.os-app-window[data-os="kali"] .st-title::before { content: "[+] "; color: #39ff88; }
+.os-app-window[data-os="kali"] .st-sub { font-size: 10.5px; font-family: var(--font-mono); color: #5d8a6d; }
+.os-app-window[data-os="kali"] .st-sub::before { content: "    "; white-space: pre; }
+.os-app-window[data-os="kali"] .st-value { color: #35d0ff; font-family: var(--font-mono); font-size: 11px; }
+.os-app-window[data-os="kali"] .st-chev { color: #39ff88; font-size: 15px; }
+.os-app-window[data-os="kali"] .st-search input {
+  border: 1px solid #1d4a30;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: #07110b;
+}
+.os-app-window[data-os="kali"] .st-search input::placeholder { color: #3f6b50; }
+.os-app-window[data-os="kali"] .st-switch { border-radius: 3px; background: #14311f; height: 22px; }
+.os-app-window[data-os="kali"] .st-switch i { border-radius: 2px; background: #39ff88; }
+.os-app-window[data-os="kali"] .st-switch.on { background: #1d6b41; }
+.os-app-window[data-os="kali"] .st-switch.on i { background: #b6ffd2; }
+.os-app-window[data-os="kali"] .st-hero { border: 1px solid #1d4a30; background: rgba(6, 16, 10, 0.86); text-align: left; }
+.os-app-window[data-os="kali"] .st-hero-ic { background: #07110b; border: 1px solid #1d4a30; color: #39ff88; border-radius: 3px; margin: 0 0 12px; }
+.os-app-window[data-os="kali"] .st-hero-title { color: #39ff88; font-family: var(--font-mono); font-size: 16px; }
+.os-app-window[data-os="kali"] .st-hero-desc { font-family: var(--font-mono); font-size: 11px; }
+.os-app-window[data-os="kali"] .st-tile { border-radius: 2px; }
+.os-app-window[data-os="kali"] .st-tile.active { background: rgba(57, 255, 136, 0.08); }
+.kali-hero {
+  border: 1px solid #1d4a30;
+  background: #040a06;
+  border-radius: 3px;
+  padding: 14px;
+  margin-bottom: 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.65;
+  color: #9dd7b2;
+}
+.kali-hero .k-prompt { color: #39ff88; }
+.kali-hero .k-ok { color: #35d0ff; }
+.kali-hero .k-warn { color: #ffcc66; }
+
+/* Search empty state */
+.st-empty { text-align: center; padding: 44px 20px; color: var(--st-sub); font-size: 13px; }
+.st-empty .st-empty-ic { font-size: 34px; opacity: 0.5; margin-bottom: 10px; }
+
+/* Floating simulator controls must never sit on top of an open app */
+#phone-container.app-open .hud-pill-btn,
+#phone-container.app-open .edge-hardware-controls {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
 }

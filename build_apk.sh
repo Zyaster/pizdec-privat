@@ -33,16 +33,18 @@ echo "==> 2. Linking Resources & Generating R.java..."
   --auto-add-overlay
 
 echo "==> 3. Compiling Java Source Files..."
+mapfile -d '' JAVA_SOURCES < <(find "$PROJECT_ROOT/app/src/main/java" "$BUILD_DIR/gen" -name "*.java" -print0)
 javac -source 8 -target 8 \
   -bootclasspath "$ANDROID_JAR" \
   -cp "$ANDROID_JAR" \
   -d "$BUILD_DIR/classes" \
-  $(find "$PROJECT_ROOT/app/src/main/java" "$BUILD_DIR/gen" -name "*.java")
+  "${JAVA_SOURCES[@]}"
 
 echo "==> 4. Converting Bytecode to DEX with D8..."
+mapfile -d '' CLASS_FILES < <(find "$BUILD_DIR/classes" -name "*.class" -print0)
 "$D8" --lib "$ANDROID_JAR" \
   --output "$BUILD_DIR" \
-  $(find "$BUILD_DIR/classes" -name "*.class")
+  "${CLASS_FILES[@]}"
 
 echo "==> 5. Building Unaligned APK with Assets and DEX..."
 cp "$BUILD_DIR/resources.apk" "$BUILD_DIR/unaligned.apk"

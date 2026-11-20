@@ -452,7 +452,7 @@
     </div>
 
     <!-- STATE 5: Active Operating System (100% Fullscreen Interactive Android OS!) -->
-    <div id="screen-os" class="screen-view">
+    <div id="screen-os" class="screen-view" data-os="hyperos">
       <!-- Fullscreen Status Bar -->
       <div class="os-statusbar" id="os-statusbar">
         <span class="os-time" id="os-clock">14:30</span>
@@ -535,6 +535,9 @@
           </div>
         </div>
 
+        <!-- Gesture navigation bar (HyperOS / Pixel / Evolution X) -->
+        <div class="os-gesture-bar" id="os-gesture-bar"><i></i></div>
+
         <!-- Android Navigation Bar (3-Button Navigation) -->
         <div class="os-nav-bar" id="os-nav-bar">
           <button class="nav-key" id="os-key-back" title="Назад">
@@ -550,7 +553,7 @@
       </div>
 
       <!-- In-OS Fullscreen App Window -->
-      <div class="os-app-window" id="os-app-window">
+      <div class="os-app-window" id="os-app-window" data-os="hyperos">
         <div class="app-window-header">
           <div class="app-header-left">
             <button class="app-back-btn" id="app-window-back">
