@@ -313,7 +313,7 @@
 
           <div class="rec-slider-wrapper">
             <div class="rec-slider-track">
-              <div class="rec-slider-handle" id="rec-slider-handle">➔</div>
+              <div class="rec-slider-handle" id="rec-slider-handle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
               <span class="rec-slider-text">Свайп для подтверждения прошивки</span>
             </div>
           </div>
@@ -365,7 +365,7 @@
           <div class="rec-page-header">Restore Backup (Восстановление)</div>
           <div style="background:#161922; border:1px solid #283040; border-radius:10px; padding:12px; margin-bottom:12px; font-size:12px;">
             <div style="padding:10px; background:#222a3a; border-radius:8px; cursor:pointer;" id="item-restore-backup">
-              <b>💾 Poco_X3_Pro_Stock_HyperOS_Nandroid.tar</b>
+              <b>Poco_X3_Pro_Stock_HyperOS_Nandroid.tar</b>
               <div style="font-size:10px; color:#94a3b8; margin-top:2px;">Размер: 5.8 ГБ • Разделы: Boot, System, Vendor</div>
             </div>
           </div>
@@ -401,9 +401,9 @@
         <div class="rec-page" id="rec-page-advanced" style="display:none;">
           <div class="rec-page-header">Advanced Tools (Расширенные инструменты)</div>
           <div class="reboot-grid">
-            <button class="rec-big-btn" id="btn-adv-terminal">💻 Terminal (Командная строка sh)</button>
-            <button class="rec-big-btn" id="btn-adv-fix-permissions">🛡️ Восстановить SELinux контексты</button>
-            <button class="rec-big-btn" id="btn-adv-copy-log">📋 Скопировать лог прошивки в /sdcard</button>
+            <button class="rec-big-btn" id="btn-adv-terminal">Terminal (командная строка sh)</button>
+            <button class="rec-big-btn" id="btn-adv-fix-permissions">Восстановить SELinux-контексты</button>
+            <button class="rec-big-btn" id="btn-adv-copy-log">Скопировать лог прошивки в /sdcard</button>
           </div>
           <button class="rec-nav-back" data-back="main">◀ Назад в главное меню</button>
         </div>
@@ -457,9 +457,13 @@
       <div class="os-statusbar" id="os-statusbar">
         <span class="os-time" id="os-clock">14:30</span>
         <div class="os-icons">
-          <span class="root-badge ksu-badge" id="os-ksu-badge">KernelSU</span>
-          <span class="root-badge magisk-badge" id="os-magisk-badge"># SU</span>
-          <span class="fps-badge" id="os-fps-badge">120 Hz</span>
+          <span class="root-badge ksu-badge" id="os-ksu-badge" title="KernelSU">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </span>
+          <span class="root-badge magisk-badge" id="os-magisk-badge" title="Magisk">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14c1.5 1.6 5.5 1.6 7 0"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>
+          </span>
+          <span class="fps-badge" id="os-fps-badge">120</span>
           
           <!-- Authentic Android 5G Signal Bars -->
           <div class="sb-cellular" title="Мобильная сеть 5G">
@@ -561,7 +565,7 @@
             </button>
             <span class="app-window-title" id="app-window-title">Приложение</span>
           </div>
-          <button class="app-close-btn" id="app-window-close">✕</button>
+          <button class="app-close-btn" id="app-window-close" aria-label="Закрыть"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
         </div>
         <div class="app-window-content" id="app-window-content">
           <!-- Dynamic App Content -->
@@ -602,7 +606,7 @@
           <button class="pc-tab-btn" data-tab="miflash">Mi Flash Tool</button>
           <button class="pc-tab-btn" data-tab="quests">Квесты</button>
         </div>
-        <button class="pc-close-btn" id="btn-close-pc">✕ Закрыть (К смартфону)</button>
+        <button class="pc-close-btn" id="btn-close-pc">Закрыть (к смартфону)</button>
       </div>
 
       <div class="pc-modal-body">
@@ -628,7 +632,7 @@
             <div class="term-input-line">
               <span class="t-prompt">C:\platform-tools&gt;</span>
               <input type="text" id="pc-terminal-input" class="t-input" placeholder="например: fastboot oem unlock" autocomplete="off" spellcheck="false">
-              <button id="pc-terminal-send" class="t-send">Отправить ↵</button>
+              <button id="pc-terminal-send" class="t-send">Отправить</button>
             </div>
           </div>
         </div>
@@ -869,7 +873,7 @@
         <!-- TAB 6: Quests & Progression -->
         <div class="pc-tab-view" id="tab-quests">
           <div class="quests-container">
-            <h3>🏆 Путь Мододела (Квесты 4PDA)</h3>
+            <h3>Путь мододела — квесты 4PDA</h3>
             <p class="q-subtitle">Выполняйте задания, чтобы прокачать статус от «Новичка» до «Легенды ветки vayu»!</p>
             <div class="quests-scroll" id="quests-scroll">
               <!-- Dynamically populated quest cards -->

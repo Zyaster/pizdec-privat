@@ -148,17 +148,17 @@ const GameState = {
 
   // Quests & Progression
   quests: [
-    { id: 'usb', title: '🔌 Подключение к ПК', desc: 'Убедитесь, что USB кабель подключен к ПК', exp: 50, done: true },
-    { id: 'unlock', title: '🔓 Разблокировка загрузчика', desc: 'Перейдите в Fastboot и введите fastboot oem unlock', exp: 150, done: false },
-    { id: 'recovery', title: '🦊 Прошивка рекавери', desc: 'Прошейте TWRP или OrangeFox через Fastboot', exp: 200, done: false },
-    { id: 'wipe', title: '🧹 Очистка Format Data', desc: 'Сделайте Format Data в рекавери для избежания бутлупа', exp: 150, done: false },
-    { id: 'flash_rom', title: '🚀 Установка кастомной ОС', desc: 'Прошейте PixelOS, crDroid, Evolution X или Kali NetHunter', exp: 300, done: false },
-    { id: 'ksu_kernel', title: '👑 Установка ядра с KernelSU', desc: 'Прошейте NoGravityKernel или StormBreaker с поддержкой KSU', exp: 350, done: false },
-    { id: 'ksu_root', title: '🛡️ Активация прав KernelSU', desc: 'Откройте KernelSU Manager и предоставьте root приложению Termux', exp: 250, done: false },
-    { id: 'modules', title: '🧩 Установка модулей Zygisk', desc: 'Установите Play Integrity Fix, Shamiko или ViPER4Android', exp: 200, done: false },
-    { id: 'bank', title: '🏦 Обход банковских защит', desc: 'Изолируйте root через KernelSU или активируйте Play Integrity Fix', exp: 300, done: false },
-    { id: 'fps120', title: '🎮 Разгон PUBG до 120 FPS', desc: 'Запустите игровой тест на crDroid с разогнанным ядром', exp: 400, done: false },
-    { id: 'antutu_record', title: '🔥 Рекорд AnTuTu (1,000,000+)', desc: 'Выбейте миллион очков на StormBreaker Kernel с оверклоком', exp: 500, done: false }
+    { id: 'usb', title: 'Подключение к ПК', desc: 'Убедитесь, что USB кабель подключен к ПК', exp: 50, done: true },
+    { id: 'unlock', title: 'Разблокировка загрузчика', desc: 'Перейдите в Fastboot и введите fastboot oem unlock', exp: 150, done: false },
+    { id: 'recovery', title: 'Прошивка рекавери', desc: 'Прошейте TWRP или OrangeFox через Fastboot', exp: 200, done: false },
+    { id: 'wipe', title: 'Очистка Format Data', desc: 'Сделайте Format Data в рекавери для избежания бутлупа', exp: 150, done: false },
+    { id: 'flash_rom', title: 'Установка кастомной ОС', desc: 'Прошейте PixelOS, crDroid, Evolution X или Kali NetHunter', exp: 300, done: false },
+    { id: 'ksu_kernel', title: 'Установка ядра с KernelSU', desc: 'Прошейте NoGravityKernel или StormBreaker с поддержкой KSU', exp: 350, done: false },
+    { id: 'ksu_root', title: 'Активация прав KernelSU', desc: 'Откройте KernelSU Manager и предоставьте root приложению Termux', exp: 250, done: false },
+    { id: 'modules', title: 'Установка модулей Zygisk', desc: 'Установите Play Integrity Fix, Shamiko или ViPER4Android', exp: 200, done: false },
+    { id: 'bank', title: 'Обход банковских защит', desc: 'Изолируйте root через KernelSU или активируйте Play Integrity Fix', exp: 300, done: false },
+    { id: 'fps120', title: 'Разгон PUBG до 120 FPS', desc: 'Запустите игровой тест на crDroid с разогнанным ядром', exp: 400, done: false },
+    { id: 'antutu_record', title: 'Рекорд AnTuTu (1,000,000+)', desc: 'Выбейте миллион очков на StormBreaker Kernel с оверклоком', exp: 500, done: false }
   ]
 };
 
@@ -393,7 +393,7 @@ function bootToRecovery() {
     checkQuest('recovery');
   } else {
     termLog('Stock Recovery: Кастомное рекавери не установлено! Прошейте twrp_3.7.0.img или orangefox_R11.1.img через Fastboot.', 'warning');
-    alert('⚠️ Stock Recovery: У вас не установлено кастомное рекавери!\n\nПрошейте TWRP или OrangeFox через Fastboot:\nfastboot flash recovery twrp_3.7.0.img');
+    alert('Stock Recovery: У вас не установлено кастомное рекавери!\n\nПрошейте TWRP или OrangeFox через Fastboot:\nfastboot flash recovery twrp_3.7.0.img');
     bootDevice();
   }
 }
@@ -480,7 +480,7 @@ function applyRecoveryTheme() {
   const el = UI.screenRecovery;
   if (GameState.recoveryType === 'orangefox') {
     el.className = 'screen-view active theme-orangefox';
-    UI.recBrandTitle.textContent = '🦊 OrangeFox Recovery Project R11.1';
+    UI.recBrandTitle.textContent = 'OrangeFox Recovery Project R11.1';
   } else {
     el.className = 'screen-view active theme-twrp';
     UI.recBrandTitle.textContent = 'Team Win Recovery Project 3.7.0';
@@ -691,7 +691,7 @@ function bindRecovery() {
     btnAdvLog.addEventListener('click', () => {
       sounds.click();
       sounds.vibrate(25);
-      alert('📋 Лог recovery.log успешно скопирован в /sdcard/recovery.log!');
+      alert('Лог recovery.log успешно скопирован в /sdcard/recovery.log!');
     });
   }
 
@@ -1047,7 +1047,7 @@ function updateOsUI() {
   // Badges in statusbar
   UI.osKsuBadge.classList.toggle('visible', GameState.ksuWorking);
   UI.osMagiskBadge.classList.toggle('visible', GameState.magiskInstalled && !GameState.ksuWorking);
-  UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
+  UI.osFpsBadge.textContent = `${GameState.displayRefreshRate}`;
 
   // Dynamic Widgets per Operating System
   renderOsWidgets(os);
@@ -1059,100 +1059,87 @@ function updateOsUI() {
 function renderOsWidgets(os) {
   const widget = UI.osHeroWidget;
   const now = new Date();
-  const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
   const hours = String(now.getHours()).padStart(2, '0');
   const mins = String(now.getMinutes()).padStart(2, '0');
   const dateStr = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
+  const weather = '21°C, ясно';
 
-  // 1. GOOGLE PIXEL: At a Glance + two-line Material You clock + search pill
+  // 1. GOOGLE PIXEL: At a Glance + двухстрочные часы
   if (os === 'pixel') {
     UI.pixelSearchBar.style.display = 'flex';
     widget.innerHTML = `
       <div class="px-glance">
         <span>${dateStr}</span>
-        <span style="opacity:.5">•</span>
-        <span>−3°C</span>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f5c451" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+        <span class="px-glance-sep">·</span>
+        <span>${weather}</span>
       </div>
       <div class="px-clock"><span>${hours}</span><span>${mins}</span></div>
-      <div class="px-date-line">${dateStr}</div>
-      <div class="hero-kernel-title" style="color:#8e919e;">${GameState.kernelVersion}</div>
     `;
     return;
   }
 
   UI.pixelSearchBar.style.display = 'none';
 
-  // 2. CRDROID: gaming HUD, red terminal readouts
+  // 2. CRDROID: строка системных показателей + часы
   if (os === 'crdroid') {
     widget.innerHTML = `
       <div class="cr-hero-hud">
-        <div><b>${GameState.displayRefreshRate}</b><span>FPS</span></div>
-        <div><b>${GameState.kernel === 'stormbreaker' ? '3.2' : '2.96'}</b><span>GHz</span></div>
-        <div><b>${GameState.kernel === 'stormbreaker' ? '825' : '675'}</b><span>MHz GPU</span></div>
-        <div><b>38°</b><span>TEMP</span></div>
+        <div><b>${GameState.displayRefreshRate}</b><span>ГЦ</span></div>
+        <div><b>${GameState.kernel === 'stormbreaker' ? '3.20' : '2.96'}</b><span>ГГЦ</span></div>
+        <div><b>${GameState.kernel === 'stormbreaker' ? '825' : '675'}</b><span>МГЦ GPU</span></div>
+        <div><b>38°</b><span>CPU</span></div>
       </div>
-      <div class="cr-clock">${timeStr}</div>
-      <div class="cr-tag">// CRDROID 10.5 GAMING EDITION</div>
-      <div class="hero-kernel-title" style="color:#8a5b66;">${GameState.kernelVersion}</div>
+      <div class="cr-clock">${hours}:${mins}</div>
+      <div class="cr-tag">crDroid 10.5 · ${dateStr}</div>
     `;
     return;
   }
 
-  // 3. KALI NETHUNTER: chroot terminal
+  // 3. KALI NETHUNTER: терминал chroot
   if (os === 'kali') {
     widget.innerHTML = `
       <div class="kali-terminal-widget">
-        <span class="k-prompt">root@kali-vayu:~#</span> ./nethunter_init.sh<br>
-        <span class="k-ok">[+]</span> chroot arm64: /data/local/nhsystem mounted<br>
-        <span class="k-ok">[+]</span> wlan0mon: monitor mode active<br>
-        <span class="k-dim">[sys] time ${timeStr} · kernel ${GameState.kernelVersion}</span>
+        <span class="k-prompt">root@kali:~#</span> nethunter --status<br>
+        <span class="k-ok">[+]</span> chroot arm64: /data/local/nhsystem<br>
+        <span class="k-ok">[+]</span> wlan0mon: monitor mode<br>
+        <span class="k-dim">[sys] ${hours}:${mins} · ${dateStr}</span>
       </div>
-      <div class="kali-banner">[ OFFENSIVE SECURITY PLATFORM ]</div>
+      <div class="kali-banner">KALI NETHUNTER</div>
     `;
     return;
   }
 
-  // 4. EVOLUTION X: Evolver gradient clock
+  // 4. EVOLUTION X: часы + подпись сборки
   if (os === 'evolution') {
     widget.innerHTML = `
-      <div class="ev-clock">${timeStr}</div>
-      <div class="ln-weekday" style="color:#b9a8ce;">${dateStr} • 21°C</div>
-      <span class="ev-tag">EVOLVER · NEBULA THEME</span>
-      <div class="hero-kernel-title" style="color:#8a7fa0;">${GameState.kernelVersion}</div>
+      <div class="ev-clock">${hours}:${mins}</div>
+      <div class="ln-weekday">${dateStr}</div>
+      <span class="ev-tag">Evolution X 8.5</span>
     `;
     return;
   }
 
-  // 5. LINEAGEOS: Trebuchet clock + Trust chip
+  // 5. LINEAGEOS: часы Trebuchet + Trust
   if (os === 'lineage') {
     widget.innerHTML = `
-      <div class="ln-widget-line">${timeStr}</div>
-      <div class="ln-weekday">${dateStr} • Ясно, 21°C</div>
+      <div class="ln-widget-line">${hours}:${mins}</div>
+      <div class="ln-weekday">${dateStr} · ${weather}</div>
       <div class="ln-trust-chip">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Trust: SELinux ${GameState.selinuxMode === 'enforcing' ? 'Enforcing' : 'Permissive'}
+        SELinux ${GameState.selinuxMode === 'enforcing' ? 'Enforcing' : 'Permissive'}
       </div>
-      <div class="hero-kernel-title" style="color:#5f807c;">${GameState.kernelVersion}</div>
     `;
     return;
   }
 
-  // 6. XIAOMI HYPEROS (default): big thin clock, weather + step chips
+  // 6. XIAOMI HYPEROS (по умолчанию): крупные тонкие часы, дата, погода и шаги
   widget.innerHTML = `
     <div class="hx-clock-line">${hours}<b>:</b>${mins}</div>
-    <div class="hx-date-line">${dateStr} • HyperOS</div>
+    <div class="hx-date-line">${dateStr}</div>
     <div class="hx-chip-row">
-      <span class="hx-chip">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>
-        6 420 шагов
-      </span>
-      <span class="hx-chip">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
-        21°C
-      </span>
+      <span class="hx-chip">${weather}</span>
+      <span class="hx-chip">6 420 шагов</span>
     </div>
-    <div class="hero-kernel-title" style="color:#6f86b8;">${GameState.kernelVersion}</div>
   `;
 }
 
@@ -1326,11 +1313,11 @@ function openFullscreenApp(appId) {
     body.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:12px;">
         <div style="background:#1e2538; padding:14px; border-radius:10px;">
-          <b>🎮 Game Turbo 120Hz</b>
+          <b>Game Turbo 120 Гц</b>
           <p style="color:#22c55e; font-size:12px; margin-top:4px;">Частота обновления дисплея зафиксирована на 120 Hz</p>
         </div>
         <div style="background:#1e2538; padding:14px; border-radius:10px;">
-          <b>⚡ Профиль CPU Overclock</b>
+          <b>Профиль CPU Overclock</b>
           <p style="color:#ff9900; font-size:12px; margin-top:4px;">${GameState.kernel === 'stormbreaker' ? 'Частота 3.2 GHz (StormBreaker Extreme)' : 'Частота 2.96 GHz (Standard)'}</p>
         </div>
       </div>
@@ -1340,11 +1327,11 @@ function openFullscreenApp(appId) {
     body.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:12px;">
         <div style="background:#0f172a; padding:14px; border-radius:10px; border:1px solid #0f766e;">
-          <b>🐉 NetHunter Chroot Terminal</b>
+          <b>NetHunter chroot</b>
           <p style="color:#00f2fe; font-size:12px; margin-top:4px;">Запустите Termux и введите 'nethunter' или 'nh' для входа в root chroot!</p>
         </div>
         <div style="background:#0f172a; padding:14px; border-radius:10px;">
-          <b>📶 Беспроводные атаки</b>
+          <b>Беспроводные адаптеры</b>
           <p style="color:#94a3b8; font-size:12px;">Драйверы Atheros / RTL8812AU загружены в ядро.</p>
         </div>
       </div>
@@ -1360,7 +1347,7 @@ function renderKernelSUApp(container) {
     container.innerHTML = `
       <div class="ksu-card">
         <div class="ksu-header-badge">
-          <div class="ksu-icon-big">👑</div>
+          <div class="ksu-icon-big"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
           <div>
             <b style="font-size:16px;">KernelSU</b>
             <div><span class="ksu-status-tag ${GameState.ksuWorking ? '' : 'not-installed'}">${GameState.ksuWorking ? 'Работает (LKM Kernel Mode)' : 'Не установлено'}</span></div>
@@ -1449,7 +1436,7 @@ function renderKernelSUApp(container) {
         content.innerHTML = activeList.map(m => `
           <div class="ksu-app-item">
             <div>
-              <b>🧩 ${m}</b>
+              <b>${m}</b>
               <div style="font-size:10px; color:#22c55e;">Модуль активен</div>
             </div>
             <span style="color:#22c55e; font-size:12px; font-weight:bold;">Вкл</span>
@@ -1467,7 +1454,7 @@ function renderMagiskApp(container) {
   container.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:14px;">
       <div style="background:#1b2336; border:1px solid #2d3b5c; border-radius:12px; padding:18px; text-align:center;">
-        <div style="font-size:38px;">🪄</div>
+        <div style="display:flex;justify-content:center;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8.5 14c1.5 1.6 5.5 1.6 7 0"/><circle cx="9" cy="10" r="1" fill="#38bdf8"/><circle cx="15" cy="10" r="1" fill="#38bdf8"/></svg></div>
         <b style="font-size:16px; display:block; margin-top:6px;">Magisk v27.0</b>
         <span style="color:#00e676; font-size:12px;">Установлен (Ramdisk Patch)</span>
       </div>
@@ -1485,7 +1472,7 @@ function renderMagiskApp(container) {
         <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
           ${Array.from(GameState.modules).map(m => `
             <div style="background:#243048; padding:10px; border-radius:8px; font-size:12px; display:flex; justify-content:space-between;">
-              <span>🛡️ ${m}</span>
+              <span>${m}</span>
               <span style="color:#00e676; font-weight:bold;">Активен</span>
             </div>
           `).join('') || '<div style="color:#888; font-size:12px;">(Нет активных модулей)</div>'}
@@ -1554,7 +1541,7 @@ function renderLsposedApp(container) {
   container.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:12px;">
       <div style="background:#1e1b4b; border:1px solid #4338ca; padding:16px; border-radius:12px; text-align:center;">
-        <div style="font-size:36px;">💉</div>
+        <div style="display:flex;justify-content:center;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="12" x2="4" y2="8"/><line x1="8" y1="16" x2="8" y2="4"/><line x1="12" y1="14" x2="12" y2="6"/><line x1="16" y1="18" x2="16" y2="3"/><line x1="20" y1="13" x2="20" y2="7"/></svg></div>
         <b style="font-size:16px; display:block; margin-top:4px;">LSPosed v1.9.2</b>
         <span style="color:#22c55e; font-size:12px;">Zygote Hooking Active</span>
       </div>
@@ -1595,10 +1582,10 @@ function renderPubgApp(container) {
   container.innerHTML = `
     <div class="pubg-game-wrapper">
       <div class="pubg-hud-bar">
-        <div>❤️ HP: <b id="pubg-hp-val" style="color:#00e676;">100%</b></div>
-        <div>💀 Очки: <b id="pubg-score-val" style="color:#f59e0b;">0</b></div>
-        <div>⚡ <span id="pubg-fps-indicator" style="color:#38bdf8; font-weight:bold;">${maxFps} FPS</span></div>
-        <div>🌡️ <span id="pubg-temp-val" style="color:#ef4444;">${GameState.cpuTemp.toFixed(1)}°C</span></div>
+        <div>HP: <b id="pubg-hp-val" style="color:#00e676;">100%</b></div>
+        <div>Очки: <b id="pubg-score-val" style="color:#f59e0b;">0</b></div>
+        <div><span id="pubg-fps-indicator" style="color:#38bdf8; font-weight:bold;">${maxFps} FPS</span></div>
+        <div><span id="pubg-temp-val" style="color:#ef4444;">${GameState.cpuTemp.toFixed(1)}°C</span></div>
       </div>
 
       <div class="pubg-canvas-frame">
@@ -1627,7 +1614,7 @@ function renderPubgApp(container) {
         </div>
 
         <button class="pubg-fire-btn" id="btn-pubg-fire">
-          🔥 ОГОНЬ
+          ОГОНЬ
         </button>
       </div>
     </div>
@@ -1991,7 +1978,7 @@ function renderFkmApp(container) {
               </div>
             </div>
             <div class="settings-tile ${GameState.cpuFreq === 3.20 ? 'active' : ''}" data-freq="3.2" style="border-color:#ef4444; background:rgba(239,68,68,0.1);">
-              <div class="settings-tile-title" style="color:#ef4444;">⚡ 3.20 GHz Extreme OC (StormBreaker)</div>
+              <div class="settings-tile-title" style="color:#ef4444;">3.20 GHz Extreme OC (StormBreaker)</div>
               <div class="settings-tile-sub">Максимальный оверклок для 120 FPS в PUBG и рекорда AnTuTu</div>
             </div>
           </div>
@@ -2021,7 +2008,7 @@ function renderFkmApp(container) {
         </div>
 
         <button id="btn-apply-fkm" class="rec-big-btn success" style="margin-top:6px;">
-          💾 Применить настройки ядра
+          Применить настройки ядра
         </button>
       </div>
     `;
@@ -2053,7 +2040,7 @@ function renderFkmApp(container) {
     document.getElementById('btn-apply-fkm').onclick = () => {
       sounds.bootChime();
       sounds.vibrate(60);
-      alert(`⚡ FKM: Параметры ядра успешно сохранены!\nCPU: ${GameState.cpuFreq.toFixed(2)} GHz\nGPU: ${GameState.gpuFreq} MHz\nGovernor: ${GameState.cpuGovernor}\n\nPUBG и AnTuTu работают на максимальной производительности!`);
+      alert(`FKM: Параметры ядра успешно сохранены!\nCPU: ${GameState.cpuFreq.toFixed(2)} GHz\nGPU: ${GameState.gpuFreq} MHz\nGovernor: ${GameState.cpuGovernor}\n\nPUBG и AnTuTu работают на максимальной производительности!`);
       if (GameState.cpuFreq >= 3.20) {
         checkQuest('fps120');
       }
@@ -2372,7 +2359,7 @@ function renderMtManagerApp(container) {
     container.innerHTML = `
       <div style="display:flex; flex-direction:column; height:100%;">
         <div style="display:flex; align-items:center; gap:8px; background:#0d131f; padding:8px 12px; border-radius:8px; border:1px solid #1e293b; font-family:var(--font-mono); font-size:12px; color:#38bdf8; margin-bottom:10px;">
-          <span>📂</span>
+          <span style="display:flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
           <span style="flex:1;">${currentDir}</span>
           ${currentDir !== '/' ? `<button id="btn-mt-up" style="background:#1e293b; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:11px; cursor:pointer;">▲ Вверх</button>` : ''}
         </div>
@@ -2419,36 +2406,36 @@ function renderMtManagerApp(container) {
     let items = [];
     if (currentDir === '/') {
       items = [
-        { name: 'sdcard', type: 'dir', icon: '📁' },
-        { name: 'system', type: 'dir', icon: '📁' },
-        { name: 'data', type: 'dir', icon: '📁' },
-        { name: 'vendor', type: 'dir', icon: '📁' }
+        { name: 'sdcard', type: 'dir' },
+        { name: 'system', type: 'dir' },
+        { name: 'data', type: 'dir' },
+        { name: 'vendor', type: 'dir' }
       ];
     } else if (currentDir === '/system') {
       items = [
-        { name: 'bin', type: 'dir', icon: '📁' },
-        { name: 'etc', type: 'dir', icon: '📁' },
-        { name: 'lib64', type: 'dir', icon: '📁' },
-        { name: 'build.prop', type: 'file', icon: '📄', sub: 'Редактор свойств системы' }
+        { name: 'bin', type: 'dir' },
+        { name: 'etc', type: 'dir' },
+        { name: 'lib64', type: 'dir' },
+        { name: 'build.prop', type: 'file', sub: 'Редактор свойств системы' }
       ];
     } else if (currentDir === '/sdcard') {
       items = [
-        { name: 'Download', type: 'dir', icon: '📁' },
-        { name: 'TWRP', type: 'dir', icon: '📁' },
-        { name: 'Android', type: 'dir', icon: '📁' },
-        { name: 'recovery.log', type: 'file', icon: '📋' }
+        { name: 'Download', type: 'dir' },
+        { name: 'TWRP', type: 'dir' },
+        { name: 'Android', type: 'dir' },
+        { name: 'recovery.log', type: 'file' }
       ];
     } else {
       items = [
-        { name: 'app', type: 'dir', icon: '📁' },
-        { name: 'adb', type: 'dir', icon: '📁' }
+        { name: 'app', type: 'dir' },
+        { name: 'adb', type: 'dir' }
       ];
     }
 
     return items.map(item => `
       <div class="mt-file-row" data-type="${item.type}" data-name="${item.name}">
         <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:16px;">${item.icon}</span>
+          <span style="display:flex;color:#5b6b82;">${item.type === 'dir' ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>' : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>'}</span>
           <div>
             <div style="font-weight:700; color:${item.name === 'build.prop' ? '#00f2fe' : '#fff'}; font-size:12px;">${item.name}</div>
             ${item.sub ? `<div style="font-size:10px; color:#888;">${item.sub}</div>` : ''}
@@ -2474,7 +2461,7 @@ function renderMtManagerApp(container) {
         <textarea id="mt-editor-input" class="mt-editor-box">${textContent}</textarea>
 
         <button id="btn-mt-save" class="rec-big-btn success">
-          💾 Сохранить изменения и обновить свойства
+          Сохранить изменения и обновить свойства
         </button>
       </div>
     `;
@@ -2501,7 +2488,7 @@ function renderMtManagerApp(container) {
           }
         }
       });
-      alert(`🎉 build.prop сохранен!\nМодель устройства теперь: ${GameState.model}\nСвойства системы обновлены.`);
+      alert(`build.prop сохранен!\nМодель устройства теперь: ${GameState.model}\nСвойства системы обновлены.`);
       isEditingBuildProp = false;
       render();
     };
@@ -2972,7 +2959,7 @@ function renderSettingsApp(container) {
     setTitle('Батарея и питание');
     const gauge = `<div class="st-gauge">
       <div class="st-gauge-num">${GameState.battery}%</div>
-      <div class="st-gauge-label">${GameState.usbConnected ? '⚡ Mi Turbo Charge 33W • зарядка идёт' : '≈ 19 ч 45 мин работы'}</div>
+      <div class="st-gauge-label">${GameState.usbConnected ? 'Mi Turbo Charge 33W • зарядка идёт' : '≈ 19 ч 45 мин работы'}</div>
       <div class="st-gauge-meta">
         <span>Здоровье: <b style="color:#21c46a">98%</b></span>
         <span>Ёмкость: <b>5 160 мАч</b></span>
@@ -3030,7 +3017,7 @@ function renderSettingsApp(container) {
       ${trustBlock}${kaliBlock}
       ${section('Аттестация устройства',
         row({ icon: 'badge', title: 'Google Play Protect', sub: 'Устройство сертифицировано Google', value: 'CERTIFIED', chev: false, ico: '#22c55e' })
-        + row({ icon: 'shield', title: 'Play Integrity API', sub: `BASIC ✅ • DEVICE ✅ • STRONG ${strong ? '✅' : '⚠️'}`, value: strong ? 'STRONG' : 'BASIC', chev: false, ico: '#a855f7' })
+        + row({ icon: 'shield', title: 'Play Integrity API', sub: `BASIC да · DEVICE да · STRONG ${strong ? 'да' : 'нет'}`, value: strong ? 'STRONG' : 'BASIC', chev: false, ico: '#a855f7' })
       )}
       ${section('Root-подсистема',
         row({ icon: 'key', title: 'KernelSU', sub: GameState.ksuWorking ? 'v0.9.5 • перехват в ядре Linux' : 'Не обнаружен в ядре', value: GameState.ksuWorking ? 'WORKING' : 'OFF', chev: false, ico: '#22c55e' })
@@ -3091,17 +3078,17 @@ function renderSettingsApp(container) {
   function renderEasterEggView() {
     setTitle('Easter Egg');
     const egg = {
-      hyperos: ['🐰', 'Mitu нашёл пасхалку', 'HyperOS прячет кролика Mitu — он уже починил этот Android.'],
-      pixel: ['🚀', 'Android 14', 'UpsideDownCake • Space Rocket Mission. Пасхалка Pixel найдена.'],
-      lineage: ['🛡️', 'LineageOS Trust', 'Никакой слежки: пасхалка осталась в открытом коде.'],
-      crdroid: ['🎮', 'crDroid 120 FPS', 'Gaming-пасхалка: 120 кадров и ни одного троттлинга.'],
-      evolution: ['🌌', 'Evolver Nebula', 'Тема Nebula активна. Кастомизация дошла до космоса.'],
-      kali: ['🐉', 'Kali NetHunter', 'root@kali-vayu:~# flag{egg_found} — доступ получен.']
-    }[theme] || ['🤖', 'Android 14', 'Пасхалка найдена.'];
+      hyperos: ['HyperOS', 'Mitu нашёл пасхалку', 'HyperOS прячет кролика Mitu — он уже починил этот Android.'],
+      pixel: ['Android 14', 'Android 14', 'UpsideDownCake • Space Rocket Mission. Пасхалка Pixel найдена.'],
+      lineage: ['Trust', 'LineageOS Trust', 'Никакой слежки: пасхалка осталась в открытом коде.'],
+      crdroid: ['120 FPS', 'crDroid 120 FPS', 'Gaming-пасхалка: 120 кадров и ни одного троттлинга.'],
+      evolution: ['Evolver', 'Evolver Nebula', 'Тема Nebula активна. Кастомизация дошла до космоса.'],
+      kali: ['root', 'Kali NetHunter', 'root@kali-vayu:~# flag{egg_found} — доступ получен.']
+    }[theme] || ['Android', 'Android 14', 'Пасхалка найдена.'];
 
     wrap(`
       ${hero('heart', egg[1], egg[2])}
-      <div style="text-align:center;font-size:64px;margin:4px 0 18px;">${egg[0]}</div>
+      <div style="text-align:center;font-size:20px;font-weight:600;letter-spacing:1px;margin:4px 0 18px;opacity:.75;">${egg[0]}</div>
       ${section('', row({ icon: 'info', title: 'Секрет разблокирован', sub: 'Продолжайте моддить — но делайте бэкапы.', nav: 'about', chev: false, ico: '#f59e0b' }))}
     `);
   }
@@ -3154,7 +3141,7 @@ function renderSettingsApp(container) {
     if (el.dataset.hz) {
       sounds.click(); sounds.vibrate(20);
       GameState.displayRefreshRate = parseInt(el.dataset.hz, 10);
-      UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
+      UI.osFpsBadge.textContent = `${GameState.displayRefreshRate}`;
       render();
       return;
     }
@@ -3164,7 +3151,7 @@ function renderSettingsApp(container) {
       GameState.perfProfile = el.dataset.perf;
       if (GameState.perfProfile === 'performance') GameState.displayRefreshRate = 120;
       if (GameState.perfProfile === 'powersave') GameState.displayRefreshRate = 60;
-      UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
+      UI.osFpsBadge.textContent = `${GameState.displayRefreshRate}`;
       render();
       return;
     }
@@ -3183,7 +3170,7 @@ function renderSettingsApp(container) {
         sounds.vibrate(20);
         GameState.forcePeakRefreshRate = !GameState.forcePeakRefreshRate;
         if (GameState.forcePeakRefreshRate) GameState.displayRefreshRate = 120;
-        UI.osFpsBadge.textContent = `${GameState.displayRefreshRate} Hz`;
+        UI.osFpsBadge.textContent = `${GameState.displayRefreshRate}`;
         render();
         break;
       case 'toggle-color':
@@ -3269,8 +3256,8 @@ function renderSettingsApp(container) {
           GameState.developerUnlocked = true;
           sounds.bootChime();
           sounds.vibrate(150);
-          if (hint) hint.textContent = '🎉 Режим разработчика активирован!';
-          alert('🎉 Меню «Для разработчиков» разблокировано.');
+          if (hint) hint.textContent = 'Режим разработчика активирован!';
+          alert('Меню «Для разработчиков» разблокировано.');
         }
         break;
       }
@@ -3292,12 +3279,12 @@ function renderSettingsApp(container) {
         break;
       case 'wipe-dalvik':
         sounds.vibrate(30);
-        alert('🧹 Dalvik / ART Cache очищен. Кэш приложений сброшен.');
+        alert('Dalvik / ART Cache очищен. Кэш приложений сброшен.');
         break;
       case 'factory-reset':
         sounds.errorTone();
         sounds.vibrate(60);
-        if (confirm('⚠️ ВНИМАНИЕ! Это сотрёт все данные пользователя (/data) и настройки. Продолжить?')) {
+        if (confirm('ВНИМАНИЕ! Это сотрёт все данные пользователя (/data) и настройки. Продолжить?')) {
           GameState.phoneStorage.clear();
           GameState.modules.clear();
           closeFullscreenApp(true);
@@ -3322,7 +3309,7 @@ Type 'su' or 'ksu' to request root permissions.
       <div style="display:flex; gap:8px;">
         <span id="termux-prompt" style="font-family:monospace; font-size:13px; color:#00f2fe; align-self:center;">$</span>
         <input type="text" id="termux-input" style="flex:1; background:#111; border:1px solid #333; color:#fff; font-family:monospace; font-size:12px; padding:8px 10px; border-radius:6px;" placeholder="help, neofetch, su, ls, free, uname" autocomplete="off">
-        <button id="termux-btn-send" style="background:#238636; color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer;">↵</button>
+        <button id="termux-btn-send" style="background:#238636; color:#fff; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer;">OK</button>
       </div>
       <div style="display:flex; gap:6px; margin-top:8px; overflow-x:auto;">
         <button class="q-btn" data-tcmd="help">help</button>
@@ -3523,7 +3510,7 @@ function renderBankApp(container) {
 
   container.innerHTML = `
     <div style="text-align:center; padding:20px 10px;">
-      <div style="font-size:46px; margin-bottom:8px;">🏦</div>
+      <div style="display:flex;justify-content:center;margin-bottom:10px;"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M5 10V6l7-3 7 3v4M5 10v9M19 10v9M3 19h18M9 19v-5h6v5"/></svg></div>
       <h3 style="font-size:18px;">СберБанк Онлайн</h3>
       <p style="font-size:12px; color:#888;">Проверка безопасности Google Play Integrity...</p>
       <div id="bank-result-box" style="margin-top:20px; padding:16px; border-radius:12px; text-align:left;">
@@ -3541,7 +3528,7 @@ function renderBankApp(container) {
       box.style.background = '#064e3b';
       box.style.border = '1px solid #059669';
       box.innerHTML = `
-        <b style="color:#34d399; font-size:14px;">✅ Безопасность подтверждена!</b>
+        <b style="color:#34d399; font-size:14px;">Безопасность подтверждена</b>
         <p style="font-size:12px; margin-top:6px; color:#d1fae5;">
           • MEETS_DEVICE_INTEGRITY: true<br>
           • MEETS_BASIC_INTEGRITY: true<br>
@@ -3558,7 +3545,7 @@ function renderBankApp(container) {
       box.style.background = '#450a0a';
       box.style.border = '1px solid #dc2626';
       box.innerHTML = `
-        <b style="color:#f87171; font-size:14px;">❌ Вход заблокирован (Угроза безопасности)!</b>
+        <b style="color:#f87171; font-size:14px;">Вход заблокирован: угроза безопасности</b>
         <p style="font-size:12px; margin-top:6px; color:#fecaca;">
           Обнаружен Root или разблокированный Bootloader!<br>
           Play Integrity: FAILED (NO_INTEGRITY)<br><br>
@@ -3575,7 +3562,7 @@ function renderBankApp(container) {
 function renderAntutuApp(container) {
   container.innerHTML = `
     <div style="text-align:center; padding:16px;">
-      <div style="font-size:42px;">🔥</div>
+      
       <h3 style="font-size:18px;">AnTuTu Benchmark v10</h3>
       <p style="font-size:12px; color:#888;">Тестирование производительности Snapdragon 860</p>
 
@@ -3634,7 +3621,7 @@ function renderAntutuApp(container) {
 
         if (GameState.antutuScore > 1000000) {
           checkQuest('antutu_record');
-          alert(`🔥 Рекорд! ${GameState.antutuScore.toLocaleString()} баллов! Процессор разогнан на кастомном ядре!`);
+          alert(`Рекорд! ${GameState.antutuScore.toLocaleString()} баллов! Процессор разогнан на кастомном ядре!`);
         }
       }
     }, 700);
